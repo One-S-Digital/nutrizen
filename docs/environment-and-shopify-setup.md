@@ -109,7 +109,7 @@ Each referenced product must be published and have at least one **variant** (the
 The product template (`/products/[handle]`) can render two blocks below the hero:
 
 1. **Three-column info strip** — Reviews, Ingredients, Directions & usage (each column hides if that content is missing).
-2. **“How you’ll feel” timeline** — Stepper + detail card (hidden if no milestones).
+2. **”How you’ll feel” timeline** — Stepper + detail card (hidden if no milestones).
 
 All content is loaded from **product metafields** and **metaobject** entries referenced by those metafields. Enable **Storefront API** on every definition below.
 
@@ -155,13 +155,114 @@ Aliases: `heading` for `card_title`; `description` / `body` for `card_descriptio
 
 After creating definitions, add entries in **Content → Metaobjects**, then select those entries on each product’s `ingredients_detailed` and `timeline_items` metafields.
 
-### Previewing in mock mode (no Shopify credentials)
+---
+
+## 4c. Product page — express shipping & trust badges
+
+The PDP always displays a static **express shipping banner** directly below the product description (no metafield required — it reflects a store-wide fulfilment policy).
+
+**Trust badges** appear below the shipping banner when a product has the `custom.trust_badges` metafield set. Each badge becomes a pill chip with a checkmark icon.
+
+| Namespace | Key | Type | Purpose |
+|-----------|-----|------|---------|
+| `custom` | `trust_badges` | Multi-line text | One badge label per line (e.g. “Halal Certified”, “GMO Free”). Hidden if blank. |
+
+Example value for `trust_badges`:
+```
+Halal Certified
+GMO Free
+No Artificial Fillers
+Bioavailable Forms
+```
+
+---
+
+## 4d. Product page — FAQ section
+
+An accordion FAQ section renders below the wellness timeline when `custom.faq_items` is populated.
+
+### Product metafield
+
+| Namespace | Key | Type | Purpose |
+|-----------|-----|------|---------|
+| `custom` | `faq_items` | **List of metaobject references** | Ordered FAQ entries — see metaobject definition below. Up to 20 items. |
+
+### Metaobject type: FAQ item (for `faq_items`)
+
+Create a **Metaobject definition** (recommended handle: `faq_item`). Add fields:
+
+| Field key | Type | Purpose |
+|-----------|------|---------|
+| `question` | Single line text (required) | The question shown in the accordion header. |
+| `answer` | Multi-line text (required) | The answer revealed when expanded. |
+
+Aliases supported: `q` for `question`; `a` / `body` for `answer`.
+
+Steps:
+1. Create the `faq_item` metaobject definition in **Settings → Custom data → Metaobjects**.
+2. Add FAQ entries in **Content → Metaobjects**.
+3. Create the `custom.faq_items` product metafield definition as **List of metaobject references** pointing to `faq_item`.
+4. Enable **Storefront API** access on the metafield and the metaobject definition.
+5. On each product, assign the relevant FAQ entries to the `faq_items` metafield.
+
+---
+
+## 4e. Product page — reviews section
+
+A full reviews section (average score, star breakdown, review cards, “load more”) renders below the FAQ section when `custom.product_reviews` is populated.
+
+> **Note:** This uses product metafields for reviews — not Shopify’s native Product Reviews app. If you want to use an external reviews app (e.g. Judge.me, Yotpo), replace the `ProductReviewsSection` component with the app’s embed and remove the `product_reviews` metafield.
+
+### Product metafield
+
+| Namespace | Key | Type | Purpose |
+|-----------|-----|------|---------|
+| `custom` | `product_reviews` | **List of metaobject references** | Individual customer reviews. Up to 50 items. |
+
+### Metaobject type: product review (for `product_reviews`)
+
+Create a **Metaobject definition** (recommended handle: `product_review`). Add fields:
+
+| Field key | Type | Purpose |
+|-----------|------|---------|
+| `rating` | Integer (1–5) | Star rating. Defaults to 5 if missing or out of range. |
+| `author` | Single line text (required) | Reviewer display name. |
+| `date` | Single line text | ISO date string, e.g. `2024-11-03`. Displayed formatted. Optional. |
+| `body` | Multi-line text (required) | Review body text. |
+
+Aliases supported: `name` for `author`; `review` / `text` for `body`; `review_date` for `date`.
+
+Steps:
+1. Create the `product_review` metaobject definition in **Settings → Custom data → Metaobjects**.
+2. Add review entries in **Content → Metaobjects**.
+3. Create the `custom.product_reviews` product metafield definition as **List of metaobject references** pointing to `product_review`.
+4. Enable **Storefront API** access on both definitions.
+5. On each product, assign the review entries to the `product_reviews` metafield.
+
+The UI shows **6 reviews** by default with a **Load more** button for the rest.
+
+---
+
+## 4f. Previewing all sections in mock mode
 
 When the app uses the **mock catalog** (local `next dev` or Vercel Preview with mock mode), open:
 
 **`/products/vitacore`**
 
-That mock product includes sample **featured review**, **ingredient pills**, **directions** (summary + full text), **timeline** (four steps), plus bundle and frequently-bought-together rows so you can review layout end-to-end.
+That mock product includes sample data for every PDP section:
+
+| Section | Mock data |
+|---------|-----------|
+| Featured review | Single quote + author |
+| Ingredient pills | 5 ingredients |
+| Directions | Summary + full text |
+| Wellness timeline | 4 steps |
+| Express shipping | Always shown (static) |
+| Trust badges | 4 badges |
+| FAQ | 5 questions |
+| Reviews | 5 reviews with star ratings |
+| Bundle & save | 2 products |
+| Frequently bought together | 2 products |
 
 ---
 
@@ -172,6 +273,9 @@ That mock product includes sample **featured review**, **ingredient pills**, **d
 - [ ] Products/collections published to the channel the API can read.
 - [ ] Optional: `custom.bundle_products` and `custom.frequently_bought_together` defined with **Storefront** access.
 - [ ] Optional: Editorial metafields and metaobjects from [§4b](#4b-product-page--editorial-sections-info-strip--timeline) for the info strip and timeline.
+- [ ] Optional: `custom.trust_badges` (multi-line text) for trust badge pills — see [§4c](#4c-product-page--express-shipping--trust-badges).
+- [ ] Optional: `custom.faq_items` + `faq_item` metaobject definition — see [§4d](#4d-product-page--faq-section).
+- [ ] Optional: `custom.product_reviews` + `product_review` metaobject definition — see [§4e](#4e-product-page--reviews-section).
 - [ ] Production env vars configured on the hosting provider.
 - [ ] Optional: `SHOPIFY_USE_MOCK=false` in development/preview if you want to test against a real store.
 
@@ -184,10 +288,12 @@ That mock product includes sample **featured review**, **ingredient pills**, **d
 | `.env.example` | Template for local env vars. |
 | `src/lib/shopify.ts` | Storefront GraphQL client, queries, `shopifyFetch`. |
 | `src/lib/shopify-mode.ts` | Mock vs live decision. |
-| `src/lib/shopify-mock.ts` | Local/preview mock catalog (includes full PDP editorial demo on `vitacore`). |
-| `src/lib/shopify-pdp-meta.ts` | Parsers for ingredient and timeline metaobjects. |
-| `src/components/product/ProductInfoStrip.tsx` | Reviews / ingredients / directions UI. |
-| `src/components/product/WellnessTimelineSection.tsx` | “How you’ll feel” timeline UI. |
+| `src/lib/shopify-mock.ts` | Local/preview mock catalog (includes full PDP demo on `vitacore`). |
+| `src/lib/shopify-pdp-meta.ts` | Parsers for all PDP metaobjects (ingredients, timeline, FAQ, reviews). |
+| `src/components/product/ProductInfoStrip.tsx` | Reviews / ingredients / directions info strip. |
+| `src/components/product/WellnessTimelineSection.tsx` | “How you’ll feel” timeline. |
+| `src/components/product/ProductFaqSection.tsx` | FAQ accordion section. |
+| `src/components/product/ProductReviewsSection.tsx` | Full reviews section with rating breakdown. |
 | `next.config.ts` | Image remote patterns for Shopify CDN. |
 
 For questions about Storefront API scopes and metafield types, use [Shopify’s Storefront API documentation](https://shopify.dev/docs/api/storefront) and your store’s **Custom data** screens.

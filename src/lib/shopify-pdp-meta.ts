@@ -88,3 +88,58 @@ export function parseTimelineReferences(
   out.sort((a, b) => a.stepNumber - b.stepNumber);
   return out;
 }
+
+export type PdpFaqItem = {
+  question: string;
+  answer: string;
+};
+
+export type PdpProductReview = {
+  rating: number;
+  author: string;
+  date: string | null;
+  body: string;
+};
+
+export function parseFaqMetaobject(map: Record<string, string>): PdpFaqItem | null {
+  const question = map.question?.trim() || map.q?.trim();
+  const answer = map.answer?.trim() || map.a?.trim() || map.body?.trim();
+  if (!question || !answer) return null;
+  return { question, answer };
+}
+
+export function parseReviewMetaobject(map: Record<string, string>): PdpProductReview | null {
+  const author = map.author?.trim() || map.name?.trim();
+  const body = map.body?.trim() || map.review?.trim() || map.text?.trim();
+  if (!author || !body) return null;
+  const rawRating = parseInt(map.rating ?? "5", 10);
+  const rating = Number.isFinite(rawRating) && rawRating >= 1 && rawRating <= 5 ? rawRating : 5;
+  const date = map.date?.trim() || map.review_date?.trim() || null;
+  return { rating, author, date, body };
+}
+
+export function parseFaqReferences(
+  edges: { node: MetaobjectNode | null }[] | undefined,
+): PdpFaqItem[] {
+  if (!edges?.length) return [];
+  const out: PdpFaqItem[] = [];
+  for (const e of edges) {
+    const map = metaobjectFieldsToMap(e.node?.fields ?? undefined);
+    const row = parseFaqMetaobject(map);
+    if (row) out.push(row);
+  }
+  return out;
+}
+
+export function parseReviewReferences(
+  edges: { node: MetaobjectNode | null }[] | undefined,
+): PdpProductReview[] {
+  if (!edges?.length) return [];
+  const out: PdpProductReview[] = [];
+  for (const e of edges) {
+    const map = metaobjectFieldsToMap(e.node?.fields ?? undefined);
+    const row = parseReviewMetaobject(map);
+    if (row) out.push(row);
+  }
+  return out;
+}

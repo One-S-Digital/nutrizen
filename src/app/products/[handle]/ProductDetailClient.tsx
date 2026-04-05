@@ -12,6 +12,8 @@ import { BundleSaveSection } from "@/components/product/BundleSaveSection";
 import { FrequentlyBoughtTogetherSection } from "@/components/product/FrequentlyBoughtTogetherSection";
 import { ProductInfoStrip } from "@/components/product/ProductInfoStrip";
 import { WellnessTimelineSection } from "@/components/product/WellnessTimelineSection";
+import { ProductFaqSection } from "@/components/product/ProductFaqSection";
+import { ProductReviewsSection } from "@/components/product/ProductReviewsSection";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -92,6 +94,9 @@ export default function ProductDetailClient({ product }: Props) {
     Boolean(product.directionsSummary?.trim()) ||
     Boolean(product.directionsFull?.trim());
   const showTimeline = product.timelineItems.length > 0;
+  const showBadges = product.trustBadges.length > 0;
+  const showFaq = product.faqItems.length > 0;
+  const showReviews = product.productReviews.length > 0;
 
   return (
     <div className="min-h-screen bg-background-main pb-24 pt-10">
@@ -163,7 +168,57 @@ export default function ProductDetailClient({ product }: Props) {
                 ) : null}
               </div>
 
-              <p className="mb-8 text-lg leading-relaxed text-neutral-dark">{product.description}</p>
+              <p className="mb-6 text-lg leading-relaxed text-neutral-dark">{product.description}</p>
+
+              {/* Express shipping */}
+              <div className="mb-4 flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-neutral-darkest">
+                <svg
+                  className="h-5 w-5 shrink-0 text-primary"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <rect x="1" y="3" width="15" height="13" rx="2" />
+                  <path d="M16 8h4l3 5v3h-7V8z" />
+                  <circle cx="5.5" cy="18.5" r="2.5" />
+                  <circle cx="18.5" cy="18.5" r="2.5" />
+                </svg>
+                <span>
+                  <span className="font-semibold">Express shipping available</span> — shipped through priority express
+                </span>
+              </div>
+
+              {/* Trust badges */}
+              {showBadges ? (
+                <div className="mb-8 flex flex-wrap gap-2">
+                  {product.trustBadges.map((badge, i) => (
+                    <span
+                      key={i}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-neutral-darkest"
+                    >
+                      <svg
+                        className="h-3.5 w-3.5 shrink-0 text-primary"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden
+                      >
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                      </svg>
+                      {badge}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
 
               {showVariantPicker ? (
                 <div className="mb-8">
@@ -271,7 +326,7 @@ export default function ProductDetailClient({ product }: Props) {
           </div>
         </div>
 
-        {(showEditorialStrip || showTimeline) && (
+        {(showEditorialStrip || showTimeline || showFaq || showReviews) && (
           <div className="mt-16 space-y-16 pb-4">
             {showEditorialStrip ? (
               <ProductInfoStrip
@@ -282,6 +337,8 @@ export default function ProductDetailClient({ product }: Props) {
               />
             ) : null}
             {showTimeline ? <WellnessTimelineSection items={product.timelineItems} /> : null}
+            {showFaq ? <ProductFaqSection items={product.faqItems} /> : null}
+            {showReviews ? <ProductReviewsSection reviews={product.productReviews} /> : null}
           </div>
         )}
 

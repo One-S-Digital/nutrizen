@@ -2,9 +2,13 @@ import { formatPrice } from "@/lib/formatPrice";
 import {
   parseIngredientReferences,
   parseTimelineReferences,
+  parseFaqReferences,
+  parseReviewReferences,
   type PdpFeaturedReview,
   type PdpIngredientEntry,
   type PdpTimelineMilestone,
+  type PdpFaqItem,
+  type PdpProductReview,
 } from "@/lib/shopify-pdp-meta";
 import {
   referencedProductsFromMetafield,
@@ -668,10 +672,16 @@ export type ProductDetail = {
   directionsFull: string | null;
   /** Journey milestones (metaobject list custom.timeline_items). */
   timelineItems: PdpTimelineMilestone[];
+  /** Trust badges shown below description (custom.trust_badges — multi-line, one per line). */
+  trustBadges: string[];
+  /** FAQ accordion items (metaobject list custom.faq_items). */
+  faqItems: PdpFaqItem[];
+  /** Customer reviews (metaobject list custom.product_reviews). */
+  productReviews: PdpProductReview[];
 };
 
 export type { ProductVariantSummary, ReferencedProductSummary } from "@/lib/shopify-referenced-products";
-export type { PdpFeaturedReview, PdpIngredientEntry, PdpTimelineMilestone } from "@/lib/shopify-pdp-meta";
+export type { PdpFeaturedReview, PdpIngredientEntry, PdpTimelineMilestone, PdpFaqItem, PdpProductReview } from "@/lib/shopify-pdp-meta";
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
@@ -707,6 +717,9 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
       directionsSummary: m.directionsSummary,
       directionsFull: m.directionsFull,
       timelineItems: m.timelineItems,
+      trustBadges: m.trustBadges,
+      faqItems: m.faqItems,
+      productReviews: m.productReviews,
     };
   }
 
@@ -862,6 +875,37 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
             }
           }
         }
+        trust_badges: metafield(namespace: "custom", key: "trust_badges") {
+          value
+        }
+        faq_items: metafield(namespace: "custom", key: "faq_items") {
+          references(first: 20) {
+            edges {
+              node {
+                ... on Metaobject {
+                  fields {
+                    key
+                    value
+                  }
+                }
+              }
+            }
+          }
+        }
+        product_reviews: metafield(namespace: "custom", key: "product_reviews") {
+          references(first: 50) {
+            edges {
+              node {
+                ... on Metaobject {
+                  fields {
+                    key
+                    value
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   `;
@@ -908,6 +952,17 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
                 edges: { node: { fields: { key: string; value: string | null }[] } | null }[];
               } | null;
             } | null;
+            trust_badges: { value: string } | null;
+            faq_items: {
+              references: {
+                edges: { node: { fields: { key: string; value: string | null }[] } | null }[];
+              } | null;
+            } | null;
+            product_reviews: {
+              references: {
+                edges: { node: { fields: { key: string; value: string | null }[] } | null }[];
+              } | null;
+            } | null;
           } | null;
         }
       | undefined;
@@ -950,6 +1005,17 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
           } | null;
         } | null;
         timeline_items: {
+          references: {
+            edges: { node: { fields: { key: string; value: string | null }[] } | null }[];
+          } | null;
+        } | null;
+        trust_badges: { value: string } | null;
+        faq_items: {
+          references: {
+            edges: { node: { fields: { key: string; value: string | null }[] } | null }[];
+          } | null;
+        } | null;
+        product_reviews: {
           references: {
             edges: { node: { fields: { key: string; value: string | null }[] } | null }[];
           } | null;
@@ -1002,6 +1068,13 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
   const directionsFull = p.directions_full?.value?.trim() ?? null;
   const timelineItems = parseTimelineReferences(p.timeline_items?.references?.edges);
 
+  const rawBadges = p.trust_badges?.value?.trim() ?? "";
+  const trustBadges = rawBadges
+    ? rawBadges.split(/\n+/).map((s) => s.trim()).filter(Boolean)
+    : [];
+  const faqItems = parseFaqReferences(p.faq_items?.references?.edges);
+  const productReviews = parseReviewReferences(p.product_reviews?.references?.edges);
+
   return {
     id: p.id,
     title: p.title,
@@ -1024,5 +1097,8 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
     directionsSummary,
     directionsFull,
     timelineItems,
+    trustBadges,
+    faqItems,
+    productReviews,
   };
 }

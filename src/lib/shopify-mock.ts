@@ -4,6 +4,8 @@ import type {
   PdpFeaturedReview,
   PdpIngredientEntry,
   PdpTimelineMilestone,
+  PdpFaqItem,
+  PdpProductReview,
 } from "@/lib/shopify-pdp-meta";
 import type {
   ProductVariantSummary,
@@ -414,6 +416,74 @@ export function getMockCollectionByHandle(handle: string): CollectionPageData | 
   };
 }
 
+const VITACORE_TRUST_BADGES: string[] = [
+  "Halal Certified",
+  "GMO Free",
+  "No Artificial Fillers",
+  "Bioavailable Forms",
+];
+
+const VITACORE_FAQ: PdpFaqItem[] = [
+  {
+    question: "What is VitaCore Daily and what does it contain?",
+    answer:
+      "VitaCore Daily is a comprehensive multi-nutrient supplement formulated to fill everyday dietary gaps. It combines key vitamins, minerals, and botanical co-factors in their most bioavailable forms — no megadoses, no unnecessary fillers.",
+  },
+  {
+    question: "What are the health benefits of VitaCore Daily?",
+    answer:
+      "Regular use supports steady energy metabolism, immune function, healthy skin and hair, and balanced mood. The formula is designed to complement a whole-food diet rather than replace it.",
+  },
+  {
+    question: "How often should I use VitaCore Daily and how do I apply it?",
+    answer:
+      "Take two capsules daily with a meal. For best absorption, pair with a source of healthy fat. Consistency matters — daily use over weeks is when you start to notice the difference.",
+  },
+  {
+    question: "How long before I can see results from taking VitaCore Daily?",
+    answer:
+      "Most users notice subtle improvements in energy and digestion within the first two weeks. Immune and metabolic benefits typically build over one to three months of consistent use.",
+  },
+  {
+    question: "How long does it take to see hair growth results with VitaCore Daily?",
+    answer:
+      "Hair growth cycles are long — expect at least 8–12 weeks before visible changes. Nutrients like zinc and biotin in the formula support the scalp environment; results vary based on individual health and diet.",
+  },
+];
+
+const VITACORE_REVIEWS: PdpProductReview[] = [
+  {
+    rating: 5,
+    author: "Shanice G.",
+    date: "2024-11-03",
+    body: "My energy is steadier through the day and I actually look forward to taking this — no stomach upset like other multis I've tried.",
+  },
+  {
+    rating: 5,
+    author: "Kenneth Hall",
+    date: "2024-10-27",
+    body: "I was sceptical at first but after six weeks I genuinely feel more balanced. My afternoon slumps are mostly gone.",
+  },
+  {
+    rating: 4,
+    author: "Ryan Young",
+    date: "2024-10-12",
+    body: "Shipping was fast and the capsules are easy to swallow. Gave it 4 stars only because I need another month to properly judge the results.",
+  },
+  {
+    rating: 5,
+    author: "Tanya Pietersen",
+    date: "2024-09-18",
+    body: "Clean ingredients and no weird aftertaste. This is the first multi I've stuck with for more than a month.",
+  },
+  {
+    rating: 4,
+    author: "Gregory M.",
+    date: "2024-09-05",
+    body: "Good quality supplement. I pair it with the Magnesium Complex and notice a real difference in sleep. Would recommend.",
+  },
+];
+
 /** PDP extras — only used in mock mode */
 export type MockProductDetailExtras = {
   benefits: string[];
@@ -439,6 +509,9 @@ export type MockProductDetail = {
   directionsSummary: string | null;
   directionsFull: string | null;
   timelineItems: PdpTimelineMilestone[];
+  trustBadges: string[];
+  faqItems: PdpFaqItem[];
+  productReviews: PdpProductReview[];
 } & MockProductDetailExtras;
 
 const DEFAULT_EXTRAS: MockProductDetailExtras = {
@@ -497,5 +570,8 @@ export function getMockProductDetail(handle: string): MockProductDetail | null {
     directionsSummary: isVitacore ? VITACORE_DIRECTIONS_SUMMARY : null,
     directionsFull: isVitacore ? VITACORE_DIRECTIONS_FULL : null,
     timelineItems: isVitacore ? VITACORE_TIMELINE : [],
+    trustBadges: isVitacore ? VITACORE_TRUST_BADGES : [],
+    faqItems: isVitacore ? VITACORE_FAQ : [],
+    productReviews: isVitacore ? VITACORE_REVIEWS : [],
   };
 }
