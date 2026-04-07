@@ -1,3 +1,5 @@
+export const revalidate = 86400;
+
 import { notFound } from "next/navigation";
 import { getProductDetail } from "@/lib/shopify";
 import ProductDetailClient from "./ProductDetailClient";

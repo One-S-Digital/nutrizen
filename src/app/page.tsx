@@ -1,3 +1,5 @@
+export const revalidate = 86400;
+
 import Hero from "@/components/home/Hero";
 import ProductMarquee from "@/components/home/ProductMarquee";
 import DynamicProductShowcase from "@/components/home/DynamicProductShowcase";
