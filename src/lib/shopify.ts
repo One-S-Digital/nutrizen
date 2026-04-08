@@ -552,7 +552,14 @@ export async function getMainMenuLinks(
     }>({ query, variables: { handle: "main-menu" } });
     const items = response.body?.menu?.items;
     if (items?.length) {
-      return flattenFooterLeafLinks(items);
+      return flattenFooterLeafLinks(items).map((link) => {
+        // Convert /collections/<handle> → /shop?collection=<handle>
+        const collectionMatch = link.href.match(/^\/collections\/([^/?#]+)/);
+        if (collectionMatch) {
+          return { ...link, href: `/shop?collection=${encodeURIComponent(collectionMatch[1]!)}`, external: false };
+        }
+        return link;
+      });
     }
   } catch {
     // fall through to fallback

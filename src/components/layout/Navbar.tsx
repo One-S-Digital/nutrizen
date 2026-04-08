@@ -59,23 +59,17 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
     return () => window.removeEventListener("keydown", onKey);
   }, [mobileOpen]);
 
-  // Convert any Shopify collection URL to a /shop?collection= filter URL.
-  function toShopFilter(href: string): string {
-    const collectionMatch = href.match(/\/collections\/([^/?#]+)/);
-    if (collectionMatch) {
-      return `/shop?collection=${encodeURIComponent(collectionMatch[1]!)}`;
-    }
-    return href;
-  }
-
-  // Items shown in the Shop mega-menu: prefer Shopify main-menu links,
+  // Items shown in the Shop mega-menu: prefer Shopify main-menu links
+  // (already normalised to /shop?collection= at the data layer),
   // fall back to nav collections if main-menu is empty.
   const dropdownItems: { id: string; title: string; href: string; imageUrl?: string | null }[] =
     mainMenuLinks.length > 0
       ? mainMenuLinks.map((l) => {
-          const href = toShopFilter(l.href);
-          const matched = collections.find((c) => l.href.includes(c.handle));
-          return { id: l.id, title: l.title, href, imageUrl: matched?.imageUrl ?? null };
+          // Match a collection image by extracting the handle from the filter URL
+          const handleMatch = l.href.match(/[?&]collection=([^&]+)/);
+          const handle = handleMatch ? decodeURIComponent(handleMatch[1]!) : null;
+          const matched = handle ? collections.find((c) => c.handle === handle) : null;
+          return { id: l.id, title: l.title, href: l.href, imageUrl: matched?.imageUrl ?? null };
         })
       : collections.map((c) => ({
           id: c.id,
