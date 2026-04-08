@@ -59,13 +59,23 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
     return () => window.removeEventListener("keydown", onKey);
   }, [mobileOpen]);
 
+  // Convert any Shopify collection URL to a /shop?collection= filter URL.
+  function toShopFilter(href: string): string {
+    const collectionMatch = href.match(/\/collections\/([^/?#]+)/);
+    if (collectionMatch) {
+      return `/shop?collection=${encodeURIComponent(collectionMatch[1]!)}`;
+    }
+    return href;
+  }
+
   // Items shown in the Shop mega-menu: prefer Shopify main-menu links,
   // fall back to nav collections if main-menu is empty.
   const dropdownItems: { id: string; title: string; href: string; imageUrl?: string | null }[] =
     mainMenuLinks.length > 0
       ? mainMenuLinks.map((l) => {
+          const href = toShopFilter(l.href);
           const matched = collections.find((c) => l.href.includes(c.handle));
-          return { id: l.id, title: l.title, href: l.href, imageUrl: matched?.imageUrl ?? null };
+          return { id: l.id, title: l.title, href, imageUrl: matched?.imageUrl ?? null };
         })
       : collections.map((c) => ({
           id: c.id,
@@ -253,29 +263,16 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
               {dropdownItems.length > 0 && (
                 <>
                   <p className="text-xs font-semibold uppercase tracking-wide text-neutral-dark pt-4 pb-2">Categories</p>
-                  {dropdownItems.map((item) =>
-                    item.href.startsWith("http") ? (
-                      <a
-                        key={item.id}
-                        href={item.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="py-2.5 border-b border-neutral-light/50 text-sm hover:text-primary transition-colors"
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        {item.title}
-                      </a>
-                    ) : (
-                      <Link
-                        key={item.id}
-                        href={item.href}
-                        className="py-2.5 border-b border-neutral-light/50 text-sm hover:text-primary transition-colors"
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        {item.title}
-                      </Link>
-                    )
-                  )}
+                  {dropdownItems.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      className="py-2.5 border-b border-neutral-light/50 text-sm hover:text-primary transition-colors"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {item.title}
+                    </Link>
+                  ))}
                 </>
               )}
 
