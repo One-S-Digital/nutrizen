@@ -99,12 +99,9 @@ export default function CategoryShowcase({ categories }: { categories: Category[
             })}
           </div>
 
-          {/* Active Category Description */}
-          {activeCategory.description && (
-             <p className="text-neutral-dark text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed animate-fade-in">
-               {activeCategory.description}
-             </p>
-          )}
+          <p className="text-neutral-dark text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
+            Explore our full range of natural supplements
+          </p>
         </div>
 
         {/* Dynamic Product Grid */}
