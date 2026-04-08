@@ -5,10 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useCartStore } from "@/store/cartStore";
-import type { NavCollection } from "@/lib/shopify";
+import type { NavCollection, FooterNavLink } from "@/lib/shopify";
 
 type NavbarProps = {
   collections?: NavCollection[];
+  mainMenuLinks?: FooterNavLink[];
 };
 
 function ChevronDown({ className }: { className?: string }) {
@@ -19,7 +20,7 @@ function ChevronDown({ className }: { className?: string }) {
   );
 }
 
-export default function Navbar({ collections = [] }: NavbarProps) {
+export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -39,9 +40,7 @@ export default function Navbar({ collections = [] }: NavbarProps) {
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -50,19 +49,30 @@ export default function Navbar({ collections = [] }: NavbarProps) {
     if (!mobileOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
+    return () => { document.body.style.overflow = prev; };
   }, [mobileOpen]);
 
   useEffect(() => {
     if (!mobileOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMobileOpen(false);
-    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMobileOpen(false); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [mobileOpen]);
+
+  // Items shown in the Shop mega-menu: prefer Shopify main-menu links,
+  // fall back to nav collections if main-menu is empty.
+  const dropdownItems: { id: string; title: string; href: string; imageUrl?: string | null }[] =
+    mainMenuLinks.length > 0
+      ? mainMenuLinks.map((l) => {
+          const matched = collections.find((c) => l.href.includes(c.handle));
+          return { id: l.id, title: l.title, href: l.href, imageUrl: matched?.imageUrl ?? null };
+        })
+      : collections.map((c) => ({
+          id: c.id,
+          title: c.title,
+          href: `/shop?collection=${encodeURIComponent(c.handle)}`,
+          imageUrl: c.imageUrl,
+        }));
 
   return (
     <motion.header
@@ -74,8 +84,9 @@ export default function Navbar({ collections = [] }: NavbarProps) {
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
       <div className="max-w-7xl mx-auto px-6 h-20 grid grid-cols-3 items-center gap-4">
-        {/* Nav - left */}
+        {/* Nav — left */}
         <div className="justify-self-start min-w-0 flex items-center gap-1">
+          {/* Mobile hamburger */}
           <button
             type="button"
             className="md:hidden p-2 -ml-2 rounded-lg text-neutral-dark hover:bg-neutral-light/60 hover:text-primary transition-colors"
@@ -90,12 +101,10 @@ export default function Navbar({ collections = [] }: NavbarProps) {
             </svg>
           </button>
 
+          {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-8 font-medium text-neutral-dark">
-            <div
-              className="relative"
-              onMouseEnter={openShop}
-              onMouseLeave={closeShopDelayed}
-            >
+            {/* Shop — with Shopify main-menu mega-menu */}
+            <div className="relative" onMouseEnter={openShop} onMouseLeave={closeShopDelayed}>
               <Link
                 href="/shop"
                 className="inline-flex items-center gap-1 hover:text-primary transition-colors"
@@ -110,37 +119,45 @@ export default function Navbar({ collections = [] }: NavbarProps) {
                 <div
                   className="absolute left-0 top-full z-[100] pt-2"
                   role="navigation"
-                  aria-label="Shop by category"
+                  aria-label="Shop navigation"
                   onMouseEnter={openShop}
                   onMouseLeave={closeShopDelayed}
                 >
-                  <div className="w-[min(calc(100vw-3rem),42rem)] rounded-2xl border border-neutral-light/80 bg-white shadow-xl p-6">
+                  <div className="w-[min(calc(100vw-3rem),44rem)] rounded-2xl border border-neutral-light/80 bg-white shadow-xl p-6">
                     <Link
                       href="/shop"
                       className="mb-4 block text-sm font-semibold text-primary hover:text-primary/90"
+                      onClick={() => setShopOpen(false)}
                     >
-                      Shop all products
+                      Shop all products →
                     </Link>
-                    {collections.length > 0 ? (
+
+                    {dropdownItems.length > 0 ? (
                       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[min(60vh,22rem)] overflow-y-auto pr-1">
-                        {collections.map((c) => (
-                          <li key={c.id}>
+                        {dropdownItems.map((item) => (
+                          <li key={item.id}>
                             <Link
-                              href={`/shop?collection=${encodeURIComponent(c.handle)}`}
+                              href={item.href}
                               className="flex items-center gap-3 rounded-xl p-2 -m-2 text-sm font-medium text-neutral-darkest hover:bg-background-main transition-colors"
+                              onClick={() => setShopOpen(false)}
                             >
-                              {c.imageUrl ? (
+                              {item.imageUrl ? (
                                 <Image
-                                  src={c.imageUrl}
+                                  src={item.imageUrl}
                                   alt=""
                                   width={44}
                                   height={44}
                                   className="h-11 w-11 shrink-0 rounded-lg object-cover bg-neutral-light/40"
                                 />
                               ) : (
-                                <span className="h-11 w-11 shrink-0 rounded-lg bg-primary/10" aria-hidden />
+                                <span className="h-11 w-11 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center text-primary/40" aria-hidden>
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"/>
+                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                                  </svg>
+                                </span>
                               )}
-                              <span className="leading-snug">{c.title}</span>
+                              <span className="leading-snug">{item.title}</span>
                             </Link>
                           </li>
                         ))}
@@ -155,20 +172,18 @@ export default function Navbar({ collections = [] }: NavbarProps) {
               )}
             </div>
 
+            {/* Hardcoded top-level links */}
             <Link href="/pages/about" className="hover:text-primary transition-colors">
-              Our Story
-            </Link>
-            <Link href="/pages/science" className="hover:text-primary transition-colors">
-              The Science
+              About Us
             </Link>
           </nav>
         </div>
 
-        {/* Logo - center */}
+        {/* Logo — center */}
         <Link href="/" className="justify-self-center flex items-center">
           <Image
             src="/nutrizen-logo.png"
-            alt="Nutri Zen"
+            alt="NutriZen"
             width={240}
             height={56}
             className="h-9 sm:h-10 md:h-11 w-auto max-w-[min(240px,70vw)] object-contain object-center"
@@ -176,7 +191,7 @@ export default function Navbar({ collections = [] }: NavbarProps) {
           />
         </Link>
 
-        {/* Actions - right */}
+        {/* Actions — right */}
         <div className="flex items-center gap-6 justify-self-end">
           <button aria-label="Search" className="hover:text-primary transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -217,35 +232,56 @@ export default function Navbar({ collections = [] }: NavbarProps) {
                 onClick={() => setMobileOpen(false)}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 6 6 18" />
-                  <path d="m6 6 12 12" />
+                  <path d="M18 6 6 18" /><path d="m6 6 12 12" />
                 </svg>
               </button>
             </div>
+
             <nav className="flex flex-col gap-1 font-medium text-neutral-darkest">
-              <Link href="/shop" className="py-3 border-b border-neutral-light/80 text-primary font-semibold" onClick={() => setMobileOpen(false)}>
+              <Link
+                href="/shop"
+                className="py-3 border-b border-neutral-light/80 text-primary font-semibold"
+                onClick={() => setMobileOpen(false)}
+              >
                 Shop all
               </Link>
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-dark pt-4 pb-2">Categories</p>
-              {collections.length > 0 ? (
-                collections.map((c) => (
-                  <Link
-                    key={c.id}
-                    href={`/shop?collection=${encodeURIComponent(c.handle)}`}
-                    className="py-2.5 border-b border-neutral-light/50 text-sm hover:text-primary transition-colors"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {c.title}
-                  </Link>
-                ))
-              ) : (
-                <p className="text-sm text-neutral-dark py-2">Connect Shopify to load categories.</p>
+
+              {/* Shopify main-menu links */}
+              {dropdownItems.length > 0 && (
+                <>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-dark pt-4 pb-2">Categories</p>
+                  {dropdownItems.map((item) =>
+                    item.href.startsWith("http") ? (
+                      <a
+                        key={item.id}
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="py-2.5 border-b border-neutral-light/50 text-sm hover:text-primary transition-colors"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        {item.title}
+                      </a>
+                    ) : (
+                      <Link
+                        key={item.id}
+                        href={item.href}
+                        className="py-2.5 border-b border-neutral-light/50 text-sm hover:text-primary transition-colors"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        {item.title}
+                      </Link>
+                    )
+                  )}
+                </>
               )}
-              <Link href="/pages/about" className="py-3 mt-4 border-t border-neutral-light/80 hover:text-primary transition-colors" onClick={() => setMobileOpen(false)}>
-                Our Story
-              </Link>
-              <Link href="/pages/science" className="py-3 border-b border-neutral-light/80 hover:text-primary transition-colors" onClick={() => setMobileOpen(false)}>
-                The Science
+
+              <Link
+                href="/pages/about"
+                className="py-3 mt-4 border-t border-neutral-light/80 hover:text-primary transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                About Us
               </Link>
             </nav>
           </div>

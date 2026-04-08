@@ -38,7 +38,7 @@ export default async function RootLayout({
               : "Mock Shopify catalog (Storefront API not used). Set SHOPIFY_USE_MOCK=false to use your live store."}
           </div>
         ) : null}
-        <Navbar collections={shopCategories} />
+        <Navbar collections={shopCategories} mainMenuLinks={mainMenuLinks} />
         <CartDrawer />
         <main className={previewMockCatalog ? "flex-grow pt-32" : "flex-grow pt-20"}>
           {children}
