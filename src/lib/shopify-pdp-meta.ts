@@ -118,6 +118,33 @@ export function parseReviewMetaobject(map: Record<string, string>): PdpProductRe
   return { rating, author, date, body };
 }
 
+/**
+ * Parse a raw JSON string from the custom.faq metafield.
+ * Accepts arrays like `[{"question":"...","answer":"..."}]` or objects with a
+ * `faqs`/`items`/`data` wrapper key.
+ */
+export function parseFaqJson(raw: string | null | undefined): PdpFaqItem[] {
+  if (!raw?.trim()) return [];
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    const arr: unknown = Array.isArray(parsed)
+      ? parsed
+      : ((parsed as Record<string, unknown>).faqs ??
+          (parsed as Record<string, unknown>).items ??
+          (parsed as Record<string, unknown>).data ??
+          []);
+    if (!Array.isArray(arr)) return [];
+    return (arr as unknown[])
+      .map((item) => {
+        if (typeof item !== "object" || !item) return null;
+        return parseFaqMetaobject(item as Record<string, string>);
+      })
+      .filter((x): x is PdpFaqItem => x !== null);
+  } catch {
+    return [];
+  }
+}
+
 export function parseFaqReferences(
   edges: { node: MetaobjectNode | null }[] | undefined,
 ): PdpFaqItem[] {
