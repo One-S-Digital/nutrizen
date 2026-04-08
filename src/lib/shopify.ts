@@ -104,7 +104,7 @@ export async function getCollections() {
             title
             description
             handle
-            products(first: 12, sortKey: BEST_SELLING) {
+            products(first: 12, sortKey: BEST_SELLING, query: "available_for_sale:true") {
               edges {
                 node {
                   id
@@ -217,7 +217,7 @@ export async function getMarqueeProducts(limit = 24): Promise<MarqueeProduct[]> 
 
   const query = `
     query MarqueeProducts($first: Int!) {
-      products(first: $first, sortKey: BEST_SELLING) {
+      products(first: $first, sortKey: BEST_SELLING, query: "available_for_sale:true") {
         edges {
           node {
             id
@@ -279,7 +279,7 @@ export async function getAllProductsForShop(limit = 250): Promise<ShopProduct[]>
 
   const query = `
     query ShopProducts($first: Int!) {
-      products(first: $first, sortKey: TITLE) {
+      products(first: $first, sortKey: TITLE, query: "available_for_sale:true") {
         edges {
           node {
             id
@@ -600,7 +600,7 @@ export async function getCollectionByHandle(handle: string): Promise<CollectionP
         title
         description
         handle
-        products(first: 48) {
+        products(first: 48, query: "available_for_sale:true") {
           edges {
             node {
               id
