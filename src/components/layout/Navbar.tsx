@@ -176,6 +176,9 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
             <Link href="/pages/about" className="hover:text-primary transition-colors">
               About Us
             </Link>
+            <Link href="/pages/science" className="hover:text-primary transition-colors">
+              The Science
+            </Link>
           </nav>
         </div>
 
@@ -282,6 +285,13 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                 onClick={() => setMobileOpen(false)}
               >
                 About Us
+              </Link>
+              <Link
+                href="/pages/science"
+                className="py-2.5 border-b border-neutral-light/50 hover:text-primary transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                The Science
               </Link>
             </nav>
           </div>
