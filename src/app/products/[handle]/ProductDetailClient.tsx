@@ -168,7 +168,10 @@ export default function ProductDetailClient({ product }: Props) {
                 ) : null}
               </div>
 
-              <p className="mb-6 text-lg leading-relaxed text-neutral-dark">{product.description}</p>
+              <div
+                className="pdp-description mb-6 text-lg leading-relaxed text-neutral-dark"
+                dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
+              />
 
               {/* Express shipping */}
               <div className="mb-4 flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-neutral-darkest">
@@ -199,10 +202,10 @@ export default function ProductDetailClient({ product }: Props) {
                   {product.trustBadges.map((badge, i) => (
                     <span
                       key={i}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-neutral-darkest"
+                      className="group inline-flex cursor-default items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-neutral-darkest transition-all duration-200 hover:border-primary hover:bg-primary hover:text-white"
                     >
                       <svg
-                        className="h-3.5 w-3.5 shrink-0 text-primary"
+                        className="h-3.5 w-3.5 shrink-0 text-primary transition-colors duration-200 group-hover:text-white"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"

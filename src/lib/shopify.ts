@@ -3,6 +3,7 @@ import {
   parseIngredientReferences,
   parseTimelineReferences,
   parseFaqReferences,
+  parseFaqJson,
   parseReviewReferences,
   type PdpFeaturedReview,
   type PdpIngredientEntry,
@@ -647,6 +648,7 @@ export type ProductDetail = {
   title: string;
   handle: string;
   description: string;
+  descriptionHtml: string;
   priceDisplay: string;
   amount: string;
   currencyCode: string;
@@ -678,6 +680,10 @@ export type ProductDetail = {
   faqItems: PdpFaqItem[];
   /** Customer reviews (metaobject list custom.product_reviews). */
   productReviews: PdpProductReview[];
+  /** SEO title from global.title_tag metafield (used in <title>). */
+  seoTitle: string | null;
+  /** SEO description from global.description_tag metafield (used in <meta description>). */
+  seoDescription: string | null;
 };
 
 export type { ProductVariantSummary, ReferencedProductSummary } from "@/lib/shopify-referenced-products";
@@ -720,6 +726,8 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
       trustBadges: m.trustBadges,
       faqItems: m.faqItems,
       productReviews: m.productReviews,
+      seoTitle: null,
+      seoDescription: null,
     };
   }
 
@@ -906,6 +914,15 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
             }
           }
         }
+        faq: metafield(namespace: "custom", key: "faq") {
+          value
+        }
+        seo_title: metafield(namespace: "global", key: "title_tag") {
+          value
+        }
+        seo_description: metafield(namespace: "global", key: "description_tag") {
+          value
+        }
       }
     }
   `;
@@ -963,6 +980,9 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
                 edges: { node: { fields: { key: string; value: string | null }[] } | null }[];
               } | null;
             } | null;
+            faq: { value: string } | null;
+            seo_title: { value: string } | null;
+            seo_description: { value: string } | null;
           } | null;
         }
       | undefined;
@@ -1020,6 +1040,9 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
             edges: { node: { fields: { key: string; value: string | null }[] } | null }[];
           } | null;
         } | null;
+        faq: { value: string } | null;
+        seo_title: { value: string } | null;
+        seo_description: { value: string } | null;
       } | null;
     }>({ query, variables: { handle: clean } });
   } catch {
@@ -1072,14 +1095,20 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
   const trustBadges = rawBadges
     ? rawBadges.split(/\n+/).map((s) => s.trim()).filter(Boolean)
     : [];
-  const faqItems = parseFaqReferences(p.faq_items?.references?.edges);
+  const faqItems =
+    parseFaqReferences(p.faq_items?.references?.edges).length > 0
+      ? parseFaqReferences(p.faq_items?.references?.edges)
+      : parseFaqJson(p.faq?.value);
   const productReviews = parseReviewReferences(p.product_reviews?.references?.edges);
+  const seoTitle = p.seo_title?.value?.trim() || null;
+  const seoDescription = p.seo_description?.value?.trim() || null;
 
   return {
     id: p.id,
     title: p.title,
     handle: p.handle,
     description: plain,
+    descriptionHtml: p.descriptionHtml ?? plain,
     priceDisplay: formatPrice(min.amount, min.currencyCode),
     amount: min.amount,
     currencyCode: min.currencyCode,
@@ -1100,5 +1129,7 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
     trustBadges,
     faqItems,
     productReviews,
+    seoTitle,
+    seoDescription,
   };
 }

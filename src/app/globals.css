@@ -9,3 +9,18 @@
     @apply antialiased selection:bg-primary/30;
   }
 }
+
+@layer components {
+  .pdp-description p {
+    @apply mb-4 last:mb-0;
+  }
+  .pdp-description strong {
+    @apply font-semibold;
+  }
+  .pdp-description ul {
+    @apply mb-4 list-disc pl-5 space-y-1;
+  }
+  .pdp-description ol {
+    @apply mb-4 list-decimal pl-5 space-y-1;
+  }
+}
