@@ -30,6 +30,7 @@ import {
   getMockCollections,
   getMockMarqueeProducts,
   getMockFooterMenu,
+  getMockMainMenuLinks,
   getMockNavCollections,
   getMockProductDetail,
 } from "@/lib/shopify-mock";
@@ -518,6 +519,57 @@ export async function getFooterColumns(collections: NavCollection[]): Promise<Fo
   return buildFallbackFooterColumns(collections);
 }
 
+/**
+ * Flat link list from the Shopify `main-menu` navigation (used as the "Shop" column in the footer).
+ * Falls back to collection-based mock links when using mock mode or the menu is unavailable.
+ */
+export async function getMainMenuLinks(
+  fallbackCollections: NavCollection[],
+): Promise<FooterNavLink[]> {
+  if (shouldUseShopifyMock()) {
+    return getMockMainMenuLinks();
+  }
+
+  try {
+    const query = `
+      query MainMenu($handle: String!) {
+        menu(handle: $handle) {
+          items {
+            id
+            title
+            url
+            items {
+              id
+              title
+              url
+            }
+          }
+        }
+      }
+    `;
+    const response = await shopifyFetch<{
+      menu: { items: MenuItemGql[] } | null;
+    }>({ query, variables: { handle: "main-menu" } });
+    const items = response.body?.menu?.items;
+    if (items?.length) {
+      return flattenFooterLeafLinks(items);
+    }
+  } catch {
+    // fall through to fallback
+  }
+
+  // Fallback: derive links from nav collections
+  return [
+    { id: "fb-all", title: "All Products", href: "/shop", external: false },
+    ...fallbackCollections.slice(0, 8).map((c) => ({
+      id: c.id,
+      title: c.title,
+      href: `/shop?collection=${encodeURIComponent(c.handle)}`,
+      external: false,
+    })),
+  ];
+}
+
 export type CollectionProductSummary = {
   id: string;
   title: string;
@@ -706,6 +758,7 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
       title: m.title,
       handle: m.handle,
       description: m.description,
+      descriptionHtml: m.description,
       priceDisplay: m.priceDisplay,
       amount: m.amount,
       currencyCode: m.currencyCode,

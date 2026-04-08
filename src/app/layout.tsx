@@ -4,7 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/cart/CartDrawer";
-import { getFooterColumns, getNavCollections } from "@/lib/shopify";
+import { getFooterColumns, getMainMenuLinks, getNavCollections } from "@/lib/shopify";
 import { shouldUseShopifyMock } from "@/lib/shopify-mode";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -20,7 +20,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const shopCategories = await getNavCollections();
-  const footerColumns = await getFooterColumns(shopCategories);
+  const [footerColumns, mainMenuLinks] = await Promise.all([
+    getFooterColumns(shopCategories),
+    getMainMenuLinks(shopCategories),
+  ]);
   const previewMockCatalog = shouldUseShopifyMock();
 
   return (
@@ -40,7 +43,7 @@ export default async function RootLayout({
         <main className={previewMockCatalog ? "flex-grow pt-32" : "flex-grow pt-20"}>
           {children}
         </main>
-        <Footer footerColumns={footerColumns} />
+        <Footer footerColumns={footerColumns} mainMenuLinks={mainMenuLinks} />
       </body>
     </html>
   );

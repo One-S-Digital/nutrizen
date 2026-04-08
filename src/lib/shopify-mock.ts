@@ -400,6 +400,16 @@ export function getMockFooterMenu() {
   return buildFallbackFooterColumns(getMockNavCollections());
 }
 
+/** Main-menu links for mock catalog — flat list mirroring the nav. */
+export function getMockMainMenuLinks() {
+  return getMockNavCollections().map((c) => ({
+    id: c.id,
+    title: c.title,
+    href: `/shop?collection=${encodeURIComponent(c.handle)}`,
+    external: false,
+  }));
+}
+
 export function getMockCollectionByHandle(handle: string): CollectionPageData | null {
   const def = COLLECTION_DEFS.find((c) => c.handle === handle);
   if (!def) return null;

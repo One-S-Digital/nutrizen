@@ -2,22 +2,52 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import type { FooterNavColumn } from "@/lib/shopify";
+import type { FooterNavColumn, FooterNavLink } from "@/lib/shopify";
+
+const COMPANY_LINKS: FooterNavLink[] = [
+  { id: "company-about", title: "About Us", href: "/pages/about", external: false },
+  { id: "company-contact", title: "Contact Us", href: "/pages/contact", external: false },
+  { id: "company-shipping", title: "Shipping Policy", href: "/policies/shipping-policy", external: false },
+  { id: "company-terms", title: "Terms and Conditions", href: "/policies/terms-of-service", external: false },
+  { id: "company-returns", title: "Return & Refund Policy", href: "/policies/refund-policy", external: false },
+];
 
 type FooterProps = {
   footerColumns: FooterNavColumn[];
+  mainMenuLinks: FooterNavLink[];
 };
 
-export default function Footer({ footerColumns }: FooterProps) {
+function FooterLink({ link }: { link: FooterNavLink }) {
+  if (link.external) {
+    return (
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:text-primary transition"
+      >
+        {link.title}
+      </a>
+    );
+  }
+  return (
+    <Link href={link.href} className="hover:text-primary transition">
+      {link.title}
+    </Link>
+  );
+}
+
+export default function Footer({ mainMenuLinks }: FooterProps) {
   return (
     <footer className="bg-background-alt pt-16 pb-8 border-t border-neutral-light mt-auto">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-12">
-        {/* Brand Column */}
-        <div className="md:col-span-2 xl:col-span-3">
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-12">
+
+        {/* Col 1 — Brand */}
+        <div>
           <Link href="/" className="mb-4 inline-block">
             <Image
               src="/nutrizen-logo.png"
-              alt="Nutri Zen"
+              alt="NutriZen"
               width={240}
               height={56}
               className="h-9 w-auto max-w-[min(240px,100%)] object-contain object-left sm:h-10 md:h-11"
@@ -28,37 +58,32 @@ export default function Footer({ footerColumns }: FooterProps) {
           </p>
         </div>
 
-        {/* Shopify menu columns (or fallback Shop + About) */}
-        <div className="md:col-span-2 xl:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-8 lg:gap-12">
-          {footerColumns.map((col) => (
-            <div key={col.id}>
-              <h4 className="font-semibold mb-4 text-neutral-darkest">{col.title}</h4>
-              <ul className="space-y-3 text-sm text-neutral-dark">
-                {col.links.map((link) => (
-                  <li key={link.id}>
-                    {link.external ? (
-                      <a
-                        href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-primary transition"
-                      >
-                        {link.title}
-                      </a>
-                    ) : (
-                      <Link href={link.href} className="hover:text-primary transition">
-                        {link.title}
-                      </Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        {/* Col 2 — Shop (main-menu from Shopify) */}
+        <div>
+          <h4 className="font-semibold mb-4 text-neutral-darkest">Shop</h4>
+          <ul className="space-y-3 text-sm text-neutral-dark">
+            {mainMenuLinks.map((link) => (
+              <li key={link.id}>
+                <FooterLink link={link} />
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {/* Newsletter */}
-        <div className="md:col-span-2 xl:col-span-3">
+        {/* Col 3 — Company (hardcoded) */}
+        <div>
+          <h4 className="font-semibold mb-4 text-neutral-darkest">Company</h4>
+          <ul className="space-y-3 text-sm text-neutral-dark">
+            {COMPANY_LINKS.map((link) => (
+              <li key={link.id}>
+                <FooterLink link={link} />
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Col 4 — Newsletter */}
+        <div>
           <h4 className="font-semibold mb-4 text-neutral-darkest">Stay Connected</h4>
           <p className="text-sm text-neutral-dark mb-4">
             Join our newsletter for exclusive offers and wellness tips.
@@ -79,14 +104,13 @@ export default function Footer({ footerColumns }: FooterProps) {
         </div>
       </div>
 
+      {/* Bottom bar */}
       <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-neutral-light flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-neutral">
         <p className="flex flex-row flex-nowrap items-center justify-center md:justify-start gap-x-1.5 text-center md:text-left">
           <span className="shrink-0">
             &copy; {new Date().getFullYear()} NutriZen Wellness. All rights reserved.
           </span>
-          <span className="shrink-0 text-neutral-dark/50" aria-hidden>
-            ·
-          </span>
+          <span className="shrink-0 text-neutral-dark/50" aria-hidden>·</span>
           <span className="shrink-0">
             Built by{" "}
             <a
@@ -100,10 +124,10 @@ export default function Footer({ footerColumns }: FooterProps) {
           </span>
         </p>
         <div className="flex gap-4">
-          <Link href="/pages/privacy-policy" className="hover:text-neutral-dark transition">
+          <Link href="/policies/privacy-policy" className="hover:text-neutral-dark transition">
             Privacy Policy
           </Link>
-          <Link href="/pages/terms" className="hover:text-neutral-dark transition">
+          <Link href="/policies/terms-of-service" className="hover:text-neutral-dark transition">
             Terms of Service
           </Link>
         </div>
