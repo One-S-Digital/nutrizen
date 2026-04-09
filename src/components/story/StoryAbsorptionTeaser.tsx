@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { scrollEase, scrollViewport } from "@/lib/motion";
+import RadialOrbitalTimeline from "@/components/ui/radial-orbital-timeline";
+import { formulaEcosystemTimelineData } from "@/data/formula-ecosystem-timeline";
 
 export default function StoryAbsorptionTeaser() {
   const reduceMotion = useReducedMotion();
@@ -13,73 +15,25 @@ export default function StoryAbsorptionTeaser() {
 
       <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 lg:grid-cols-2 lg:gap-16">
         <motion.div
-          className="relative flex min-h-[280px] items-center justify-center"
-          initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }}
+          className="relative mx-auto w-full max-w-lg overflow-visible"
+          initial={reduceMotion ? false : { opacity: 0, scale: 0.98 }}
           whileInView={reduceMotion ? undefined : { opacity: 1, scale: 1 }}
           viewport={scrollViewport}
           transition={{ duration: reduceMotion ? 0 : 0.85, ease: scrollEase }}
         >
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-[280px] w-[280px] rounded-full bg-gradient-to-tr from-primary/20 via-background-alt to-secondary/25 blur-2xl" />
+          <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-primary/15 via-transparent to-secondary/20 blur-2xl" />
+          <div className="relative overflow-visible rounded-[2rem] border border-white/70 bg-white/70 p-4 shadow-sm backdrop-blur-md md:p-6">
+            <div className="relative z-10 w-full overflow-visible">
+              <RadialOrbitalTimeline
+                embed
+                prefersReducedMotion={!!reduceMotion}
+                timelineData={formulaEcosystemTimelineData}
+              />
+            </div>
+            <p className="relative z-0 mt-4 text-center text-sm text-neutral-dark">
+              Tap a node to explore how ingredients connect — uptake, balance, and absorption.
+            </p>
           </div>
-          <svg
-            viewBox="0 0 400 320"
-            className="relative z-[1] w-full max-w-md text-primary/90"
-            aria-hidden
-          >
-            <motion.circle
-              cx="200"
-              cy="160"
-              r="52"
-              fill="currentColor"
-              fillOpacity="0.12"
-              stroke="currentColor"
-              strokeOpacity="0.35"
-              strokeWidth="1.5"
-              animate={reduceMotion ? undefined : { scale: [1, 1.03, 1] }}
-              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            />
-            {[
-              { cx: 90, cy: 90, label: "Magnesium" },
-              { cx: 310, cy: 100, label: "Zinc" },
-              { cx: 110, cy: 230, label: "Cofactors" },
-              { cx: 300, cy: 220, label: "Support nutrients" },
-            ].map((n, i) => (
-              <g key={n.label}>
-                <motion.line
-                  x1="200"
-                  y1="160"
-                  x2={n.cx}
-                  y2={n.cy}
-                  stroke="currentColor"
-                  strokeOpacity="0.22"
-                  strokeWidth="1.25"
-                  initial={reduceMotion ? false : { opacity: 0 }}
-                  whileInView={reduceMotion ? undefined : { opacity: 1 }}
-                  viewport={scrollViewport}
-                  transition={{ duration: reduceMotion ? 0 : 0.65, delay: 0.1 + i * 0.06 }}
-                />
-                <circle cx={n.cx} cy={n.cy} r="10" fill="white" className="text-white" />
-                <circle
-                  cx={n.cx}
-                  cy={n.cy}
-                  r="10"
-                  fill="currentColor"
-                  fillOpacity="0.18"
-                  stroke="currentColor"
-                  strokeOpacity="0.35"
-                />
-              </g>
-            ))}
-            <text
-              x="200"
-              y="168"
-              textAnchor="middle"
-              className="fill-neutral-darkest text-[11px] font-semibold"
-            >
-              Absorption
-            </text>
-          </svg>
         </motion.div>
 
         <motion.div
