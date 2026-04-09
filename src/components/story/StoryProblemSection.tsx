@@ -17,14 +17,14 @@ export default function StoryProblemSection() {
           className="relative"
         >
           <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-primary/10 via-transparent to-secondary/15 blur-xl" />
-          <div className=”relative overflow-hidden rounded-[2rem] border border-neutral-light/80 bg-background-main shadow-sm”>
+          <div className="relative overflow-hidden rounded-[2rem] border border-neutral-light/80 bg-background-main shadow-sm">
             <video
-              src=”/why-we-started.mp4”
+              src="/why-we-started.mp4"
               autoPlay
               muted
               loop
               playsInline
-              className=”w-full object-cover”
+              className="w-full object-cover"
             />
           </div>
         </motion.div>
@@ -39,7 +39,7 @@ export default function StoryProblemSection() {
             Why we started
           </p>
           <h2 className="mt-3 text-3xl font-bold leading-tight text-neutral-darkest md:text-4xl">
-            Wellness shouldn’t mean compromise
+            Wellness shouldn&apos;t mean compromise
           </h2>
           <p className="mt-6 text-lg leading-relaxed text-neutral-dark">
             Most people want the same things: clarity, consistency, and formulas that respect the
@@ -47,7 +47,7 @@ export default function StoryProblemSection() {
             mystery blends, and doses that look good on a label but do little in real life.
           </p>
           <p className="mt-4 text-lg leading-relaxed text-neutral-dark">
-            NutriZen began with a simple frustration turned into a promise: build supplements we’d
+            NutriZen began with a simple frustration turned into a promise: build supplements we&apos;d
             confidently take ourselves-transparent, intentional, and designed around how nutrients
             actually behave in the body.
           </p>
@@ -60,7 +60,7 @@ export default function StoryProblemSection() {
             className="mt-8 rounded-2xl border border-primary/20 bg-primary/5 px-6 py-5 md:px-8"
           >
             <p className="text-base font-medium text-neutral-darkest">
-              We didn’t want louder packaging-we wanted quieter confidence: labels you can read,
+              We didn&apos;t want louder packaging-we wanted quieter confidence: labels you can read,
               doses you can trust, and support that meets you where your health goals actually are.
             </p>
           </motion.div>
