@@ -17,26 +17,15 @@ export default function StoryProblemSection() {
           className="relative"
         >
           <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-primary/10 via-transparent to-secondary/15 blur-xl" />
-          <div className="relative overflow-hidden rounded-[2rem] border border-neutral-light/80 bg-background-main shadow-sm">
-            <div className="grid grid-cols-2 gap-3 p-6 md:p-8">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/iron.png"
-                alt="Supplement bottle on a calm surface"
-                className="h-40 w-full rounded-2xl object-contain md:h-48"
-              />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/glutathione.png"
-                alt="Clean supplement formulation"
-                className="h-40 w-full rounded-2xl object-contain md:h-48"
-              />
-            </div>
-            <div className="border-t border-neutral-light/60 bg-background-alt/80 px-6 py-5 text-center md:px-10">
-              <p className="text-sm font-medium italic leading-relaxed text-neutral-dark">
-                “We created the supplements we wished were easier to find.”
-              </p>
-            </div>
+          <div className=”relative overflow-hidden rounded-[2rem] border border-neutral-light/80 bg-background-main shadow-sm”>
+            <video
+              src=”/why-we-started.mp4”
+              autoPlay
+              muted
+              loop
+              playsInline
+              className=”w-full object-cover”
+            />
           </div>
         </motion.div>
 

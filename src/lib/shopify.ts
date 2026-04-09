@@ -57,7 +57,7 @@ export async function shopifyFetch<T>({
     return { status: 503, body: undefined };
   }
 
-  const endpoint = `https://${domain.replace(/^https?:\/\//, "").replace(/\/$/, "")}/api/2024-10/graphql.json`;
+  const endpoint = `https://${domain.replace(/^https?:\/\//, "").replace(/\/$/, "")}/api/2026-01/graphql.json`;
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",

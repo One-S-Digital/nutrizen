@@ -20,8 +20,8 @@ export default function BrandQuoteSection() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/magnesium complex.png"
-            alt="NutriZen magnesium complex bottle"
+            src="/about banner.png"
+            alt="NutriZen Metabol+ supplement bottle"
             className="h-56 w-full object-cover object-center md:h-64"
           />
         </motion.div>
