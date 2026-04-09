@@ -75,8 +75,12 @@ export async function shopifyFetch<T>({
     const body = await response.json();
 
     if (body.errors) {
-      console.error(body.errors[0].message);
+      console.error("[shopify] GraphQL errors:", JSON.stringify(body.errors));
       throw body.errors[0];
+    }
+
+    if (!body.data) {
+      console.error("[shopify] Response had no data. Status:", response.status, "Body:", JSON.stringify(body));
     }
 
     return {
@@ -154,11 +158,13 @@ export async function getCollections() {
         }[];
       };
     }>({ query });
-  } catch {
+  } catch (err) {
+    console.error("[shopify] getCollections fetch error:", err);
     return [];
   }
 
   if (!response.body?.collections) {
+    console.error("[shopify] getCollections: no collections in response body. Status:", response.status, "Body:", JSON.stringify(response.body));
     return [];
   }
 
