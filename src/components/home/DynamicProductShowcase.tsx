@@ -12,7 +12,7 @@ import {
 } from "framer-motion";
 import { scrollEase, scrollViewport } from "@/lib/motion";
 
-export const COMBO_PRODUCT_HREF = "/shop";
+export const COMBO_PRODUCT_HREF = "/products/nutrizen-daily-immunity-recovery-stack";
 
 const BENEFIT_PILLS = [
   { label: "Supports immune defense", icon: "🛡️" },
@@ -209,7 +209,7 @@ export default function DynamicProductShowcase() {
             <motion.div variants={itemVariants}>
               <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
                 <Link
-                  href={COMBO_PRODUCT_HREF}
+                  href="/products/nutrizen-daily-immunity-recovery-stack"
                   className="group inline-flex items-center gap-3 rounded-full bg-[#425244] px-10 py-4 text-[13px] font-bold uppercase tracking-wider text-white shadow-[0_8px_24px_-4px_rgba(66,82,68,0.4)] hover:bg-[#344136] transition-colors duration-300"
                 >
                   Get the Combo &amp; Save
