@@ -108,7 +108,7 @@ export async function getCollections() {
             title
             description
             handle
-            products(first: 12, sortKey: BEST_SELLING, query: "available_for_sale:true") {
+            products(first: 12, sortKey: BEST_SELLING) {
               edges {
                 node {
                   id
@@ -613,7 +613,7 @@ export async function getCollectionByHandle(handle: string): Promise<CollectionP
         title
         description
         handle
-        products(first: 48, query: "available_for_sale:true") {
+        products(first: 48) {
           edges {
             node {
               id
@@ -680,12 +680,14 @@ export async function getCollectionByHandle(handle: string): Promise<CollectionP
         };
       } | null;
     }>({ query, variables: { handle } });
-  } catch {
+  } catch (err) {
+    console.error("[shopify] getCollectionByHandle fetch error for handle:", handle, err);
     return null;
   }
 
   const col = response.body?.collection;
   if (!col) {
+    console.error("[shopify] getCollectionByHandle: null collection for handle:", handle, "status:", (response as any).status, "body:", JSON.stringify(response.body));
     return null;
   }
 
