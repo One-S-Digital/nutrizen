@@ -1,11 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   motion,
   useReducedMotion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  useScroll,
   type Variants,
 } from "framer-motion";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import DNAHelix from "@/components/ui/DNAHelix";
 import AuroraBackground from "@/components/ui/AuroraBackground";
@@ -20,7 +25,6 @@ type ProductBottleProps = {
   delay: number;
   floatDelay?: number;
   hoverTilt: { x: number; y: number };
-  /** When false, the extra vertical float is disabled (e.g. zinc nested in the DNA float group). */
   innerFloat?: boolean;
 };
 
@@ -102,8 +106,6 @@ function ProductBottle({
     return () => media.removeEventListener("change", update);
   }, []);
 
-  /* Layout lives on a plain div. Framer sets `transform` on motion.div for the entrance; if both
-     share one node, Tailwind translate/position utilities that use transform are overwritten. */
   return (
     <div className={className}>
       <motion.div
@@ -161,6 +163,11 @@ export default function Hero() {
   const desktopBottles = [HERO_BOTTLES[0], HERO_BOTTLES[1]];
   const zincBottle = HERO_BOTTLES[2];
 
+  // Scroll: fade + lift text only
+  const { scrollY } = useScroll();
+  const textY = useTransform(scrollY, [0, 400], [0, -40]);
+  const textOpacity = useTransform(scrollY, [0, 350], [1, 0]);
+
   const textVariants: Variants = {
     hidden: { opacity: 0, y: 18 },
     visible: {
@@ -185,7 +192,9 @@ export default function Hero() {
 
   return (
     <AuroraBackground>
+      {/* section is the positioning context for all absolute bottles */}
       <section className="relative min-h-[90vh] flex flex-col items-center justify-center pt-20 w-full overflow-hidden">
+        {/* Background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
 
         {/* Mobile: bottles above text */}
@@ -224,71 +233,84 @@ export default function Hero() {
           </div>
         </div>
 
+        {/* Text — scroll parallax via motion.style, NOT position */}
         <motion.div
-          variants={textVariants}
-          initial={reduceMotion ? false : "hidden"}
-          animate="visible"
           className="relative z-20 max-w-4xl mx-auto px-6 text-center max-md:mt-8 md:-mt-[15vh]"
+          style={reduceMotion ? {} : { y: textY, opacity: textOpacity }}
         >
-          <motion.h1
-            variants={textChildVariants}
-            className="text-5xl md:text-7xl font-bold tracking-tight text-neutral-darkest mb-6 leading-[1.1]"
+          <motion.div
+            variants={textVariants}
+            initial={reduceMotion ? false : "hidden"}
+            animate="visible"
           >
-            Clean Supplements. <br />
-            <span className="text-primary relative inline-block mt-2">
-              Real Results.
-              <span className="absolute -bottom-2 left-0 w-full h-1.5 bg-secondary/30 rounded-full" />
-            </span>
-          </motion.h1>
+            <motion.span
+              variants={textChildVariants}
+              className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-4"
+            >
+              Precision Wellness
+            </motion.span>
 
-          <motion.p
-            variants={textChildVariants}
-            className="text-lg md:text-xl text-neutral-dark mb-10 max-w-2xl mx-auto leading-relaxed"
-          >
-            No fillers. No hidden blends. Just scientifically formulated nutrients your body actually
-            uses.
-          </motion.p>
+            <motion.h1
+              variants={textChildVariants}
+              className="text-5xl md:text-7xl font-bold tracking-tight text-neutral-darkest mb-6 leading-[1.1]"
+            >
+              Clean Supplements. <br />
+              <span className="text-primary relative inline-block mt-2">
+                Real Results.
+                <motion.span
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 0.8, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ originX: 0 }}
+                  className="absolute -bottom-2 left-0 w-full h-[3px] bg-secondary/40 rounded-full"
+                />
+              </span>
+            </motion.h1>
 
-          <motion.div variants={textChildVariants} className="flex flex-col items-center justify-center gap-4">
-            <Button size="lg" variant="primary" className="px-10 text-lg group">
-              Shop Now
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="ml-2 group-hover:translate-x-1 transition-transform"
-              >
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
-            </Button>
-            <div className="flex items-center gap-2 text-sm font-medium text-neutral-dark/80 mt-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-secondary"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              <span>Transparent ingredients. Clinically effective doses. Fast delivery.</span>
-            </div>
+            <motion.p
+              variants={textChildVariants}
+              className="text-lg md:text-xl text-neutral-dark mb-10 max-w-2xl mx-auto leading-relaxed"
+            >
+              No fillers. No hidden blends. Just scientifically formulated nutrients your body actually uses.
+            </motion.p>
+
+            <motion.div variants={textChildVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                <Link href="/shop">
+                  <Button size="lg" variant="primary" className="px-10 text-lg group shadow-[0_8px_24px_-6px_rgba(140,171,119,0.5)]">
+                    Shop Now
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2 group-hover:translate-x-1 transition-transform">
+                      <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+                    </svg>
+                  </Button>
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                <Link href="/pages/science">
+                  <Button size="lg" variant="outline" className="px-8 text-lg">
+                    The Science
+                  </Button>
+                </Link>
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              variants={textChildVariants}
+              className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8 text-sm font-medium text-neutral-dark/80"
+            >
+              {["Transparent ingredients", "Clinically effective doses", "Fast delivery"].map((trust) => (
+                <span key={trust} className="flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-secondary flex-shrink-0">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  {trust}
+                </span>
+              ))}
+            </motion.div>
           </motion.div>
         </motion.div>
 
-        {/* Desktop: vitacore + cellunex; zinc centered inside DNA cluster (shared float) */}
+        {/* Desktop: vitacore + cellunex — absolutely positioned, section is containing block */}
         <div className="hidden md:block">
           {desktopBottles.map((bottle) => (
             <ProductBottle
@@ -305,6 +327,7 @@ export default function Hero() {
             />
           ))}
 
+          {/* DNA + Zinc cluster — right side, original position */}
           <motion.div
             initial={!reduceMotion ? { opacity: 0, x: -260, y: 120, scale: 0.92 } : false}
             animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
@@ -348,6 +371,23 @@ export default function Hero() {
             </motion.div>
           </motion.div>
         </div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5, duration: 0.8 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
+        >
+          <span className="text-xs font-medium text-neutral-dark/50 tracking-widest uppercase">Scroll</span>
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            className="w-5 h-8 rounded-full border-2 border-neutral-dark/20 flex items-start justify-center pt-1.5"
+          >
+            <div className="w-1 h-1.5 bg-neutral-dark/30 rounded-full" />
+          </motion.div>
+        </motion.div>
       </section>
     </AuroraBackground>
   );

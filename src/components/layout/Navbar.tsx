@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import type { NavCollection, FooterNavLink } from "@/lib/shopify";
 
@@ -12,37 +13,19 @@ type NavbarProps = {
   mainMenuLinks?: FooterNavLink[];
 };
 
-function ChevronDown({ className }: { className?: string }) {
-  return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
-}
-
 export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const shopLeaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { openCart, items } = useCartStore();
-
+  const pathname = usePathname();
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  const openShop = () => {
-    if (shopLeaveTimer.current) clearTimeout(shopLeaveTimer.current);
-    setShopOpen(true);
-  };
-
-  const closeShopDelayed = () => {
-    if (shopLeaveTimer.current) clearTimeout(shopLeaveTimer.current);
-    shopLeaveTimer.current = setTimeout(() => setShopOpen(false), 160);
-  };
-
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setIsScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -59,13 +42,20 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
     return () => window.removeEventListener("keydown", onKey);
   }, [mobileOpen]);
 
-  // Items shown in the Shop mega-menu: prefer Shopify main-menu links
-  // (already normalised to /shop?collection= at the data layer),
-  // fall back to nav collections if main-menu is empty.
+  const openShop = () => {
+    if (shopLeaveTimer.current) clearTimeout(shopLeaveTimer.current);
+    setShopOpen(true);
+  };
+  const closeShopDelayed = () => {
+    if (shopLeaveTimer.current) clearTimeout(shopLeaveTimer.current);
+    shopLeaveTimer.current = setTimeout(() => setShopOpen(false), 160);
+  };
+
+  // Build dropdown items: prefer main-menu links (already /shop?collection= normalised),
+  // fall back to raw nav collections.
   const dropdownItems: { id: string; title: string; href: string; imageUrl?: string | null }[] =
     mainMenuLinks.length > 0
       ? mainMenuLinks.map((l) => {
-          // Match a collection image by extracting the handle from the filter URL
           const handleMatch = l.href.match(/[?&]collection=([^&]+)/);
           const handle = handleMatch ? decodeURIComponent(handleMatch[1]!) : null;
           const matched = handle ? collections.find((c) => c.handle === handle) : null;
@@ -78,216 +68,299 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
           imageUrl: c.imageUrl,
         }));
 
+  const secondaryLinks = [
+    { href: "/pages/about", label: "Our Story" },
+    { href: "/pages/science", label: "The Science" },
+  ];
+
   return (
-    <motion.header
-      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
-        isScrolled || shopOpen || mobileOpen ? "bg-background-main/80 backdrop-blur-md shadow-sm" : "bg-transparent"
-      }`}
-      initial={false}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-    >
-      <div className="max-w-7xl mx-auto px-6 h-20 grid grid-cols-3 items-center gap-4">
-        {/* Nav — left */}
-        <div className="justify-self-start min-w-0 flex items-center gap-1">
-          {/* Mobile hamburger */}
-          <button
-            type="button"
-            className="md:hidden p-2 -ml-2 rounded-lg text-neutral-dark hover:bg-neutral-light/60 hover:text-primary transition-colors"
-            aria-label="Open menu"
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen(true)}
+    <>
+      {/* Outer header */}
+      <header className="fixed inset-x-0 top-0 z-50 pointer-events-none flex justify-center">
+        <motion.div
+          className="pointer-events-auto w-full"
+          animate={
+            isScrolled
+              ? { maxWidth: "58rem", marginTop: 12, borderRadius: 9999 }
+              : { maxWidth: 1280, marginTop: 0, borderRadius: 0 }
+          }
+          transition={{ duration: 0.45, ease: [0.32, 0, 0.16, 1] }}
+          style={{ marginLeft: "auto", marginRight: "auto" }}
+        >
+          <motion.div
+            animate={
+              isScrolled
+                ? {
+                    backgroundColor: "rgba(247,249,246,0.92)",
+                    boxShadow: "0 8px 32px -4px rgba(47,58,51,0.14), 0 0 0 1px rgba(47,58,51,0.07)",
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                  }
+                : {
+                    backgroundColor: "rgba(247,249,246,0)",
+                    boxShadow: "0 0 0 0 transparent",
+                    paddingLeft: 24,
+                    paddingRight: 24,
+                    paddingTop: 20,
+                    paddingBottom: 20,
+                  }
+            }
+            transition={{ duration: 0.45, ease: [0.32, 0, 0.16, 1] }}
+            style={{
+              borderRadius: "inherit",
+              backdropFilter: isScrolled ? "blur(20px)" : "blur(0px)",
+              WebkitBackdropFilter: isScrolled ? "blur(20px)" : "blur(0px)",
+            }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <line x1="4" x2="20" y1="12" y2="12" />
-              <line x1="4" x2="20" y1="6" y2="6" />
-              <line x1="4" x2="20" y1="18" y2="18" />
-            </svg>
-          </button>
-
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-8 font-medium text-neutral-dark">
-            {/* Shop — with Shopify main-menu mega-menu */}
-            <div className="relative" onMouseEnter={openShop} onMouseLeave={closeShopDelayed}>
-              <Link
-                href="/shop"
-                className="inline-flex items-center gap-1 hover:text-primary transition-colors"
-                aria-haspopup="true"
-                aria-expanded={shopOpen}
-              >
-                Shop
-                <ChevronDown className={`transition-transform ${shopOpen ? "rotate-180" : ""}`} />
-              </Link>
-
-              {shopOpen && (
-                <div
-                  className="absolute left-0 top-full z-[100] pt-2"
-                  role="navigation"
-                  aria-label="Shop navigation"
-                  onMouseEnter={openShop}
-                  onMouseLeave={closeShopDelayed}
+            <div className="grid grid-cols-3 items-center gap-4">
+              {/* LEFT: nav */}
+              <div className="justify-self-start flex items-center gap-1 min-w-0">
+                {/* Mobile hamburger */}
+                <button
+                  type="button"
+                  className="md:hidden p-2 -ml-1 rounded-lg text-neutral-dark hover:bg-neutral-light/60 hover:text-primary transition-colors"
+                  aria-label="Open menu"
+                  onClick={() => setMobileOpen(true)}
                 >
-                  <div className="w-[min(calc(100vw-3rem),44rem)] rounded-2xl border border-neutral-light/80 bg-white shadow-xl p-6">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <line x1="4" x2="20" y1="12" y2="12" />
+                    <line x1="4" x2="20" y1="6" y2="6" />
+                    <line x1="4" x2="20" y1="18" y2="18" />
+                  </svg>
+                </button>
+
+                {/* Desktop nav */}
+                <nav className="hidden md:flex items-center gap-6 font-medium text-neutral-dark text-sm">
+                  {/* Shop with mega-menu */}
+                  <div className="relative" onMouseEnter={openShop} onMouseLeave={closeShopDelayed}>
                     <Link
                       href="/shop"
-                      className="mb-4 block text-sm font-semibold text-primary hover:text-primary/90"
-                      onClick={() => setShopOpen(false)}
+                      className="inline-flex items-center gap-1 hover:text-primary transition-colors duration-200 py-1 relative"
                     >
-                      Shop all products →
+                      Shop
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className={`transition-transform duration-200 ${shopOpen ? "rotate-180" : ""}`}
+                        aria-hidden
+                      >
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                      {pathname === "/shop" && (
+                        <motion.span
+                          layoutId="navUnderline"
+                          className="absolute -bottom-0.5 left-0 right-4 h-[2px] bg-primary rounded-full"
+                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                        />
+                      )}
                     </Link>
 
-                    {dropdownItems.length > 0 ? (
-                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[min(60vh,22rem)] overflow-y-auto pr-1">
-                        {dropdownItems.map((item) => (
-                          <li key={item.id}>
+                    <AnimatePresence>
+                      {shopOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                          className="absolute left-0 top-full z-[100] pt-3"
+                          onMouseEnter={openShop}
+                          onMouseLeave={closeShopDelayed}
+                        >
+                          <div className="w-[min(calc(100vw-3rem),42rem)] rounded-2xl border border-neutral-light/80 bg-white/95 backdrop-blur-xl shadow-xl p-6">
                             <Link
-                              href={item.href}
-                              className="flex items-center gap-3 rounded-xl p-2 -m-2 text-sm font-medium text-neutral-darkest hover:bg-background-main transition-colors"
+                              href="/shop"
+                              className="mb-4 block text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
                               onClick={() => setShopOpen(false)}
                             >
-                              {item.imageUrl ? (
-                                <Image
-                                  src={item.imageUrl}
-                                  alt=""
-                                  width={44}
-                                  height={44}
-                                  className="h-11 w-11 shrink-0 rounded-lg object-cover bg-neutral-light/40"
-                                />
-                              ) : (
-                                <span className="h-11 w-11 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center text-primary/40" aria-hidden>
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"/>
-                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                                  </svg>
-                                </span>
-                              )}
-                              <span className="leading-snug">{item.title}</span>
+                              Shop all products →
                             </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-neutral-dark">
-                        Categories will appear here when your Shopify store is connected.
-                      </p>
-                    )}
+                            {dropdownItems.length > 0 ? (
+                              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[min(60vh,22rem)] overflow-y-auto pr-1">
+                                {dropdownItems.map((item) => (
+                                  <li key={item.id}>
+                                    <Link
+                                      href={item.href}
+                                      className="flex items-center gap-3 rounded-xl p-2 -m-2 text-sm font-medium text-neutral-darkest hover:bg-background-main transition-colors"
+                                      onClick={() => setShopOpen(false)}
+                                    >
+                                      {item.imageUrl ? (
+                                        <Image
+                                          src={item.imageUrl}
+                                          alt=""
+                                          width={44}
+                                          height={44}
+                                          className="h-11 w-11 shrink-0 rounded-lg object-cover bg-neutral-light/40"
+                                        />
+                                      ) : (
+                                        <span className="h-11 w-11 shrink-0 rounded-lg bg-primary/10" aria-hidden />
+                                      )}
+                                      <span className="leading-snug">{item.title}</span>
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="text-sm text-neutral-dark">
+                                Categories will appear here once your Shopify store is connected.
+                              </p>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-                </div>
-              )}
-            </div>
 
-            {/* Hardcoded top-level links */}
-            <Link href="/pages/about" className="hover:text-primary transition-colors">
-              About Us
-            </Link>
-            <Link href="/pages/science" className="hover:text-primary transition-colors">
-              The Science
-            </Link>
-          </nav>
-        </div>
-
-        {/* Logo — center */}
-        <Link href="/" className="justify-self-center flex items-center">
-          <Image
-            src="/nutrizen-logo.png"
-            alt="NutriZen"
-            width={240}
-            height={56}
-            className="h-9 sm:h-10 md:h-11 w-auto max-w-[min(240px,70vw)] object-contain object-center"
-            priority
-          />
-        </Link>
-
-        {/* Actions — right */}
-        <div className="flex items-center gap-6 justify-self-end">
-          <button aria-label="Search" className="hover:text-primary transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
-          </button>
-          <button onClick={openCart} aria-label="Cart" className="hover:text-primary transition-colors relative">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-              <path d="M3 6h18" />
-              <path d="M16 10a4 4 0 0 1-8 0" />
-            </svg>
-            {cartItemCount > 0 && (
-              <span className="absolute -top-1.5 -right-2 bg-primary text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">
-                {cartItemCount}
-              </span>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-[200] md:hidden" role="dialog" aria-modal="true" aria-label="Site menu">
-          <button
-            type="button"
-            className="absolute inset-0 bg-neutral-darkest/40"
-            aria-label="Close menu"
-            onClick={() => setMobileOpen(false)}
-          />
-          <div className="absolute left-0 top-0 bottom-0 w-[min(100%,20rem)] bg-background-main shadow-xl flex flex-col pt-6 pb-8 px-5 overflow-y-auto">
-            <div className="flex justify-end mb-4">
-              <button
-                type="button"
-                className="p-2 rounded-lg text-neutral-dark hover:bg-neutral-light/60"
-                aria-label="Close menu"
-                onClick={() => setMobileOpen(false)}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 6 6 18" /><path d="m6 6 12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <nav className="flex flex-col gap-1 font-medium text-neutral-darkest">
-              <Link
-                href="/shop"
-                className="py-3 border-b border-neutral-light/80 text-primary font-semibold"
-                onClick={() => setMobileOpen(false)}
-              >
-                Shop all
-              </Link>
-
-              {/* Shopify main-menu links */}
-              {dropdownItems.length > 0 && (
-                <>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-dark pt-4 pb-2">Categories</p>
-                  {dropdownItems.map((item) => (
+                  {secondaryLinks.map((link) => (
                     <Link
-                      key={item.id}
-                      href={item.href}
-                      className="py-2.5 border-b border-neutral-light/50 text-sm hover:text-primary transition-colors"
-                      onClick={() => setMobileOpen(false)}
+                      key={link.href}
+                      href={link.href}
+                      className="hover:text-primary transition-colors duration-200 py-1 relative"
                     >
-                      {item.title}
+                      {link.label}
+                      {pathname === link.href && (
+                        <motion.span
+                          layoutId="navUnderline"
+                          className="absolute -bottom-0.5 left-0 right-0 h-[2px] bg-primary rounded-full"
+                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                        />
+                      )}
                     </Link>
                   ))}
-                </>
-              )}
+                </nav>
+              </div>
 
-              <Link
-                href="/pages/about"
-                className="py-3 mt-4 border-t border-neutral-light/80 hover:text-primary transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                About Us
+              {/* CENTER: logo */}
+              <Link href="/" className="justify-self-center flex items-center">
+                <Image
+                  src="/nutrizen-logo.png"
+                  alt="NutriZen"
+                  width={240}
+                  height={56}
+                  className={`w-auto object-contain object-center transition-all duration-500 ${isScrolled ? "h-8" : "h-9 sm:h-10 md:h-11"}`}
+                  priority
+                />
               </Link>
-              <Link
-                href="/pages/science"
-                className="py-2.5 border-b border-neutral-light/50 hover:text-primary transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                The Science
-              </Link>
-            </nav>
+
+              {/* RIGHT: actions */}
+              <div className="justify-self-end flex items-center gap-4">
+                <button aria-label="Search" className="hidden md:block text-neutral-dark hover:text-primary transition-colors duration-200">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                  </svg>
+                </button>
+
+                <button
+                  onClick={openCart}
+                  aria-label={`Cart${cartItemCount > 0 ? `, ${cartItemCount} items` : ""}`}
+                  className="relative text-neutral-dark hover:text-primary transition-colors duration-200"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                    <path d="M3 6h18" />
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+                  </svg>
+                  <AnimatePresence>
+                    {cartItemCount > 0 && (
+                      <motion.span
+                        key="cart-badge"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                        className="absolute -top-1.5 -right-2 bg-primary text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center"
+                      >
+                        {cartItemCount}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      </header>
+
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <div className="fixed inset-0 z-[200] md:hidden" role="dialog" aria-modal="true" aria-label="Site menu">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="absolute inset-0 bg-neutral-darkest/40"
+              onClick={() => setMobileOpen(false)}
+            />
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ duration: 0.38, ease: [0.32, 0, 0.16, 1] }}
+              className="absolute left-0 top-0 bottom-0 w-[min(100%,20rem)] bg-background-main shadow-2xl flex flex-col pt-6 pb-8 px-5 overflow-y-auto"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <Link href="/" onClick={() => setMobileOpen(false)}>
+                  <Image src="/nutrizen-logo.png" alt="NutriZen" width={140} height={36} className="h-8 w-auto" />
+                </Link>
+                <button
+                  type="button"
+                  className="p-2 rounded-lg text-neutral-dark hover:bg-neutral-light/60"
+                  onClick={() => setMobileOpen(false)}
+                  aria-label="Close menu"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <nav className="flex flex-col gap-1 font-medium text-neutral-darkest">
+                <Link href="/shop" className="py-3 border-b border-neutral-light/80 text-primary font-semibold" onClick={() => setMobileOpen(false)}>
+                  Shop all
+                </Link>
+
+                {dropdownItems.length > 0 && (
+                  <>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-neutral-dark pt-4 pb-2">Categories</p>
+                    {dropdownItems.map((item) => (
+                      <Link
+                        key={item.id}
+                        href={item.href}
+                        className="py-2.5 border-b border-neutral-light/50 text-sm hover:text-primary transition-colors"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        {item.title}
+                      </Link>
+                    ))}
+                  </>
+                )}
+
+                {secondaryLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="py-3 border-b border-neutral-light/50 hover:text-primary transition-colors mt-2"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </motion.div>
           </div>
-        </div>
-      )}
-    </motion.header>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
