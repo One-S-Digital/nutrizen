@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { loginCustomer, logoutCustomer, registerCustomer } from "@/lib/shopify-customer";
 import { CUSTOMER_TOKEN_COOKIE, type AuthState } from "@/lib/auth-config";
+import { validateEmail, validatePassword } from "@/lib/auth-validation";
 
 // ---------------------------------------------------------------------------
 // Set / clear token cookie helpers (server-only)
@@ -27,25 +28,6 @@ async function clearTokenCookie() {
 export async function getCustomerToken(): Promise<string | null> {
   const cookieStore = await cookies();
   return cookieStore.get(CUSTOMER_TOKEN_COOKIE)?.value ?? null;
-}
-
-// ---------------------------------------------------------------------------
-// Validation helpers
-// ---------------------------------------------------------------------------
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function validateEmail(email: string): string | null {
-  if (!email) return "Email is required.";
-  if (email.length > 254) return "Email address is too long.";
-  if (!EMAIL_RE.test(email)) return "Please enter a valid email address.";
-  return null;
-}
-
-function validatePassword(password: string): string | null {
-  if (!password) return "Password is required.";
-  if (password.length < 8) return "Password must be at least 8 characters.";
-  if (password.length > 128) return "Password is too long.";
-  return null;
 }
 
 // ---------------------------------------------------------------------------
