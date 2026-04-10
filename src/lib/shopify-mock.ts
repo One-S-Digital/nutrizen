@@ -95,6 +95,7 @@ type MarqueeProduct = {
 
 type ShopProduct = {
   id: string;
+  variantId: string | null;
   title: string;
   handle: string;
   priceDisplay: string;
@@ -112,6 +113,7 @@ type NavCollection = {
 
 type CollectionProductSummary = {
   id: string;
+  variantId: string | null;
   title: string;
   handle: string;
   price: string;
@@ -229,6 +231,7 @@ const MOCK_ROWS = [
 function toShopProduct(row: (typeof MOCK_ROWS)[number]): ShopProduct {
   return {
     id: row.id,
+    variantId: row.id.replace("Product", "ProductVariant") + "/default",
     title: row.title,
     handle: row.handle,
     priceDisplay: formatPrice(row.amount, ZAR),
@@ -240,6 +243,7 @@ function toShopProduct(row: (typeof MOCK_ROWS)[number]): ShopProduct {
 function toCollectionSummary(row: (typeof MOCK_ROWS)[number]): CollectionProductSummary {
   return {
     id: row.id,
+    variantId: row.id.replace("Product", "ProductVariant") + "/default",
     title: row.title,
     handle: row.handle,
     price: row.amount,
@@ -353,6 +357,7 @@ export function getMockCollections() {
       .filter(Boolean)
       .map((row) => ({
         id: row!.id,
+        variantId: row!.id.replace("Product", "ProductVariant") + "/default",
         title: row!.title,
         handle: row!.handle,
         price: formatPrice(row!.amount, ZAR),

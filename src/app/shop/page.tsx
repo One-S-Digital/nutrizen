@@ -72,6 +72,7 @@ export default async function ShopPage({
     if (!col) notFound();
     products = col.products.map((p) => ({
       id: p.id,
+      variantId: p.variantId,
       title: p.title,
       handle: p.handle,
       priceDisplay: formatPrice(p.price, p.currencyCode),

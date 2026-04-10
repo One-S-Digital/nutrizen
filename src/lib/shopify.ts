@@ -163,6 +163,13 @@ export async function getCollections() {
                     url
                     altText
                   }
+                  variants(first: 1) {
+                    edges {
+                      node {
+                        id
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -190,6 +197,7 @@ export async function getCollections() {
                   handle: string;
                   priceRange: { minVariantPrice: { amount: string; currencyCode: string } };
                   featuredImage: { url: string; altText: string | null } | null;
+                  variants: { edges: { node: { id: string } }[] };
                 };
               }[];
             };
@@ -218,6 +226,7 @@ export async function getCollections() {
             handle: string;
             priceRange: { minVariantPrice: { amount: string; currencyCode: string } };
             featuredImage: { url: string; altText: string | null } | null;
+            variants: { edges: { node: { id: string } }[] };
           };
         }) => {
           const pNode = productEdge.node;
@@ -225,6 +234,7 @@ export async function getCollections() {
           const currencyCode = pNode.priceRange.minVariantPrice.currencyCode;
           return {
             id: pNode.id,
+            variantId: pNode.variants.edges[0]?.node.id ?? null,
             title: pNode.title,
             handle: pNode.handle,
             price: formatPrice(amount, currencyCode),
@@ -309,6 +319,7 @@ export async function getMarqueeProducts(limit = 24): Promise<MarqueeProduct[]> 
 
 export type ShopProduct = {
   id: string;
+  variantId: string | null;
   title: string;
   handle: string;
   priceDisplay: string;
@@ -340,6 +351,13 @@ export async function getAllProductsForShop(limit = 250): Promise<ShopProduct[]>
                 currencyCode
               }
             }
+            variants(first: 1) {
+              edges {
+                node {
+                  id
+                }
+              }
+            }
           }
         }
       }
@@ -356,6 +374,7 @@ export async function getAllProductsForShop(limit = 250): Promise<ShopProduct[]>
             handle: string;
             featuredImage: { url: string; altText: string | null } | null;
             priceRange: { minVariantPrice: { amount: string; currencyCode: string } };
+            variants: { edges: { node: { id: string } }[] };
           };
         }[];
       };
@@ -367,6 +386,7 @@ export async function getAllProductsForShop(limit = 250): Promise<ShopProduct[]>
 
     return response.body.products.edges.map(({ node: n }) => ({
       id: n.id,
+      variantId: n.variants.edges[0]?.node.id ?? null,
       title: n.title,
       handle: n.handle,
       priceDisplay: formatPrice(
@@ -624,6 +644,7 @@ export async function getMainMenuLinks(
 
 export type CollectionProductSummary = {
   id: string;
+  variantId: string | null;
   title: string;
   handle: string;
   price: string;
@@ -671,6 +692,13 @@ export async function getCollectionByHandle(handle: string): Promise<CollectionP
                   currencyCode
                 }
               }
+              variants(first: 1) {
+                edges {
+                  node {
+                    id
+                  }
+                }
+              }
             }
           }
         }
@@ -694,6 +722,7 @@ export async function getCollectionByHandle(handle: string): Promise<CollectionP
                   handle: string;
                   featuredImage: { url: string; altText: string | null } | null;
                   priceRange: { minVariantPrice: { amount: string; currencyCode: string } };
+                  variants: { edges: { node: { id: string } }[] };
                 };
               }[];
             };
@@ -717,6 +746,7 @@ export async function getCollectionByHandle(handle: string): Promise<CollectionP
               handle: string;
               featuredImage: { url: string; altText: string | null } | null;
               priceRange: { minVariantPrice: { amount: string; currencyCode: string } };
+              variants: { edges: { node: { id: string } }[] };
             };
           }[];
         };
@@ -735,6 +765,7 @@ export async function getCollectionByHandle(handle: string): Promise<CollectionP
 
   const products: CollectionProductSummary[] = col.products.edges.map(({ node: n }) => ({
     id: n.id,
+    variantId: n.variants.edges[0]?.node.id ?? null,
     title: n.title,
     handle: n.handle,
     price: n.priceRange.minVariantPrice.amount,

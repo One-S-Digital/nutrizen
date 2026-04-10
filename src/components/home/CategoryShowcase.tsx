@@ -8,6 +8,7 @@ import { scrollEase, scrollViewport } from "@/lib/motion";
 
 export interface Product {
   id: string;
+  variantId?: string | null;
   title: string;
   price: string;
   imageUrl?: string;
@@ -194,7 +195,7 @@ export default function CategoryShowcase({ categories }: { categories: Category[
                 activeCategory.products.slice(0, 8).map((product) => (
                   <motion.div key={product.id} variants={cardVariants}>
                     <ProductCard
-                      id={product.id}
+                      id={product.variantId ?? product.id}
                       title={product.title}
                       price={product.price.toString()}
                       image={product.imageUrl || ""}

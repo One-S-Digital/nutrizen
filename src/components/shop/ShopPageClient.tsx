@@ -573,7 +573,7 @@ export default function ShopPageClient({
                         viewport={{ once: true, amount: 0.1 }}
                       >
                         <ProductCard
-                          id={product.id}
+                          id={product.variantId ?? product.id}
                           title={product.title}
                           price={product.priceDisplay}
                           image={product.imageUrl ?? ""}

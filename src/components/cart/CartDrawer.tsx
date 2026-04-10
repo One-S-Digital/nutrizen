@@ -1,13 +1,34 @@
 "use client";
 
+import { useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { createShopifyCheckout } from "@/app/actions/checkout";
 
 export default function CartDrawer() {
   const { isOpen, closeCart, items, updateQuantity, removeFromCart } = useCartStore();
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   const total = items.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+
+  async function handleCheckout() {
+    setCheckingOut(true);
+    setCheckoutError(null);
+    try {
+      const url = await createShopifyCheckout(items);
+      if (url) {
+        window.location.href = url;
+      } else {
+        setCheckoutError("Checkout is unavailable. Please try again or contact support.");
+        setCheckingOut(false);
+      }
+    } catch {
+      setCheckoutError("Something went wrong. Please try again.");
+      setCheckingOut(false);
+    }
+  }
 
   return (
     <AnimatePresence>
@@ -81,7 +102,12 @@ export default function CartDrawer() {
                   <span className="font-bold text-2xl text-neutral-darkest">R {total.toFixed(2)}</span>
                 </div>
                 <p className="text-sm text-neutral-dark mb-6 text-center">Shipping and taxes calculated at checkout.</p>
-                <Button fullWidth size="lg">Checkout Securely</Button>
+                {checkoutError && (
+                  <p className="text-sm text-red-500 mb-4 text-center">{checkoutError}</p>
+                )}
+                <Button fullWidth size="lg" onClick={handleCheckout} disabled={checkingOut}>
+                  {checkingOut ? "Redirecting…" : "Checkout Securely"}
+                </Button>
               </div>
             )}
           </motion.div>
