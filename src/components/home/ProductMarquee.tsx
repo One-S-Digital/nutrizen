@@ -91,7 +91,7 @@ export default function ProductMarquee({ products }: ProductMarqueeProps) {
   const duplicatedItems = [...items, ...items];
 
   return (
-    <div className="bg-[#425244] py-4 overflow-hidden border-y border-white/10 flex items-center relative z-20 -mt-6 md:-mt-16 lg:-mt-24 xl:-mt-[min(12rem,15vh)]">
+    <div className="bg-[#425244] py-4 overflow-hidden border-y border-white/10 flex items-center relative z-20">
       <div className="flex w-[200%] animate-marquee gap-8 items-center cursor-pointer hover:[animation-play-state:paused]">
         {duplicatedItems.map((item, i) => (
           <div key={`${item.href}-${i}`} className="flex items-center gap-8 flex-shrink-0">
