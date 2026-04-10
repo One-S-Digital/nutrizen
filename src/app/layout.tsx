@@ -61,9 +61,9 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: [
       {
-        url: "/nutrizen-logo.png",
-        width: 1200,
-        height: 630,
+        url: "/nutrizen favicon.png",
+        width: 762,
+        height: 762,
         alt: "NutriZen – Premium Natural Supplements",
       },
     ],
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${SITE_NAME} | Premium Natural Supplements`,
     description: SITE_DESCRIPTION,
-    images: ["/nutrizen-logo.png"],
+    images: ["/nutrizen favicon.png"],
     creator: "@nutrizen",
   },
   alternates: {
