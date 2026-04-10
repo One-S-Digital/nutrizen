@@ -9,9 +9,109 @@ import { shouldUseShopifyMock } from "@/lib/shopify-mode";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
+const SITE_NAME = "NutriZen";
+const SITE_DESCRIPTION =
+  "Premium natural supplements formulated for real results. Transparent ingredients, high-quality nutrient forms, and targeted support for your wellness goals. Free delivery across South Africa.";
+
 export const metadata: Metadata = {
-  title: "NutriZen | Premium Natural Supplements",
-  description: "High-conversion, immersive digital experience for premium wellness.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${SITE_NAME} | Premium Natural Supplements`,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  keywords: [
+    "natural supplements",
+    "premium supplements South Africa",
+    "vitamins and minerals",
+    "bioavailable supplements",
+    "immune support",
+    "magnesium complex",
+    "vitamin D3",
+    "iron supplement",
+    "glutathione",
+    "adaptogen",
+    "wellness supplements",
+    "NutriZen",
+    "transparent ingredients",
+    "supplement South Africa",
+  ],
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  category: "Health & Wellness",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_ZA",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} | Premium Natural Supplements`,
+    description: SITE_DESCRIPTION,
+    images: [
+      {
+        url: "/nutrizen-logo.png",
+        width: 1200,
+        height: 630,
+        alt: "NutriZen – Premium Natural Supplements",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME} | Premium Natural Supplements`,
+    description: SITE_DESCRIPTION,
+    images: ["/nutrizen-logo.png"],
+    creator: "@nutrizen",
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "",
+  },
+};
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: SITE_NAME,
+  url: SITE_URL,
+  logo: `${SITE_URL}/nutrizen-logo.png`,
+  description: SITE_DESCRIPTION,
+  email: "hello@nutrizen.co.za",
+  address: {
+    "@type": "PostalAddress",
+    addressCountry: "ZA",
+  },
+  sameAs: [],
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE_NAME,
+  url: SITE_URL,
+  description: SITE_DESCRIPTION,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${SITE_URL}/shop?q={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
 };
 
 export default async function RootLayout({
@@ -28,6 +128,16 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+      </head>
       <body
         className={`${inter.variable} font-sans bg-background-main text-neutral-darkest antialiased flex flex-col min-h-screen`}
       >

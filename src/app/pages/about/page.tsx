@@ -8,10 +8,28 @@ import ProductPurposeStrip from "@/components/story/ProductPurposeStrip";
 import BrandQuoteSection from "@/components/story/BrandQuoteSection";
 import StoryFinalCta from "@/components/story/StoryFinalCta";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
+
 export const metadata: Metadata = {
-  title: "Our Story | NutriZen",
+  title: "Our Story",
   description:
-    "Why NutriZen exists: targeted formulas, true doses, better nutrient forms-and a calmer way to choose supplements.",
+    "Why NutriZen exists: targeted formulas, true doses, better nutrient forms, and a calmer way to choose supplements. Transparent ingredients you can verify, high-quality nutrient forms chosen for absorption.",
+  keywords: [
+    "NutriZen story",
+    "about NutriZen",
+    "supplement transparency",
+    "why NutriZen",
+    "natural supplement brand South Africa",
+    "honest supplements",
+  ],
+  alternates: { canonical: `${SITE_URL}/pages/about` },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/pages/about`,
+    title: "Our Story | NutriZen",
+    description:
+      "Why NutriZen exists: targeted formulas, true doses, better nutrient forms, and a calmer way to choose supplements.",
+  },
 };
 
 const COMPARE_LEFT = [

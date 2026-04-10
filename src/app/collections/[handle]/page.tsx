@@ -1,10 +1,42 @@
 export const revalidate = 300;
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getCollectionByHandle } from "@/lib/shopify";
 import { formatPrice } from "@/lib/formatPrice";
+import JsonLd from "@/components/seo/JsonLd";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ handle: string }>;
+}): Promise<Metadata> {
+  const { handle } = await params;
+  const data = await getCollectionByHandle(handle);
+  if (!data) return {};
+
+  const canonical = `${SITE_URL}/collections/${handle}`;
+  const description =
+    data.description
+      ? `${data.description.slice(0, 140)} – Shop the ${data.title} range at NutriZen.`
+      : `Shop the ${data.title} collection at NutriZen. Premium natural supplements with transparent ingredients, delivered across South Africa.`;
+
+  return {
+    title: data.title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      type: "website",
+      url: canonical,
+      title: `${data.title} | NutriZen`,
+      description,
+    },
+  };
+}
 
 export default async function CollectionPage({
   params,
@@ -17,10 +49,29 @@ export default async function CollectionPage({
     notFound();
   }
 
+  const canonical = `${SITE_URL}/collections/${handle}`;
+
+  const collectionSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: data.title,
+    url: canonical,
+    description: data.description || undefined,
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Shop", item: `${SITE_URL}/shop` },
+        { "@type": "ListItem", position: 3, name: data.title, item: canonical },
+      ],
+    },
+  };
+
   return (
     <div className="bg-background-main min-h-screen pb-24 pt-10">
+      <JsonLd data={collectionSchema} />
       <div className="max-w-7xl mx-auto px-6">
-        <nav className="text-sm text-neutral-dark mb-8">
+        <nav className="text-sm text-neutral-dark mb-8" aria-label="Breadcrumb">
           <Link href="/" className="hover:text-primary">
             Home
           </Link>

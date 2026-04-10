@@ -259,6 +259,17 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                   </svg>
                 </button>
 
+                <a
+                  href="/pages/account"
+                  aria-label="My account"
+                  className="hidden md:block text-neutral-dark hover:text-primary transition-colors duration-200"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M20 21a8 8 0 0 0-16 0" />
+                  </svg>
+                </a>
+
                 <button
                   onClick={openCart}
                   aria-label={`Cart${cartItemCount > 0 ? `, ${cartItemCount} items` : ""}`}
@@ -356,6 +367,14 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                     {link.label}
                   </Link>
                 ))}
+
+                <Link
+                  href="/pages/account"
+                  className="py-3 border-b border-neutral-light/50 hover:text-primary transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  My account
+                </Link>
               </nav>
             </motion.div>
           </div>

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   getAllProductsForShop,
@@ -10,6 +11,32 @@ import { formatPrice } from "@/lib/formatPrice";
 import ShopPageClient from "@/components/shop/ShopPageClient";
 
 export const revalidate = 300;
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
+
+export const metadata: Metadata = {
+  title: "Shop Supplements",
+  description:
+    "Browse the full NutriZen supplement range. Immune support, magnesium, vitamin D3, iron, glutathione, and more – premium formulas with transparent ingredients, delivered across South Africa.",
+  keywords: [
+    "buy supplements South Africa",
+    "online supplement store",
+    "natural vitamins South Africa",
+    "magnesium supplement",
+    "immune support",
+    "vitamin D South Africa",
+    "iron supplement",
+    "NutriZen shop",
+  ],
+  alternates: { canonical: `${SITE_URL}/shop` },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/shop`,
+    title: "Shop Supplements | NutriZen",
+    description:
+      "Premium natural supplements with transparent ingredients. Browse immune support, energy, sleep, and mineral formulas – delivered across South Africa.",
+  },
+};
 
 export default async function ShopPage({
   searchParams,

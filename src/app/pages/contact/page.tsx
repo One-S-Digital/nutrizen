@@ -3,10 +3,21 @@ import Link from "next/link";
 import ContactForm from "@/components/pages/ContactForm";
 
 const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "hello@nutrizen.co.za";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
 
 export const metadata: Metadata = {
-  title: "Contact | NutriZen",
-  description: "Reach the NutriZen team for product questions, order help, or partnerships.",
+  title: "Contact",
+  description:
+    "Reach the NutriZen team for product questions, order help, or partnerships. We respond within 1–2 business days, Monday to Friday.",
+  keywords: ["contact NutriZen", "NutriZen support", "supplement help South Africa"],
+  alternates: { canonical: `${SITE_URL}/pages/contact` },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/pages/contact`,
+    title: "Contact | NutriZen",
+    description:
+      "Reach the NutriZen team for product questions, order help, or partnerships. We respond within 1–2 business days.",
+  },
 };
 
 export default function ContactPage() {

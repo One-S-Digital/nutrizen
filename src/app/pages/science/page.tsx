@@ -6,10 +6,29 @@ import BioavailabilityStrip from "@/components/science/BioavailabilityStrip";
 import ComparisonSection from "@/components/brand/ComparisonSection";
 import StoryFinalCta from "@/components/story/StoryFinalCta";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
+
 export const metadata: Metadata = {
-  title: "The Science | NutriZen",
+  title: "The Science",
   description:
-    "How NutriZen formulates for bioavailability, synergy, and credible dosing-explained clearly, without the hype.",
+    "How NutriZen formulates for bioavailability, synergy, and credible dosing – explained clearly, without the hype. Nutrient forms chosen for uptake, transparent labelling, and evidence-aligned dosing.",
+  keywords: [
+    "supplement bioavailability",
+    "nutrient absorption",
+    "supplement science",
+    "chelated minerals",
+    "NutriZen formulation",
+    "evidence-based supplements",
+    "synergistic nutrients",
+  ],
+  alternates: { canonical: `${SITE_URL}/pages/science` },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/pages/science`,
+    title: "The Science | NutriZen",
+    description:
+      "How NutriZen formulates for bioavailability, synergy, and credible dosing – explained clearly, without the hype.",
+  },
 };
 
 const SCIENCE_LEFT = [

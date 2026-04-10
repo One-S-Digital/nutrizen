@@ -1,0 +1,43 @@
+# NutriZen
+
+> Premium natural supplements formulated for real results. Transparent ingredients, high-quality bioavailable nutrient forms, and targeted support for your wellness goals. Delivered across South Africa.
+
+NutriZen is an online supplement brand based in South Africa. We sell premium, scientifically formulated nutritional supplements with a focus on ingredient transparency, bioavailability, and purposeful dosing.
+
+## What we sell
+
+- **Immune support** – formulas targeting immune resilience with vitamins C, D3, zinc, and elderberry
+- **Magnesium Complex** – magnesium in highly absorbable forms (bisglycinate, malate) for sleep, muscle function, and stress support
+- **Vitamin D3** – cholecalciferol for bone health, immunity, and mood
+- **Iron** – gentle, bioavailable iron for energy and haemoglobin support
+- **Glutathione** – master antioxidant for cellular health
+- **Para Cleanse** – herbal-based digestive support formula
+- **Adaptogen blends** – stress and cortisol support formulas
+- **Combo packs** – bundled supplement stacks (e.g. Immunity Power Pack)
+
+## Key pages
+
+- Homepage: https://nutrizen.co.za/
+- Shop all products: https://nutrizen.co.za/shop
+- Our Story (about): https://nutrizen.co.za/pages/about
+- The Science (formulation philosophy): https://nutrizen.co.za/pages/science
+- FAQ: https://nutrizen.co.za/pages/faq
+- Contact: https://nutrizen.co.za/pages/contact
+
+## Brand values
+
+- **Transparency** – every ingredient listed with its form and purpose
+- **Bioavailability first** – nutrient forms chosen for absorption, not cost
+- **Targeted formulas** – supplements built around specific health goals
+- **No proprietary blends** – no hidden stacks or filler-heavy formulas
+- **Evidence-aligned dosing** – amounts grounded in published research
+
+## Shipping & service
+
+- Delivers nationwide across South Africa
+- Response time: 1–2 business days, Monday to Friday
+- Contact: hello@nutrizen.co.za
+
+## Sitemap
+
+https://nutrizen.co.za/sitemap.xml
