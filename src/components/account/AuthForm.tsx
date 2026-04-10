@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { loginAction, registerAction, type AuthState } from "@/lib/actions/auth";
+import { loginAction, registerAction } from "@/lib/actions/auth";
+import type { AuthState } from "@/lib/auth-config";
 
 const initialState: AuthState = {};
 

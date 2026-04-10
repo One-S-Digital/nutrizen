@@ -3,13 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { loginCustomer, logoutCustomer, registerCustomer } from "@/lib/shopify-customer";
-
-export const CUSTOMER_TOKEN_COOKIE = "nutrizen_customer_token";
-
-export type AuthState = {
-  error?: string;
-  fieldErrors?: Record<string, string>;
-};
+import { CUSTOMER_TOKEN_COOKIE, type AuthState } from "@/lib/auth-config";
 
 // ---------------------------------------------------------------------------
 // Set / clear token cookie helpers (server-only)
@@ -81,7 +75,6 @@ export async function registerAction(
   const { customer, errors } = await registerCustomer({ firstName, lastName, email, password });
 
   if (errors.length > 0 || !customer) {
-    // Map field-level Shopify errors
     const fe: Record<string, string> = {};
     for (const err of errors) {
       const field = err.field?.[err.field.length - 1];
