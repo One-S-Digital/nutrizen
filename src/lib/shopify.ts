@@ -102,7 +102,16 @@ export async function shopifyFetch<T>({
       // cache: "force-cache",
     });
 
-    const body = await response.json();
+    const text = await response.text();
+
+    if (!response.ok || text.trimStart().startsWith("<")) {
+      console.error(
+        `[shopify] Non-JSON response. URL: ${endpoint} Status: ${response.status} Body: ${text.slice(0, 300)}`
+      );
+      return { status: response.status, body: undefined };
+    }
+
+    const body = JSON.parse(text);
 
     if (body.errors) {
       console.error("[shopify] GraphQL errors:", JSON.stringify(body.errors));
@@ -115,7 +124,7 @@ export async function shopifyFetch<T>({
 
     return {
       status: response.status,
-      body: body.data, // Return just the data part by default
+      body: body.data,
     };
   } catch (error) {
     console.error('Error fetching from Shopify:', error);
@@ -632,8 +641,11 @@ export type CollectionPageData = {
 };
 
 export async function getCollectionByHandle(handle: string): Promise<CollectionPageData | null> {
+  const cleanHandle = handle?.trim().toLowerCase();
+  if (!cleanHandle || cleanHandle.length > 255 || !HANDLE_RE.test(cleanHandle)) return null;
+
   if (shouldUseShopifyMock()) {
-    return getMockCollectionByHandle(handle);
+    return getMockCollectionByHandle(cleanHandle);
   }
 
   const query = `
