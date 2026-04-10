@@ -7,13 +7,18 @@ const defaultEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "hello@nut
 export default function ContactForm() {
   const [sentHint, setSentHint] = useState(false);
 
+  /** Strip newlines and CR to prevent email header injection via mailto: URLs */
+  function sanitizeMailto(input: string, maxLength = 500): string {
+    return input.replace(/[\r\n]/g, " ").substring(0, maxLength);
+  }
+
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const fd = new FormData(form);
-    const name = String(fd.get("name") || "").trim();
-    const email = String(fd.get("email") || "").trim();
-    const message = String(fd.get("message") || "").trim();
+    const name = sanitizeMailto(String(fd.get("name") || "").trim());
+    const email = sanitizeMailto(String(fd.get("email") || "").trim(), 254);
+    const message = sanitizeMailto(String(fd.get("message") || "").trim(), 2000);
     const subject = encodeURIComponent(`NutriZen website: ${name || "Enquiry"}`);
     const body = encodeURIComponent(
       [name && `Name: ${name}`, email && `Email: ${email}`, "", message].filter(Boolean).join("\n")

@@ -1,3 +1,4 @@
+import sanitizeHtml from "sanitize-html";
 import { formatPrice } from "@/lib/formatPrice";
 import {
   parseIngredientReferences,
@@ -34,6 +35,35 @@ import {
   getMockNavCollections,
   getMockProductDetail,
 } from "@/lib/shopify-mock";
+
+/** Allowed HTML tags/attributes for product description rendering */
+const DESCRIPTION_HTML_ALLOWED_TAGS = [
+  "p", "br", "b", "i", "em", "strong", "ul", "ol", "li", "a", "span", "h2", "h3", "h4",
+];
+
+function sanitizeDescriptionHtml(html: string): string {
+  return sanitizeHtml(html, {
+    allowedTags: DESCRIPTION_HTML_ALLOWED_TAGS,
+    allowedAttributes: {
+      a: ["href", "target", "rel"],
+      span: ["class"],
+    },
+    allowedSchemes: ["https", "mailto"],
+    // Force external links to be safe
+    transformTags: {
+      a: (tagName, attribs) => {
+        const result: { tagName: string; attribs: Record<string, string> } = {
+          tagName,
+          attribs: { ...attribs, rel: "noopener noreferrer" },
+        };
+        if (!attribs.href?.startsWith("mailto:")) {
+          result.attribs.target = "_blank";
+        }
+        return result;
+      },
+    },
+  });
+}
 
 const domain = process.env.SHOPIFY_STORE_DOMAIN;
 const storefrontAccessToken = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
@@ -761,9 +791,11 @@ function stripHtml(html: string): string {
 }
 
 /** PDP: live Storefront product or mock row (preview). */
+const HANDLE_RE = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/;
+
 export async function getProductDetail(handle: string): Promise<ProductDetail | null> {
-  const clean = handle?.trim();
-  if (!clean) return null;
+  const clean = handle?.trim().toLowerCase();
+  if (!clean || clean.length > 255 || !HANDLE_RE.test(clean)) return null;
 
   if (shouldUseShopifyMock()) {
     const m = getMockProductDetail(clean);
@@ -1176,7 +1208,7 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
     title: p.title,
     handle: p.handle,
     description: plain,
-    descriptionHtml: p.descriptionHtml ?? plain,
+    descriptionHtml: sanitizeDescriptionHtml(p.descriptionHtml ?? plain),
     priceDisplay: formatPrice(min.amount, min.currencyCode),
     amount: min.amount,
     currencyCode: min.currencyCode,
