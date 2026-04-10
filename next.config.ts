@@ -31,6 +31,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Prevent Next.js from bundling sanitize-html (CJS package) — load it from node_modules at runtime
+  serverExternalPackages: ["sanitize-html"],
   async headers() {
     return [
       {
