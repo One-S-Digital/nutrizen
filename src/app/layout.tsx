@@ -4,7 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/cart/CartDrawer";
-import { getFooterColumns, getMainMenuLinks, getNavCollections } from "@/lib/shopify";
+import { getFooterColumnsCached, getMainMenuLinksCached, getNavCollectionsCached } from "@/lib/shopify";
 import { shouldUseShopifyMock } from "@/lib/shopify-mode";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -119,10 +119,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const shopCategories = await getNavCollections();
+  const shopCategories = await getNavCollectionsCached();
   const [footerColumns, mainMenuLinks] = await Promise.all([
-    getFooterColumns(shopCategories),
-    getMainMenuLinks(shopCategories),
+    getFooterColumnsCached(shopCategories),
+    getMainMenuLinksCached(shopCategories),
   ]);
   const previewMockCatalog = shouldUseShopifyMock();
 

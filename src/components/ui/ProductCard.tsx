@@ -21,9 +21,11 @@ interface ProductCardProps {
   image: string;
   badge?: string;
   handle: string;
+  /** Pass true for above-the-fold cards (first row) to preload the image. */
+  priority?: boolean;
 }
 
-export function ProductCard({ id, title, price, image, badge, handle }: ProductCardProps) {
+export function ProductCard({ id, title, price, image, badge, handle, priority = false }: ProductCardProps) {
   const { addToCart } = useCartStore();
   const hasImage = Boolean(image && image.startsWith("https://"));
   const reduceMotion = useReducedMotion();
@@ -101,6 +103,7 @@ export function ProductCard({ id, title, price, image, badge, handle }: ProductC
                 fill
                 className="object-contain p-6"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                priority={priority}
               />
             </motion.div>
           ) : (

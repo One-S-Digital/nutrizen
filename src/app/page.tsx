@@ -9,7 +9,7 @@ import CategoryShowcase from "@/components/home/CategoryShowcase";
 import IngredientBreakdown from "@/components/home/IngredientBreakdown";
 import SocialProof from "@/components/home/SocialProof";
 import JsonLd from "@/components/seo/JsonLd";
-import { getCollections, getMarqueeProducts, isShopifyConfigured } from "@/lib/shopify";
+import { getCollectionsCached, getMarqueeProductsCached, isShopifyConfigured } from "@/lib/shopify";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
 
@@ -70,8 +70,8 @@ const homePageSchema = {
 
 export default async function Home() {
   const [collections, marqueeProducts] = await Promise.all([
-    getCollections(),
-    getMarqueeProducts(24),
+    getCollectionsCached(),
+    getMarqueeProductsCached(24),
   ]);
 
   const shopifyReady = isShopifyConfigured();

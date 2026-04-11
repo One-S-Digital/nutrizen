@@ -1,3 +1,5 @@
+export const revalidate = 86400; // 24 hours — static content
+
 import type { Metadata } from "next";
 import AboutHero from "@/components/story/AboutHero";
 import StoryProblemSection from "@/components/story/StoryProblemSection";

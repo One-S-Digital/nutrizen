@@ -579,6 +579,7 @@ export default function ShopPageClient({
                           image={product.imageUrl ?? ""}
                           handle={product.handle}
                           badge={getProductTag(product.title, i)}
+                          priority={i < 4}
                         />
                       </motion.div>
                     ))}

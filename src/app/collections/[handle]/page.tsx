@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getCollectionByHandle } from "@/lib/shopify";
+import { getCollectionByHandleCached } from "@/lib/shopify";
 import { formatPrice } from "@/lib/formatPrice";
 import JsonLd from "@/components/seo/JsonLd";
 
@@ -16,7 +16,7 @@ export async function generateMetadata({
   params: Promise<{ handle: string }>;
 }): Promise<Metadata> {
   const { handle } = await params;
-  const data = await getCollectionByHandle(handle);
+  const data = await getCollectionByHandleCached(handle);
   if (!data) return {};
 
   const canonical = `${SITE_URL}/collections/${handle}`;
@@ -44,7 +44,7 @@ export default async function CollectionPage({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
-  const data = await getCollectionByHandle(handle);
+  const data = await getCollectionByHandleCached(handle);
   if (!data) {
     notFound();
   }

@@ -1,4 +1,5 @@
 import sanitizeHtml from "sanitize-html";
+import { unstable_cache } from "next/cache";
 import { formatPrice } from "@/lib/formatPrice";
 import {
   parseIngredientReferences,
@@ -1345,3 +1346,65 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
     seoDescription,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Cached exports — use these in pages and layouts instead of the raw functions.
+// unstable_cache stores results in Next.js's server-side data cache, keyed by
+// the arguments, so concurrent requests and revalidations share one result.
+// ---------------------------------------------------------------------------
+
+/** Cached nav collections — 1 hour TTL. Used in layout on every page. */
+export const getNavCollectionsCached = unstable_cache(
+  getNavCollections,
+  ["nav-collections"],
+  { revalidate: 3600, tags: ["nav"] }
+);
+
+/** Cached footer columns — 1 hour TTL. Used in layout on every page. */
+export const getFooterColumnsCached = unstable_cache(
+  getFooterColumns,
+  ["footer-columns"],
+  { revalidate: 3600, tags: ["nav"] }
+);
+
+/** Cached main menu links — 1 hour TTL. Used in layout on every page. */
+export const getMainMenuLinksCached = unstable_cache(
+  getMainMenuLinks,
+  ["main-menu-links"],
+  { revalidate: 3600, tags: ["nav"] }
+);
+
+/** Cached collections (homepage tabs) — 5 min TTL. */
+export const getCollectionsCached = unstable_cache(
+  getCollections,
+  ["collections"],
+  { revalidate: 300, tags: ["collections"] }
+);
+
+/** Cached marquee products — 5 min TTL. */
+export const getMarqueeProductsCached = unstable_cache(
+  (limit: number) => getMarqueeProducts(limit),
+  ["marquee-products"],
+  { revalidate: 300, tags: ["products"] }
+);
+
+/** Cached full shop product list — 5 min TTL. */
+export const getAllProductsForShopCached = unstable_cache(
+  (limit?: number) => getAllProductsForShop(limit),
+  ["all-products"],
+  { revalidate: 300, tags: ["products"] }
+);
+
+/** Cached collection page data — 5 min TTL. */
+export const getCollectionByHandleCached = unstable_cache(
+  (handle: string) => getCollectionByHandle(handle),
+  ["collection-by-handle"],
+  { revalidate: 300, tags: ["collections"] }
+);
+
+/** Cached product detail — 5 min TTL. */
+export const getProductDetailCached = unstable_cache(
+  (handle: string) => getProductDetail(handle),
+  ["product-detail"],
+  { revalidate: 300, tags: ["products"] }
+);

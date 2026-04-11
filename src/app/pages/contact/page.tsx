@@ -1,3 +1,5 @@
+export const revalidate = 86400; // 24 hours — static content
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import ContactForm from "@/components/pages/ContactForm";

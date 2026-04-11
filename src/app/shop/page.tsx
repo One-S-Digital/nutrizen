@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
-  getAllProductsForShop,
-  getCollectionByHandle,
-  getNavCollections,
-  getMainMenuLinks,
+  getAllProductsForShopCached,
+  getCollectionByHandleCached,
+  getNavCollectionsCached,
+  getMainMenuLinksCached,
   type ShopProduct,
 } from "@/lib/shopify";
 import { formatPrice } from "@/lib/formatPrice";
@@ -46,8 +46,8 @@ export default async function ShopPage({
   const { collection: collectionParam } = await searchParams;
   const collectionHandle = collectionParam?.trim();
 
-  const navCollections = await getNavCollections();
-  const menuLinks = await getMainMenuLinks(navCollections);
+  const navCollections = await getNavCollectionsCached();
+  const menuLinks = await getMainMenuLinksCached(navCollections);
 
   // Build an ordered list of collections matching the Shopify main-menu.
   // Fall back to all nav collections if the menu has no collection links.
@@ -68,7 +68,7 @@ export default async function ShopPage({
   let products: ShopProduct[];
 
   if (collectionHandle) {
-    const col = await getCollectionByHandle(collectionHandle);
+    const col = await getCollectionByHandleCached(collectionHandle);
     if (!col) notFound();
     products = col.products.map((p) => ({
       id: p.id,
@@ -80,7 +80,7 @@ export default async function ShopPage({
       imageAlt: p.imageAlt,
     }));
   } else {
-    products = await getAllProductsForShop();
+    products = await getAllProductsForShopCached();
   }
 
   return (

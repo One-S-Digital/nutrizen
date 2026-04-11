@@ -209,19 +209,19 @@ Steps:
 
 ## 4e. Product page — reviews section
 
-A full reviews section (average score, star breakdown, review cards, “load more”) renders below the FAQ section when `custom.product_reviews` is populated.
+A full reviews section (average score, star breakdown, review cards, “load more”) renders below the FAQ section when `custom.customer_reviews` is populated.
 
-> **Note:** This uses product metafields for reviews — not Shopify’s native Product Reviews app. If you want to use an external reviews app (e.g. Judge.me, Yotpo), replace the `ProductReviewsSection` component with the app’s embed and remove the `product_reviews` metafield.
+> **Note:** This uses product metafields for reviews — not Shopify’s native Product Reviews app. If you want to use an external reviews app (e.g. Judge.me, Yotpo), replace the `ProductReviewsSection` component with the app’s embed and remove the `customer_reviews` metafield.
 
 ### Product metafield
 
 | Namespace | Key | Type | Purpose |
 |-----------|-----|------|---------|
-| `custom` | `product_reviews` | **List of metaobject references** | Individual customer reviews. Up to 50 items. |
+| `custom` | `customer_reviews` | **List of metaobject references** | Individual customer reviews. Up to 50 items. |
 
-### Metaobject type: product review (for `product_reviews`)
+### Metaobject type: product review (for `customer_reviews`)
 
-Create a **Metaobject definition** (recommended handle: `product_review`). Add fields:
+Create a **Metaobject definition** (recommended handle: `customer_review`). Add fields:
 
 | Field key | Type | Purpose |
 |-----------|------|---------|
@@ -233,11 +233,11 @@ Create a **Metaobject definition** (recommended handle: `product_review`). Add f
 Aliases supported: `name` for `author`; `review` / `text` for `body`; `review_date` for `date`.
 
 Steps:
-1. Create the `product_review` metaobject definition in **Settings → Custom data → Metaobjects**.
+1. Create the `customer_review` metaobject definition in **Settings → Custom data → Metaobjects**.
 2. Add review entries in **Content → Metaobjects**.
-3. Create the `custom.product_reviews` product metafield definition as **List of metaobject references** pointing to `product_review`.
+3. Create the `custom.customer_reviews` product metafield definition as **List of metaobject references** pointing to `customer_review`.
 4. Enable **Storefront API** access on both definitions.
-5. On each product, assign the review entries to the `product_reviews` metafield.
+5. On each product, assign the review entries to the `customer_reviews` metafield.
 
 The UI shows **6 reviews** by default with a **Load more** button for the rest.
 
@@ -275,7 +275,7 @@ That mock product includes sample data for every PDP section:
 - [ ] Optional: Editorial metafields and metaobjects from [§4b](#4b-product-page--editorial-sections-info-strip--timeline) for the info strip and timeline.
 - [ ] Optional: `custom.trust_badges` (multi-line text) for trust badge pills — see [§4c](#4c-product-page--express-shipping--trust-badges).
 - [ ] Optional: `custom.faq_items` + `faq_item` metaobject definition — see [§4d](#4d-product-page--faq-section).
-- [ ] Optional: `custom.product_reviews` + `product_review` metaobject definition — see [§4e](#4e-product-page--reviews-section).
+- [ ] Optional: `custom.customer_reviews` + `customer_review` metaobject definition — see [§4e](#4e-product-page--reviews-section).
 - [ ] Production env vars configured on the hosting provider.
 - [ ] Optional: `SHOPIFY_USE_MOCK=false` in development/preview if you want to test against a real store.
 
