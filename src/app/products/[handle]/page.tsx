@@ -1,10 +1,15 @@
 export const revalidate = 300;
 
+import { cache } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProductDetail } from "@/lib/shopify";
 import ProductDetailClient from "./ProductDetailClient";
 import JsonLd from "@/components/seo/JsonLd";
+
+// Deduplicate: generateMetadata and the page component both call this.
+// React.cache() ensures a single fetch per handle per render pass.
+const getProductDetailCached = cache(getProductDetail);
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
 
@@ -14,7 +19,7 @@ export async function generateMetadata({
   params: Promise<{ handle: string }>;
 }): Promise<Metadata> {
   const { handle } = await params;
-  const product = await getProductDetail(handle);
+  const product = await getProductDetailCached(handle);
   if (!product) return {};
 
   const title = product.seoTitle ?? product.title;
@@ -65,7 +70,7 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
-  const product = await getProductDetail(handle);
+  const product = await getProductDetailCached(handle);
   if (!product) {
     notFound();
   }

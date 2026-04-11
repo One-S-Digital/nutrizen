@@ -82,6 +82,29 @@ console.log(
     : "endpoint=(will not fetch — domain missing)"
 );
 
+// ---------------------------------------------------------------------------
+// Concurrency limiter — prevents Render from sending too many simultaneous
+// requests to Shopify, which causes ETIMEDOUT on the store's free/basic tier.
+// Max 2 in-flight Storefront API requests at a time.
+// ---------------------------------------------------------------------------
+const MAX_CONCURRENT = 2;
+let activeRequests = 0;
+const waitQueue: Array<() => void> = [];
+
+function acquireSlot(): Promise<void> {
+  if (activeRequests < MAX_CONCURRENT) {
+    activeRequests++;
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => waitQueue.push(() => { activeRequests++; resolve(); }));
+}
+
+function releaseSlot() {
+  activeRequests--;
+  const next = waitQueue.shift();
+  if (next) next();
+}
+
 /** True when live Storefront credentials exist, or when preview/mock catalog is active. */
 export function isShopifyConfigured(): boolean {
   if (shouldUseShopifyMock()) return true;
@@ -102,6 +125,8 @@ export async function shopifyFetch<T>({
   }
 
   const endpoint = `https://${domain.replace(/^https?:\/\//, "").replace(/\/$/, "")}/api/2026-01/graphql.json`;
+
+  await acquireSlot();
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -137,6 +162,7 @@ export async function shopifyFetch<T>({
         `[shopify] ✗ ${queryName} — HTTP ${response.status} after ${elapsed}ms — body: ${text.slice(0, 300)}`
       );
       clearTimeout(timeoutId);
+      releaseSlot();
       return { status: response.status, body: undefined };
     }
 
@@ -145,6 +171,7 @@ export async function shopifyFetch<T>({
     if (body.errors) {
       console.error(`[shopify] ✗ ${queryName} — GraphQL errors after ${elapsed}ms:`, JSON.stringify(body.errors));
       clearTimeout(timeoutId);
+      releaseSlot();
       throw body.errors[0];
     }
 
@@ -155,12 +182,14 @@ export async function shopifyFetch<T>({
     }
 
     clearTimeout(timeoutId);
+    releaseSlot();
     return {
       status: response.status,
       body: body.data,
     };
   } catch (error) {
     clearTimeout(timeoutId);
+    releaseSlot();
     const elapsed = Date.now() - startMs;
     const isAbort = (error as any)?.name === "AbortError";
     const cause = (error as any)?.cause;
