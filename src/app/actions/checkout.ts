@@ -4,24 +4,41 @@ import type { CartItem } from "@/store/cartStore";
 
 const domain = process.env.SHOPIFY_STORE_DOMAIN;
 const storefrontAccessToken = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
-// Explicit override — set this when your store uses a custom primary domain so
-// Shopify embeds that domain in checkoutUrl instead of *.myshopify.com.
 const explicitMyshopifyDomain = process.env.SHOPIFY_MYSHOPIFY_DOMAIN?.trim();
 
-/** Strips protocol and trailing slash from a domain string. */
+// ─── startup diagnostic ────────────────────────────────────────────────────────
+// Printed once when this module is first loaded on the server so Render logs
+// immediately show the resolved config without needing to trigger a request.
+console.log(
+  "[checkout:boot]",
+  "SHOPIFY_STORE_DOMAIN         :", domain ? `"${domain}"` : "MISSING",
+  "\n[checkout:boot]",
+  "SHOPIFY_STOREFRONT_ACCESS_TOKEN :", storefrontAccessToken
+    ? `set (${storefrontAccessToken.length} chars, starts "${storefrontAccessToken.slice(0, 4)}…")`
+    : "MISSING",
+  "\n[checkout:boot]",
+  "SHOPIFY_MYSHOPIFY_DOMAIN     :", explicitMyshopifyDomain ? `"${explicitMyshopifyDomain}"` : "not set (will auto-detect)",
+);
+
 function bareHost(d: string): string {
   return d.replace(/^https?:\/\//, "").replace(/\/$/, "");
 }
 
-/** Cached myshopify domain — populated once per cold start from the shop query. */
+function isVariantGid(id: string): boolean {
+  return id.startsWith("gid://shopify/ProductVariant/");
+}
+
+// ─── myshopify domain auto-detection ──────────────────────────────────────────
+
 let cachedMyshopifyDomain: string | null = null;
 
-/**
- * Queries shop.myshopifyDomain via the Storefront API so we can rewrite
- * checkout URLs that embed the store's custom primary domain.
- */
 async function fetchMyshopifyDomain(endpoint: string): Promise<string | null> {
-  if (cachedMyshopifyDomain) return cachedMyshopifyDomain;
+  if (cachedMyshopifyDomain) {
+    console.log("[checkout:domain] using cached myshopify domain:", cachedMyshopifyDomain);
+    return cachedMyshopifyDomain;
+  }
+
+  console.log("[checkout:domain] querying shop { myshopifyDomain } from", endpoint);
 
   try {
     const res = await fetch(endpoint, {
@@ -32,104 +49,149 @@ async function fetchMyshopifyDomain(endpoint: string): Promise<string | null> {
       },
       body: JSON.stringify({ query: "{ shop { myshopifyDomain } }" }),
     });
-    if (!res.ok) return null;
+
+    console.log("[checkout:domain] shop query HTTP status:", res.status);
+
+    if (!res.ok) {
+      const body = await res.text();
+      console.error("[checkout:domain] shop query failed — status:", res.status, "body:", body);
+      return null;
+    }
+
     const json = (await res.json()) as {
       data?: { shop?: { myshopifyDomain?: string } };
+      errors?: unknown[];
     };
+
+    console.log("[checkout:domain] shop query raw response:", JSON.stringify(json));
+
+    if (json.errors?.length) {
+      console.error("[checkout:domain] shop query GraphQL errors:", JSON.stringify(json.errors));
+    }
+
     const host = json.data?.shop?.myshopifyDomain?.trim();
     if (host) {
       cachedMyshopifyDomain = host;
-      console.log("[checkout] auto-detected myshopify domain:", host);
+      console.log("[checkout:domain] resolved myshopify domain:", host);
+    } else {
+      console.warn("[checkout:domain] shop.myshopifyDomain was empty or missing in response");
     }
     return host ?? null;
-  } catch {
+  } catch (err) {
+    console.error("[checkout:domain] shop query threw:", err);
     return null;
   }
 }
 
-/**
- * Rewrites the checkoutUrl host to a *.myshopify.com domain so the browser
- * reaches Shopify's checkout servers instead of the Next.js app.
- *
- * Priority:
- *  1. SHOPIFY_MYSHOPIFY_DOMAIN env var (explicit override)
- *  2. Auto-detected via shop.myshopifyDomain query
- *  3. SHOPIFY_STORE_DOMAIN itself if it already ends in .myshopify.com
- *  4. Original URL unchanged (will likely 404 on a headless setup)
- */
+// ─── URL rewrite ───────────────────────────────────────────────────────────────
+
 async function rewriteCheckoutHost(
   checkoutUrl: string,
   endpoint: string,
 ): Promise<string> {
+  console.log("[checkout:rewrite] raw checkoutUrl from Shopify:", checkoutUrl);
+
+  let parsed: URL;
   try {
-    const parsed = new URL(checkoutUrl);
-
-    // Already on myshopify.com — nothing to do.
-    if (parsed.host.endsWith(".myshopify.com")) return checkoutUrl;
-
-    // 1. Explicit env override
-    let target = explicitMyshopifyDomain;
-
-    // 2. Auto-detect from Shopify's own shop query
-    if (!target) {
-      target = (await fetchMyshopifyDomain(endpoint)) ?? undefined;
-    }
-
-    // 3. SHOPIFY_STORE_DOMAIN if it's already a myshopify domain
-    if (!target && domain && bareHost(domain).endsWith(".myshopify.com")) {
-      target = bareHost(domain);
-    }
-
-    if (target) {
-      parsed.host = bareHost(target);
-      return parsed.toString();
-    }
-
-    console.warn(
-      "[checkout] Could not resolve a *.myshopify.com host for checkout URL. " +
-        "Set SHOPIFY_MYSHOPIFY_DOMAIN to your store's *.myshopify.com subdomain. URL:",
-      checkoutUrl,
-    );
-  } catch {
-    // URL parsing failed — fall through
+    parsed = new URL(checkoutUrl);
+  } catch (err) {
+    console.error("[checkout:rewrite] URL parse failed:", err, "returning as-is");
+    return checkoutUrl;
   }
+
+  console.log("[checkout:rewrite] checkoutUrl host:", parsed.host);
+
+  if (parsed.host.endsWith(".myshopify.com")) {
+    console.log("[checkout:rewrite] host is already *.myshopify.com — no rewrite needed");
+    return checkoutUrl;
+  }
+
+  console.log("[checkout:rewrite] host is NOT *.myshopify.com — attempting rewrite");
+
+  // Priority 1: explicit env var
+  if (explicitMyshopifyDomain) {
+    const target = bareHost(explicitMyshopifyDomain);
+    parsed.host = target;
+    console.log("[checkout:rewrite] rewritten via SHOPIFY_MYSHOPIFY_DOMAIN →", parsed.toString());
+    return parsed.toString();
+  }
+
+  // Priority 2: auto-detect from shop query
+  const autoDetected = await fetchMyshopifyDomain(endpoint);
+  if (autoDetected) {
+    const target = bareHost(autoDetected);
+    parsed.host = target;
+    console.log("[checkout:rewrite] rewritten via auto-detect →", parsed.toString());
+    return parsed.toString();
+  }
+
+  // Priority 3: SHOPIFY_STORE_DOMAIN is already a myshopify domain
+  if (domain && bareHost(domain).endsWith(".myshopify.com")) {
+    const target = bareHost(domain);
+    parsed.host = target;
+    console.log("[checkout:rewrite] rewritten via SHOPIFY_STORE_DOMAIN →", parsed.toString());
+    return parsed.toString();
+  }
+
+  // No rewrite possible — return original and warn loudly
+  console.error(
+    "[checkout:rewrite] ⚠️  COULD NOT REWRITE — no *.myshopify.com host available.",
+    "The browser will be redirected to:", checkoutUrl,
+    "— this will 404 if that domain points to this Next.js app.",
+    "FIX: set SHOPIFY_MYSHOPIFY_DOMAIN=your-store.myshopify.com in your Render environment.",
+  );
   return checkoutUrl;
 }
 
-function isVariantGid(id: string): boolean {
-  return id.startsWith("gid://shopify/ProductVariant/");
-}
+// ─── main export ───────────────────────────────────────────────────────────────
 
 export type CheckoutResult = {
   cartId: string;
   checkoutUrl: string;
 };
 
-/**
- * Creates a Shopify cart from the current cart items and returns both the
- * cart GID and the hosted checkout URL.
- *
- * Items without a valid Shopify variant GID are skipped.
- * Returns null when Shopify is not configured or the cart is empty after filtering.
- */
 export async function createShopifyCheckout(
   items: CartItem[],
 ): Promise<CheckoutResult | null> {
-  if (!domain?.trim() || !storefrontAccessToken?.trim()) {
-    console.warn("[checkout] Shopify credentials not configured.");
+  console.log("[checkout] ── createShopifyCheckout called ──────────────────");
+  console.log("[checkout] cart items received:", items.length);
+  items.forEach((item, i) => {
+    console.log(`[checkout] item[${i}]:`, {
+      id: item.id,
+      title: item.title,
+      quantity: item.quantity,
+      isVariantGid: isVariantGid(item.id),
+    });
+  });
+
+  // Guard: credentials
+  if (!domain?.trim()) {
+    console.error("[checkout] ABORT — SHOPIFY_STORE_DOMAIN is not set");
+    return null;
+  }
+  if (!storefrontAccessToken?.trim()) {
+    console.error("[checkout] ABORT — SHOPIFY_STOREFRONT_ACCESS_TOKEN is not set");
     return null;
   }
 
+  // Filter to valid variant GIDs
   const lines = items
     .filter((item) => isVariantGid(item.id))
     .map((item) => ({ merchandiseId: item.id, quantity: item.quantity }));
 
+  console.log("[checkout] valid GID lines to send:", lines.length, "of", items.length);
+
   if (lines.length === 0) {
-    console.warn("[checkout] No valid Shopify variant GIDs in cart.");
+    console.error(
+      "[checkout] ABORT — no valid Shopify variant GIDs in cart.",
+      "Items must have IDs like gid://shopify/ProductVariant/12345.",
+      "All item IDs received:", items.map((i) => i.id),
+    );
     return null;
   }
 
   const endpoint = `https://${bareHost(domain)}/api/2026-01/graphql.json`;
+  console.log("[checkout] Storefront API endpoint:", endpoint);
 
   const mutation = `
     mutation cartCreate($input: CartInput!) {
@@ -141,13 +203,16 @@ export async function createShopifyCheckout(
         userErrors {
           field
           message
+          code
         }
       }
     }
   `;
 
+  let res: Response;
   try {
-    const res = await fetch(endpoint, {
+    console.log("[checkout] POSTing cartCreate mutation …");
+    res = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -155,35 +220,64 @@ export async function createShopifyCheckout(
       },
       body: JSON.stringify({ query: mutation, variables: { input: { lines } } }),
     });
-
-    if (!res.ok) {
-      console.error("[checkout] Shopify cartCreate HTTP error:", res.status);
-      return null;
-    }
-
-    const json = (await res.json()) as {
-      data?: {
-        cartCreate?: {
-          cart?: { id: string; checkoutUrl: string };
-          userErrors?: { field: string; message: string }[];
-        };
-      };
-    };
-
-    const userErrors = json.data?.cartCreate?.userErrors;
-    if (userErrors?.length) {
-      console.error("[checkout] Shopify cartCreate userErrors:", userErrors);
-    }
-
-    const cart = json.data?.cartCreate?.cart;
-    if (!cart?.checkoutUrl || !cart?.id) return null;
-
-    const checkoutUrl = await rewriteCheckoutHost(cart.checkoutUrl, endpoint);
-    console.log("[checkout] cart:", cart.id, "→", checkoutUrl);
-
-    return { cartId: cart.id, checkoutUrl };
   } catch (err) {
-    console.error("[checkout] cartCreate fetch error:", err);
+    console.error("[checkout] fetch to Shopify threw:", err);
     return null;
   }
+
+  console.log("[checkout] cartCreate HTTP status:", res.status, res.statusText);
+
+  if (!res.ok) {
+    const body = await res.text();
+    console.error("[checkout] cartCreate HTTP error — body:", body);
+    return null;
+  }
+
+  let json: {
+    data?: {
+      cartCreate?: {
+        cart?: { id: string; checkoutUrl: string };
+        userErrors?: { field: string; message: string; code?: string }[];
+      };
+    };
+    errors?: unknown[];
+  };
+
+  try {
+    json = await res.json();
+  } catch (err) {
+    console.error("[checkout] failed to parse Shopify JSON response:", err);
+    return null;
+  }
+
+  console.log("[checkout] cartCreate full response:", JSON.stringify(json));
+
+  if (json.errors?.length) {
+    console.error("[checkout] top-level GraphQL errors:", JSON.stringify(json.errors));
+  }
+
+  const userErrors = json.data?.cartCreate?.userErrors;
+  if (userErrors?.length) {
+    console.error("[checkout] cartCreate userErrors:", JSON.stringify(userErrors));
+  }
+
+  const cart = json.data?.cartCreate?.cart;
+  if (!cart?.id) {
+    console.error("[checkout] ABORT — cartCreate returned no cart.id");
+    return null;
+  }
+  if (!cart?.checkoutUrl) {
+    console.error("[checkout] ABORT — cartCreate returned no cart.checkoutUrl");
+    return null;
+  }
+
+  console.log("[checkout] cart created successfully:", cart.id);
+
+  const finalUrl = await rewriteCheckoutHost(cart.checkoutUrl, endpoint);
+
+  console.log("[checkout] ── returning to client ─────────────────────────────");
+  console.log("[checkout] cartId     :", cart.id);
+  console.log("[checkout] checkoutUrl:", finalUrl);
+
+  return { cartId: cart.id, checkoutUrl: finalUrl };
 }
