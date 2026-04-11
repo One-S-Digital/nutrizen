@@ -4,6 +4,11 @@ import type { CartItem } from "@/store/cartStore";
 
 const domain = process.env.SHOPIFY_STORE_DOMAIN;
 const storefrontAccessToken = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
+// The raw *.myshopify.com subdomain used to rewrite the checkoutUrl host.
+// Shopify returns checkoutUrl using your custom domain (e.g. nutrizen.co.za)
+// which resolves to your Next.js app and 404s. We rewrite it to the myshopify
+// domain so the browser hits Shopify's checkout servers directly.
+const myshopifyDomain = process.env.SHOPIFY_MYSHOPIFY_DOMAIN?.trim();
 
 /** Returns true if the id looks like a real Shopify variant GID. */
 function isVariantGid(id: string): boolean {
@@ -77,7 +82,23 @@ export async function createShopifyCheckout(
       console.error("[checkout] Shopify cartCreate userErrors:", userErrors);
     }
 
-    return json.data?.cartCreate?.cart?.checkoutUrl ?? null;
+    const checkoutUrl = json.data?.cartCreate?.cart?.checkoutUrl;
+    if (!checkoutUrl) return null;
+
+    // If the store uses a custom domain, Shopify embeds that domain in the
+    // checkoutUrl. Rewrite the host to the raw myshopify.com domain so the
+    // browser reaches Shopify's checkout servers instead of our Next.js app.
+    if (myshopifyDomain) {
+      try {
+        const parsed = new URL(checkoutUrl);
+        parsed.host = myshopifyDomain.replace(/^https?:\/\//, "").replace(/\/$/, "");
+        return parsed.toString();
+      } catch {
+        // If URL parsing fails for any reason, fall back to the original URL.
+      }
+    }
+
+    return checkoutUrl;
   } catch (err) {
     console.error("[checkout] cartCreate fetch error:", err);
     return null;
