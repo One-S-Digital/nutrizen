@@ -16,8 +16,12 @@ import { useCartStore } from "@/store/cartStore";
 interface ProductCardProps {
   id: string;
   title: string;
-  /** Display string from Shopify (includes currency). */
+  /** Display string from Shopify (includes currency symbol). */
   price: string;
+  /** Raw numeric amount string, e.g. "299.00". Used for accurate cart totals. */
+  priceAmount: string;
+  /** ISO currency code, e.g. "ZAR". */
+  currencyCode: string;
   image: string;
   badge?: string;
   handle: string;
@@ -25,7 +29,7 @@ interface ProductCardProps {
   priority?: boolean;
 }
 
-export function ProductCard({ id, title, price, image, badge, handle, priority = false }: ProductCardProps) {
+export function ProductCard({ id, title, price, priceAmount, currencyCode, image, badge, handle, priority = false }: ProductCardProps) {
   const { addToCart } = useCartStore();
   const hasImage = Boolean(image && image.startsWith("https://"));
   const reduceMotion = useReducedMotion();
@@ -145,7 +149,8 @@ export function ProductCard({ id, title, price, image, badge, handle, priority =
                 addToCart({
                   id,
                   title,
-                  price,
+                  price: priceAmount,
+                  currencyCode,
                   image: hasImage ? image : "",
                 })
               }

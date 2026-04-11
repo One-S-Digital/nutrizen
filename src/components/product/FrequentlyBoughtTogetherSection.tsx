@@ -45,6 +45,7 @@ export function FrequentlyBoughtTogetherSection({ products, currencyCode }: Prop
         productId: p.productId,
         title: p.title,
         price: p.priceAmount,
+        currencyCode,
         image: p.imageUrl ?? "",
       });
     }

@@ -576,6 +576,8 @@ export default function ShopPageClient({
                           id={product.variantId ?? product.id}
                           title={product.title}
                           price={product.priceDisplay}
+                          priceAmount={product.priceAmount}
+                          currencyCode={product.currencyCode}
                           image={product.imageUrl ?? ""}
                           handle={product.handle}
                           badge={getProductTag(product.title, i)}

@@ -11,6 +11,8 @@ export interface Product {
   variantId?: string | null;
   title: string;
   price: string;
+  priceAmount?: string;
+  currencyCode?: string;
   imageUrl?: string;
   handle: string;
 }
@@ -198,6 +200,8 @@ export default function CategoryShowcase({ categories }: { categories: Category[
                       id={product.variantId ?? product.id}
                       title={product.title}
                       price={product.price.toString()}
+                      priceAmount={product.priceAmount ?? product.price}
+                      currencyCode={product.currencyCode ?? "ZAR"}
                       image={product.imageUrl || ""}
                       handle={product.handle}
                     />

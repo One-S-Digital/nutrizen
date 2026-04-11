@@ -89,6 +89,8 @@ export default function TopSellers() {
                 handle={product.handle}
                 title={product.title}
                 price={product.price}
+                priceAmount={product.price}
+                currencyCode="ZAR"
                 image={product.image}
                 badge={product.badge}
               />

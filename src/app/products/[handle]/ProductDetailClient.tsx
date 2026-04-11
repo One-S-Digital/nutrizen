@@ -78,6 +78,7 @@ export default function ProductDetailClient({ product }: Props) {
         productId: product.id,
         title: product.title,
         price: selectedVariant.priceAmount,
+        currencyCode: selectedVariant.currencyCode,
         image: activeUrl || "",
       });
     }

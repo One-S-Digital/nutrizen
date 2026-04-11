@@ -25,6 +25,7 @@ export function BundleSaveSection({ products }: Props) {
         productId: p.productId,
         title: p.title,
         price: p.priceAmount,
+        currencyCode: p.currencyCode,
         image: p.imageUrl ?? "",
       });
     }

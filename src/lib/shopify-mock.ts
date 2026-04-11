@@ -99,6 +99,8 @@ type ShopProduct = {
   title: string;
   handle: string;
   priceDisplay: string;
+  priceAmount: string;
+  currencyCode: string;
   imageUrl: string | null;
   imageAlt: string | null;
 };
@@ -234,6 +236,8 @@ function toShopProduct(row: (typeof MOCK_ROWS)[number]): ShopProduct {
     variantId: row.id.replace("Product", "ProductVariant") + "/default",
     title: row.title,
     handle: row.handle,
+    priceAmount: row.amount,
+    currencyCode: ZAR,
     priceDisplay: formatPrice(row.amount, ZAR),
     imageUrl: publicImage(row.file),
     imageAlt: row.title,
@@ -361,6 +365,8 @@ export function getMockCollections() {
         title: row!.title,
         handle: row!.handle,
         price: formatPrice(row!.amount, ZAR),
+        priceAmount: row!.amount,
+        currencyCode: ZAR,
         imageUrl: publicImage(row!.file),
       }));
     return {

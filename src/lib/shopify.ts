@@ -308,6 +308,8 @@ export async function getCollections() {
             title: pNode.title,
             handle: pNode.handle,
             price: formatPrice(amount, currencyCode),
+            priceAmount: amount,
+            currencyCode,
             imageUrl: pNode.featuredImage?.url ?? "",
           };
         }
@@ -393,6 +395,8 @@ export type ShopProduct = {
   title: string;
   handle: string;
   priceDisplay: string;
+  priceAmount: string;
+  currencyCode: string;
   imageUrl: string | null;
   imageAlt: string | null;
 };
@@ -459,6 +463,8 @@ export async function getAllProductsForShop(limit = 250): Promise<ShopProduct[]>
       variantId: n.variants.edges[0]?.node.id ?? null,
       title: n.title,
       handle: n.handle,
+      priceAmount: n.priceRange.minVariantPrice.amount,
+      currencyCode: n.priceRange.minVariantPrice.currencyCode,
       priceDisplay: formatPrice(
         n.priceRange.minVariantPrice.amount,
         n.priceRange.minVariantPrice.currencyCode

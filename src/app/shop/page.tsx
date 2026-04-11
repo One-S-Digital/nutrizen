@@ -75,6 +75,8 @@ export default async function ShopPage({
       variantId: p.variantId,
       title: p.title,
       handle: p.handle,
+      priceAmount: p.price,
+      currencyCode: p.currencyCode,
       priceDisplay: formatPrice(p.price, p.currencyCode),
       imageUrl: p.imageUrl,
       imageAlt: p.imageAlt,
