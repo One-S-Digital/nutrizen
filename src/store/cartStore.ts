@@ -31,6 +31,18 @@ interface CartState {
   invalidateShopifyCart: () => void;
 }
 
+/**
+ * Normalises a price string to a plain numeric string.
+ * Handles both "299.00" (already numeric) and legacy display strings like "R 299.00".
+ */
+function toNumericPrice(raw: string | undefined): string {
+  if (!raw) return "0";
+  const direct = parseFloat(raw);
+  if (!isNaN(direct)) return String(direct);
+  const stripped = parseFloat(raw.replace(/[^0-9.]/g, ""));
+  return isNaN(stripped) ? "0" : String(stripped);
+}
+
 export const useCartStore = create<CartState>()(
   persist(
     (set) => ({
@@ -44,11 +56,12 @@ export const useCartStore = create<CartState>()(
 
       addToCart: (item) =>
         set((state) => {
-          const existing = state.items.find((i) => i.id === item.id);
+          const normalised = { ...item, price: toNumericPrice(item.price) };
+          const existing = state.items.find((i) => i.id === normalised.id);
           if (existing) {
             return {
               items: state.items.map((i) =>
-                i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
+                i.id === normalised.id ? { ...i, quantity: i.quantity + 1 } : i,
               ),
               isOpen: true,
               shopifyCartId: null,
@@ -56,7 +69,7 @@ export const useCartStore = create<CartState>()(
             };
           }
           return {
-            items: [...state.items, { ...item, quantity: 1 }],
+            items: [...state.items, { ...normalised, quantity: 1 }],
             isOpen: true,
             shopifyCartId: null,
             shopifyCheckoutUrl: null,
@@ -88,6 +101,7 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: "nutrizen-cart",
+      version: 2,
       storage: createJSONStorage(() => localStorage),
       // Only persist cart data — not UI state like isOpen
       partialize: (state) => ({
@@ -95,6 +109,18 @@ export const useCartStore = create<CartState>()(
         shopifyCartId: state.shopifyCartId,
         shopifyCheckoutUrl: state.shopifyCheckoutUrl,
       }),
+      // Migrate old items that stored formatted display strings as price (e.g. "R 299.00")
+      migrate: (persisted: unknown) => {
+        const state = persisted as Partial<CartState>;
+        return {
+          ...state,
+          items: (state.items ?? []).map((item) => ({
+            ...item,
+            currencyCode: item.currencyCode ?? "ZAR",
+            price: toNumericPrice(item.price),
+          })),
+        };
+      },
     },
   ),
 );

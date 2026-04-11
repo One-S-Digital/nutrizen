@@ -4,29 +4,81 @@ import type { CartItem } from "@/store/cartStore";
 
 const domain = process.env.SHOPIFY_STORE_DOMAIN;
 const storefrontAccessToken = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
-const myshopifyDomain = process.env.SHOPIFY_MYSHOPIFY_DOMAIN?.trim();
+// Explicit override — set this when your store uses a custom primary domain so
+// Shopify embeds that domain in checkoutUrl instead of *.myshopify.com.
+const explicitMyshopifyDomain = process.env.SHOPIFY_MYSHOPIFY_DOMAIN?.trim();
 
 /** Strips protocol and trailing slash from a domain string. */
 function bareHost(d: string): string {
   return d.replace(/^https?:\/\//, "").replace(/\/$/, "");
 }
 
+/** Cached myshopify domain — populated once per cold start from the shop query. */
+let cachedMyshopifyDomain: string | null = null;
+
 /**
- * Ensures the checkout URL points to a *.myshopify.com host so the browser
- * reaches Shopify's checkout servers instead of our Next.js app.
- *
- * Priority: SHOPIFY_MYSHOPIFY_DOMAIN → SHOPIFY_STORE_DOMAIN (if it's a
- * myshopify domain) → original URL unchanged.
+ * Queries shop.myshopifyDomain via the Storefront API so we can rewrite
+ * checkout URLs that embed the store's custom primary domain.
  */
-function rewriteCheckoutHost(checkoutUrl: string): string {
+async function fetchMyshopifyDomain(endpoint: string): Promise<string | null> {
+  if (cachedMyshopifyDomain) return cachedMyshopifyDomain;
+
+  try {
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Shopify-Storefront-Access-Token": storefrontAccessToken!,
+      },
+      body: JSON.stringify({ query: "{ shop { myshopifyDomain } }" }),
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as {
+      data?: { shop?: { myshopifyDomain?: string } };
+    };
+    const host = json.data?.shop?.myshopifyDomain?.trim();
+    if (host) {
+      cachedMyshopifyDomain = host;
+      console.log("[checkout] auto-detected myshopify domain:", host);
+    }
+    return host ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Rewrites the checkoutUrl host to a *.myshopify.com domain so the browser
+ * reaches Shopify's checkout servers instead of the Next.js app.
+ *
+ * Priority:
+ *  1. SHOPIFY_MYSHOPIFY_DOMAIN env var (explicit override)
+ *  2. Auto-detected via shop.myshopifyDomain query
+ *  3. SHOPIFY_STORE_DOMAIN itself if it already ends in .myshopify.com
+ *  4. Original URL unchanged (will likely 404 on a headless setup)
+ */
+async function rewriteCheckoutHost(
+  checkoutUrl: string,
+  endpoint: string,
+): Promise<string> {
   try {
     const parsed = new URL(checkoutUrl);
 
+    // Already on myshopify.com — nothing to do.
     if (parsed.host.endsWith(".myshopify.com")) return checkoutUrl;
 
-    const target =
-      myshopifyDomain ||
-      (domain && bareHost(domain).endsWith(".myshopify.com") ? domain : null);
+    // 1. Explicit env override
+    let target = explicitMyshopifyDomain;
+
+    // 2. Auto-detect from Shopify's own shop query
+    if (!target) {
+      target = (await fetchMyshopifyDomain(endpoint)) ?? undefined;
+    }
+
+    // 3. SHOPIFY_STORE_DOMAIN if it's already a myshopify domain
+    if (!target && domain && bareHost(domain).endsWith(".myshopify.com")) {
+      target = bareHost(domain);
+    }
 
     if (target) {
       parsed.host = bareHost(target);
@@ -34,8 +86,8 @@ function rewriteCheckoutHost(checkoutUrl: string): string {
     }
 
     console.warn(
-      "[checkout] checkoutUrl host is not *.myshopify.com and SHOPIFY_MYSHOPIFY_DOMAIN is not set. " +
-        "Checkout may 404. URL:",
+      "[checkout] Could not resolve a *.myshopify.com host for checkout URL. " +
+        "Set SHOPIFY_MYSHOPIFY_DOMAIN to your store's *.myshopify.com subdomain. URL:",
       checkoutUrl,
     );
   } catch {
@@ -126,8 +178,8 @@ export async function createShopifyCheckout(
     const cart = json.data?.cartCreate?.cart;
     if (!cart?.checkoutUrl || !cart?.id) return null;
 
-    const checkoutUrl = rewriteCheckoutHost(cart.checkoutUrl);
-    console.log("[checkout] cart created:", cart.id, "→", checkoutUrl);
+    const checkoutUrl = await rewriteCheckoutHost(cart.checkoutUrl, endpoint);
+    console.log("[checkout] cart:", cart.id, "→", checkoutUrl);
 
     return { cartId: cart.id, checkoutUrl };
   } catch (err) {
