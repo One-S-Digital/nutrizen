@@ -68,6 +68,20 @@ function sanitizeDescriptionHtml(html: string): string {
 const domain = process.env.SHOPIFY_STORE_DOMAIN;
 const storefrontAccessToken = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
 
+// Startup diagnostic — logs once when the module is first loaded on the server.
+// Prints the resolved endpoint and whether credentials are present so the Render
+// logs immediately reveal misconfiguration without needing to trigger a request.
+console.log(
+  "[shopify] module loaded —",
+  `NODE_ENV=${process.env.NODE_ENV}`,
+  `SHOPIFY_USE_MOCK=${process.env.SHOPIFY_USE_MOCK ?? "(unset)"}`,
+  `domain=${domain ? `"${domain}"` : "(unset)"}`,
+  `token=${storefrontAccessToken ? `set (${storefrontAccessToken.length} chars)` : "(unset)"}`,
+  domain
+    ? `endpoint=https://${domain.replace(/^https?:\/\//, "").replace(/\/$/, "")}/api/2026-01/graphql.json`
+    : "endpoint=(will not fetch — domain missing)"
+);
+
 /** True when live Storefront credentials exist, or when preview/mock catalog is active. */
 export function isShopifyConfigured(): boolean {
   if (shouldUseShopifyMock()) return true;
@@ -127,7 +141,12 @@ export async function shopifyFetch<T>({
       body: body.data,
     };
   } catch (error) {
-    console.error('Error fetching from Shopify:', error);
+    const cause = (error as any)?.cause;
+    console.error(
+      `[shopify] fetch failed — endpoint: ${endpoint}`,
+      `code: ${cause?.code ?? "unknown"}`,
+      error
+    );
     throw error;
   }
 }
