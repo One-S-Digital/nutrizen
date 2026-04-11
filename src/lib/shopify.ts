@@ -108,11 +108,15 @@ export async function shopifyFetch<T>({
     "X-Shopify-Storefront-Access-Token": storefrontAccessToken,
   };
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10_000); // 10 s hard timeout
+
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
       headers,
       body: JSON.stringify({ query, ...(variables && { variables }) }),
+      signal: controller.signal,
       // cache: "force-cache",
     });
 
@@ -136,15 +140,18 @@ export async function shopifyFetch<T>({
       console.error("[shopify] Response had no data. Status:", response.status, "Body:", JSON.stringify(body));
     }
 
+    clearTimeout(timeoutId);
     return {
       status: response.status,
       body: body.data,
     };
   } catch (error) {
+    clearTimeout(timeoutId);
+    const isAbort = (error as any)?.name === "AbortError";
     const cause = (error as any)?.cause;
     console.error(
       `[shopify] fetch failed — endpoint: ${endpoint}`,
-      `code: ${cause?.code ?? "unknown"}`,
+      isAbort ? "reason: client-side 10s timeout (AbortError)" : `code: ${cause?.code ?? "unknown"}`,
       error
     );
     throw error;
