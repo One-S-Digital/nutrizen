@@ -108,8 +108,17 @@ export async function shopifyFetch<T>({
     "X-Shopify-Storefront-Access-Token": storefrontAccessToken,
   };
 
+  // Extract the first line of the query (e.g. "query ProductByHandle") for log readability
+  const queryName = query.trim().split(/[\s({]/)[1] ?? "unknown";
+
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10_000); // 10 s hard timeout
+  const timeoutId = setTimeout(() => {
+    console.error(`[shopify] ⏱ 10s timeout — aborting query "${queryName}" to ${endpoint}`);
+    controller.abort();
+  }, 10_000);
+
+  const startMs = Date.now();
+  console.log(`[shopify] → ${queryName} vars=${JSON.stringify(variables ?? {})}`);
 
   try {
     const response = await fetch(endpoint, {
@@ -120,24 +129,29 @@ export async function shopifyFetch<T>({
       // cache: "force-cache",
     });
 
+    const elapsed = Date.now() - startMs;
     const text = await response.text();
 
     if (!response.ok || text.trimStart().startsWith("<")) {
       console.error(
-        `[shopify] Non-JSON response. URL: ${endpoint} Status: ${response.status} Body: ${text.slice(0, 300)}`
+        `[shopify] ✗ ${queryName} — HTTP ${response.status} after ${elapsed}ms — body: ${text.slice(0, 300)}`
       );
+      clearTimeout(timeoutId);
       return { status: response.status, body: undefined };
     }
 
     const body = JSON.parse(text);
 
     if (body.errors) {
-      console.error("[shopify] GraphQL errors:", JSON.stringify(body.errors));
+      console.error(`[shopify] ✗ ${queryName} — GraphQL errors after ${elapsed}ms:`, JSON.stringify(body.errors));
+      clearTimeout(timeoutId);
       throw body.errors[0];
     }
 
     if (!body.data) {
-      console.error("[shopify] Response had no data. Status:", response.status, "Body:", JSON.stringify(body));
+      console.error(`[shopify] ✗ ${queryName} — no data after ${elapsed}ms — body: ${JSON.stringify(body)}`);
+    } else {
+      console.log(`[shopify] ✓ ${queryName} — ${elapsed}ms`);
     }
 
     clearTimeout(timeoutId);
@@ -147,11 +161,11 @@ export async function shopifyFetch<T>({
     };
   } catch (error) {
     clearTimeout(timeoutId);
+    const elapsed = Date.now() - startMs;
     const isAbort = (error as any)?.name === "AbortError";
     const cause = (error as any)?.cause;
     console.error(
-      `[shopify] fetch failed — endpoint: ${endpoint}`,
-      isAbort ? "reason: client-side 10s timeout (AbortError)" : `code: ${cause?.code ?? "unknown"}`,
+      `[shopify] ✗ ${queryName} — ${isAbort ? "AbortError (10s timeout)" : `${cause?.code ?? "fetch failed"}`} after ${elapsed}ms — endpoint: ${endpoint}`,
       error
     );
     throw error;
