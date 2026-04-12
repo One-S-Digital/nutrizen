@@ -56,6 +56,17 @@ export default function Footer({ mainMenuLinks }: FooterProps) {
           <p className="text-neutral-dark text-sm leading-relaxed">
             Premium, science-backed natural supplements designed to boost your daily vitality, calm, and focus.
           </p>
+          <div className="mt-4 space-y-1.5 text-sm text-neutral-dark">
+            <a href="tel:+27812609790" className="flex items-center gap-2 hover:text-primary transition">
+              <span aria-hidden>📱</span>
+              <span>+27 81 260 9790</span>
+            </a>
+            <a href="mailto:nutrizen.za@gmail.com" className="flex items-center gap-2 hover:text-primary transition">
+              <span aria-hidden>✉️</span>
+              <span>nutrizen.za@gmail.com</span>
+            </a>
+            <p className="text-xs text-neutral">Mon – Fri, 9 AM – 5 PM</p>
+          </div>
         </div>
 
         {/* Col 2 — Shop (main-menu from Shopify) */}

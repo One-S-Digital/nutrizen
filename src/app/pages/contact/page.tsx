@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ContactForm from "@/components/pages/ContactForm";
 
-const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "hello@nutrizen.co.za";
+const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "nutrizen.za@gmail.com";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
 
 export const metadata: Metadata = {
@@ -72,11 +72,11 @@ export default function ContactPage() {
             </div>
 
             <div className="rounded-[2rem] border border-neutral-light/90 bg-white/60 p-8 shadow-sm backdrop-blur-md">
-              <h2 className="text-lg font-semibold text-neutral-darkest">Response times</h2>
+              <h2 className="text-lg font-semibold text-neutral-darkest">Office hours &amp; response times</h2>
               <ul className="mt-4 space-y-3 text-sm text-neutral-dark">
                 <li className="flex gap-3">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
-                  <span>Monday to Friday, excluding public holidays</span>
+                  <span>Monday to Friday, 9 AM – 5 PM</span>
                 </li>
                 <li className="flex gap-3">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
@@ -87,6 +87,13 @@ export default function ContactPage() {
                   <span>Urgent order issues: mention &quot;Urgent&quot; in the subject line</span>
                 </li>
               </ul>
+              <a
+                href="tel:+27812609790"
+                className="mt-5 inline-flex items-center gap-2 text-base font-medium text-primary hover:text-primary/90"
+              >
+                <span>📱</span>
+                <span>+27 81 260 9790</span>
+              </a>
             </div>
 
             <div className="rounded-[2rem] border border-dashed border-neutral-light bg-background-alt/80 p-8">
