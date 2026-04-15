@@ -39,7 +39,7 @@ import {
 
 /** Allowed HTML tags/attributes for product description rendering */
 const DESCRIPTION_HTML_ALLOWED_TAGS = [
-  "p", "br", "b", "i", "em", "strong", "ul", "ol", "li", "a", "span", "h2", "h3", "h4",
+  "p", "br", "b", "i", "em", "strong", "ul", "ol", "li", "a", "span", "div", "h2", "h3", "h4",
 ];
 
 function sanitizeDescriptionHtml(html: string): string {
@@ -47,7 +47,8 @@ function sanitizeDescriptionHtml(html: string): string {
     allowedTags: DESCRIPTION_HTML_ALLOWED_TAGS,
     allowedAttributes: {
       a: ["href", "target", "rel"],
-      span: ["class"],
+      span: ["class", "style"],
+      div: ["style"],
     },
     allowedSchemes: ["https", "mailto"],
     // Force external links to be safe
