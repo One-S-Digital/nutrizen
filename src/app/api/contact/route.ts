@@ -4,6 +4,8 @@ const TURNSTILE_SECRET =
   process.env.TURNSTILE_SECRET_KEY ?? "1x0000000000000000000000000000000AA";
 const CONTACT_EMAIL =
   process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() ?? "nutrizen.za@gmail.com";
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "https://nutrizen.co.za";
 
 export async function POST(req: NextRequest) {
   const fd = await req.formData();
@@ -47,7 +49,11 @@ export async function POST(req: NextRequest) {
     `https://formsubmit.co/ajax/${CONTACT_EMAIL}`,
     {
       method: "POST",
-      headers: { Accept: "application/json" },
+      headers: {
+        Accept: "application/json",
+        Origin: SITE_URL,
+        Referer: `${SITE_URL}/pages/contact`,
+      },
       body: fd,
     }
   );
