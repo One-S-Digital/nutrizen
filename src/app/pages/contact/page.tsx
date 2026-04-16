@@ -105,7 +105,13 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <ContactForm />
+          <ContactForm
+            siteKey={
+              process.env.TURNSTILE_SITE_KEY ??
+              process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ??
+              "1x00000000000000000000AA"
+            }
+          />
         </div>
       </section>
     </div>

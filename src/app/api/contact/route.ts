@@ -52,11 +52,23 @@ export async function POST(req: NextRequest) {
     }
   );
 
-  if (!submitRes.ok) {
-    return NextResponse.json(
-      { error: "Failed to send message. Please try again." },
-      { status: 500 }
-    );
+  const submitData = (await submitRes.json().catch(() => ({}))) as {
+    success?: string | boolean;
+    message?: string;
+  };
+
+  const ok =
+    submitRes.ok &&
+    submitData.success !== "false" &&
+    submitData.success !== false;
+
+  if (!ok) {
+    console.error("[contact] FormSubmit error:", submitRes.status, submitData);
+    // FormSubmit returns success:false when the email address hasn't been
+    // activated yet — the activation link is sent to the inbox on first use.
+    const msg =
+      submitData.message ?? "Failed to send message. Please try again.";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });

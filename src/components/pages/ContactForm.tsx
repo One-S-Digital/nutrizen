@@ -5,10 +5,6 @@ import Script from "next/script";
 
 const CONTACT_EMAIL =
   process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "nutrizen.za@gmail.com";
-// Cloudflare Turnstile — replace with your real site key in production.
-// Test key "1x00000000000000000000AA" always passes without an account.
-const TURNSTILE_SITE_KEY =
-  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "1x00000000000000000000AA";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -18,7 +14,7 @@ declare global {
   }
 }
 
-export default function ContactForm() {
+export default function ContactForm({ siteKey }: { siteKey: string }) {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -135,7 +131,7 @@ export default function ContactForm() {
             {/* Cloudflare Turnstile widget */}
             <div
               className="cf-turnstile"
-              data-sitekey={TURNSTILE_SITE_KEY}
+              data-sitekey={siteKey}
               data-theme="light"
             />
 
