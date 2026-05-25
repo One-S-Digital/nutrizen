@@ -61,9 +61,9 @@ export default function Footer({ mainMenuLinks }: FooterProps) {
               <span aria-hidden>📱</span>
               <span>+27 81 260 9790</span>
             </a>
-            <a href="mailto:nutrizen.za@gmail.com" className="flex items-center gap-2 hover:text-primary transition">
+            <a href="mailto:hello@nutrizen.co.za" className="flex items-center gap-2 hover:text-primary transition">
               <span aria-hidden>✉️</span>
-              <span>nutrizen.za@gmail.com</span>
+              <span>hello@nutrizen.co.za</span>
             </a>
             <p className="text-xs text-neutral">Mon – Fri, 9 AM – 5 PM</p>
           </div>

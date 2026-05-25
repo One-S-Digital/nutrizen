@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ContactForm from "@/components/pages/ContactForm";
 
-const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "nutrizen.za@gmail.com";
+const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "hello@nutrizen.co.za";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
 
 export const metadata: Metadata = {

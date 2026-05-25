@@ -6,6 +6,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
+import { useUIStore } from "@/store/uiStore";
 import type { NavCollection, FooterNavLink } from "@/lib/shopify";
 
 type NavbarProps = {
@@ -19,6 +20,7 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
   const [mobileOpen, setMobileOpen] = useState(false);
   const shopLeaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { openCart, items } = useCartStore();
+  const { bannerVisible } = useUIStore();
   const pathname = usePathname();
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -76,7 +78,9 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
   return (
     <>
       {/* Outer header */}
-      <header className="fixed inset-x-0 top-0 z-50 pointer-events-none flex justify-center">
+      <header
+        className={`fixed inset-x-0 z-50 pointer-events-none flex justify-center transition-[top] duration-300 ${bannerVisible ? "top-9" : "top-0"}`}
+      >
         <motion.div
           className="pointer-events-auto w-full"
           animate={

@@ -251,8 +251,29 @@ export default function CartDrawer() {
                     {formatPrice(total.toFixed(2), displayCurrency)}
                   </span>
                 </div>
+
+                {/* Shipping info */}
+                {total >= 690 ? (
+                  <div className="flex items-center gap-1.5 text-xs text-primary font-medium mb-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M20 6 9 17l-5-5"/>
+                    </svg>
+                    You qualify for free shipping!
+                  </div>
+                ) : (
+                  <div className="mb-1">
+                    <p className="text-xs text-neutral-dark">
+                      Shipping: R130 nationwide — or{" "}
+                      <span className="font-semibold text-neutral-darkest">
+                        free over R690
+                      </span>{" "}
+                      <span className="text-primary">(R{(690 - total).toFixed(0)} away)</span>
+                    </p>
+                  </div>
+                )}
+
                 <p className="text-xs text-neutral-dark mb-5">
-                  Shipping and taxes calculated at checkout.
+                  Taxes calculated at checkout.
                 </p>
 
                 {checkoutError && (

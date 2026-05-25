@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import Script from "next/script";
 
 const CONTACT_EMAIL =
-  process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "nutrizen.za@gmail.com";
+  process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "hello@nutrizen.co.za";
 
 type Status = "idle" | "sending" | "sent" | "error";
 

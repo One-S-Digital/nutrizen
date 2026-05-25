@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 const TURNSTILE_SECRET =
   process.env.TURNSTILE_SECRET_KEY ?? "1x0000000000000000000000000000000AA";
 const CONTACT_EMAIL =
-  process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() ?? "nutrizen.za@gmail.com";
+  process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() ?? "hello@nutrizen.co.za";
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "https://nutrizen.co.za";
 

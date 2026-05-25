@@ -4,6 +4,10 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/cart/CartDrawer";
+import AnnouncementBanner from "@/components/layout/AnnouncementBanner";
+import MainWrapper from "@/components/layout/MainWrapper";
+import WelcomePopup from "@/components/layout/WelcomePopup";
+import CartAbandonPopup from "@/components/layout/CartAbandonPopup";
 import { getFooterColumnsCached, getMainMenuLinksCached, getNavCollectionsCached } from "@/lib/shopify";
 import { shouldUseShopifyMock } from "@/lib/shopify-mode";
 
@@ -141,8 +145,9 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} font-sans bg-background-main text-neutral-darkest antialiased flex flex-col min-h-screen`}
       >
+        <AnnouncementBanner />
         {previewMockCatalog ? (
-          <div className="fixed left-0 right-0 top-20 z-[45] border-b border-amber-200/80 bg-amber-100/95 px-4 py-2 text-center text-xs font-medium text-amber-950">
+          <div className="fixed left-0 right-0 top-[116px] z-[45] border-b border-amber-200/80 bg-amber-100/95 px-4 py-2 text-center text-xs font-medium text-amber-950">
             {process.env.VERCEL_ENV === "preview"
               ? "Preview deployment: mock Shopify catalog (Storefront API not used)."
               : "Mock Shopify catalog (Storefront API not used). Set SHOPIFY_USE_MOCK=false to use your live store."}
@@ -150,9 +155,11 @@ export default async function RootLayout({
         ) : null}
         <Navbar collections={shopCategories} mainMenuLinks={mainMenuLinks} />
         <CartDrawer />
-        <main className={previewMockCatalog ? "flex-grow pt-32" : "flex-grow pt-20"}>
+        <WelcomePopup />
+        <CartAbandonPopup />
+        <MainWrapper hasMockBanner={previewMockCatalog}>
           {children}
-        </main>
+        </MainWrapper>
         <Footer footerColumns={footerColumns} mainMenuLinks={mainMenuLinks} />
       </body>
     </html>
