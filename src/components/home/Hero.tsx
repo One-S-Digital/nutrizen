@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import {
   motion,
   useReducedMotion,
@@ -131,7 +132,7 @@ function ProductBottle({
           }
         >
           <motion.div
-            className="select-none h-full w-full min-h-0"
+            className="select-none h-full w-full min-h-0 relative"
             initial={false}
             animate={{ rotateZ: baseRotate, rotateX: 0, rotateY: 0, y: 0 }}
             whileHover={
@@ -146,10 +147,13 @@ function ProductBottle({
               willChange: "transform",
             }}
           >
-            <img
+            <Image
               src={src}
               alt={alt}
-              className="w-full h-full object-contain filter drop-shadow-2xl opacity-90 pointer-events-none select-none"
+              fill
+              className="object-contain filter drop-shadow-2xl opacity-90 pointer-events-none select-none"
+              sizes="(max-width: 640px) 144px, (max-width: 1024px) 224px, (max-width: 1280px) 288px, 380px"
+              priority
             />
           </motion.div>
         </motion.div>
