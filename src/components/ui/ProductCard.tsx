@@ -11,6 +11,7 @@ import {
   useReducedMotion,
 } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { optimizeShopifyImage } from "@/lib/optimize-shopify-image";
 import { useCartStore } from "@/store/cartStore";
 
 interface ProductCardProps {
@@ -32,6 +33,7 @@ interface ProductCardProps {
 export function ProductCard({ id, title, price, priceAmount, currencyCode, image, badge, handle, priority = false }: ProductCardProps) {
   const { addToCart } = useCartStore();
   const hasImage = Boolean(image && image.startsWith("https://"));
+  const optimizedImage = hasImage ? optimizeShopifyImage(image) : image;
   const reduceMotion = useReducedMotion();
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -102,7 +104,7 @@ export function ProductCard({ id, title, price, priceAmount, currencyCode, image
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             >
               <Image
-                src={image}
+                src={optimizedImage}
                 alt={title}
                 fill
                 className="object-contain p-6"

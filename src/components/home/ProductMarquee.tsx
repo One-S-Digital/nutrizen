@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { MarqueeProduct } from "@/lib/shopify";
+import { optimizeShopifyImage } from "@/lib/optimize-shopify-image";
 
 const MarqueeItem = ({
   title,
@@ -18,7 +19,7 @@ const MarqueeItem = ({
     <div className="relative w-8 h-10 bg-white/90 rounded flex-shrink-0 overflow-hidden border border-white/20">
       {imageUrl ? (
         <Image
-          src={imageUrl}
+          src={optimizeShopifyImage(imageUrl)}
           alt=""
           fill
           className="object-cover"
