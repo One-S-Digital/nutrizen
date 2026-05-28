@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { FooterNavColumn, FooterNavLink } from "@/lib/shopify";
-import { PaymentIcons } from "@/components/ui/PaymentIcons";
 
 const COMPANY_LINKS: FooterNavLink[] = [
   { id: "company-about", title: "About Us", href: "/pages/about", external: false },
@@ -117,15 +116,8 @@ export default function Footer({ mainMenuLinks }: FooterProps) {
       </div>
 
       {/* Bottom bar */}
-      <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-neutral-light space-y-5 text-xs text-neutral">
-        {/* Payment icons row */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="text-neutral font-medium">We accept:</span>
-          <PaymentIcons />
-        </div>
-
-        {/* Copyright row */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-4 border-t border-neutral-light/60">
+      <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-neutral-light text-xs text-neutral">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="flex flex-row flex-nowrap items-center justify-center md:justify-start gap-x-1.5 text-center md:text-left">
             <span className="shrink-0">
               &copy; {new Date().getFullYear()} NutriZen Wellness. All rights reserved.

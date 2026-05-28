@@ -36,7 +36,7 @@ const TRUST_BADGES = [
 const TRUST_STATS = [
   { value: "4.9★", label: "Average rating" },
   { value: "15,000+", label: "Happy customers" },
-  { value: "30-Day", label: "Guarantee" },
+  { value: "100%", label: "Transparent formulas" },
 ];
 
 const reviews = [
