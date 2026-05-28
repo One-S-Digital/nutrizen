@@ -18,13 +18,32 @@ export default function WelcomePopup() {
     setVisible(false);
   }
 
-  async function copyCode() {
-    try {
-      await navigator.clipboard.writeText("WELCOME10");
+  function copyCode() {
+    const code = "WELCOME10";
+
+    const succeed = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // clipboard not available
+    };
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code).then(succeed).catch(() => fallbackCopy(code, succeed));
+    } else {
+      fallbackCopy(code, succeed);
+    }
+  }
+
+  function fallbackCopy(text: string, onSuccess: () => void) {
+    const el = document.createElement("textarea");
+    el.value = text;
+    el.style.cssText = "position:fixed;top:0;left:0;opacity:0;pointer-events:none";
+    document.body.appendChild(el);
+    el.focus();
+    el.select();
+    try {
+      if (document.execCommand("copy")) onSuccess();
+    } finally {
+      document.body.removeChild(el);
     }
   }
 
