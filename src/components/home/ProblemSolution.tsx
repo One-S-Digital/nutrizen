@@ -146,12 +146,6 @@ function ParticleDots() {
 
 // ─── Section data ─────────────────────────────────────────────────────────────
 
-const PROBLEMS = [
-  "Fillers & binders that add zero nutritional value",
-  "Proprietary blends that hide exact ingredient amounts",
-  "Underdosed actives that never reach effective levels",
-];
-
 const PILLARS = [
   {
     title: "Transparent Formulas",
@@ -181,14 +175,6 @@ const PILLARS = [
 export default function ProblemSolution() {
   const rm = !!useReducedMotion();
 
-  const problemListVariants: Variants = {
-    hidden: {},
-    visible: { transition: { staggerChildren: rm ? 0 : 0.1, delayChildren: rm ? 0 : 0.05 } },
-  };
-  const problemItemVariants: Variants = {
-    hidden: rm ? { opacity: 1, x: 0 } : { opacity: 0, x: -18 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: scrollEase } },
-  };
   const cardContainerVariants: Variants = {
     hidden: {},
     visible: { transition: { staggerChildren: rm ? 0 : 0.13, delayChildren: rm ? 0 : 0.06 } },
@@ -244,7 +230,7 @@ export default function ProblemSolution() {
 
         {/* THE PROBLEM */}
         <motion.div
-          className="pt-28 pb-12 text-center max-w-3xl mx-auto"
+          className="pt-28 pb-16 text-center max-w-3xl mx-auto"
           initial={rm ? false : { opacity: 0, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={scrollViewport}
@@ -262,32 +248,6 @@ export default function ProblemSolution() {
             <span className="font-semibold text-white/85">&ldquo;proprietary blends&rdquo;</span> that hide the truth.
           </p>
         </motion.div>
-
-        {/* Problem bullets */}
-        <motion.ul
-          className="max-w-lg mx-auto space-y-3 pb-16"
-          initial="hidden"
-          whileInView="visible"
-          viewport={scrollViewport}
-          variants={problemListVariants}
-          aria-label="Common supplement problems"
-        >
-          {PROBLEMS.map((p) => (
-            <motion.li
-              key={p}
-              variants={problemItemVariants}
-              className="flex items-center gap-3.5 bg-white/[0.04] rounded-2xl px-5 py-3.5 border border-white/[0.07]"
-            >
-              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-red-500/15 flex items-center justify-center">
-                <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden>
-                  <line x1="2" y1="2" x2="7" y2="7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" />
-                  <line x1="7" y1="2" x2="2" y2="7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </span>
-              <span className="text-white/65 text-sm">{p}</span>
-            </motion.li>
-          ))}
-        </motion.ul>
 
         {/* DIVIDER */}
         <motion.div
