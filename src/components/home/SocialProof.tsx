@@ -21,8 +21,8 @@ const TRUST_BADGES = [
     Icon: ShieldCheck,
     iconColor: "#F59E0B",
     iconBg: "bg-amber-50",
-    title: "30-Day Money Back",
-    desc: "Not satisfied? Full refund — no questions asked",
+    title: "30-Day Refund",
+    desc: "Not satisfied? We'll sort it out within 30 days",
   },
   {
     Icon: MessageCircle,

@@ -28,13 +28,15 @@ function CountStat({
     }
     const start = performance.now();
     const duration = 1300;
+    let frameId: number;
     const tick = (now: number) => {
       const t = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - t, 3);
       setCount(Math.round(eased * value));
-      if (t < 1) requestAnimationFrame(tick);
+      if (t < 1) frameId = requestAnimationFrame(tick);
     };
-    requestAnimationFrame(tick);
+    frameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frameId);
   }, [inView, value, reduceMotion]);
 
   return (
