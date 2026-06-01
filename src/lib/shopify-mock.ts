@@ -1,4 +1,5 @@
 import { buildFallbackFooterColumns } from "@/lib/footer-nav";
+import type { BlogSummary, BlogArticleDetail } from "@/lib/shopify";
 import { formatPrice } from "@/lib/formatPrice";
 import type {
   PdpFeaturedReview,
@@ -595,4 +596,105 @@ export function getMockProductDetail(handle: string): MockProductDetail | null {
     faqItems: isVitacore ? VITACORE_FAQ : [],
     productReviews: isVitacore ? VITACORE_REVIEWS : [],
   };
+}
+
+// ---------------------------------------------------------------------------
+// Mock blog data
+// ---------------------------------------------------------------------------
+
+const MOCK_BLOG_HANDLE = "news";
+
+const MOCK_ARTICLES: BlogArticleDetail[] = [
+  {
+    id: "gid://shopify/Article/1",
+    title: "Why Bioavailability is the Most Important Word in Supplements",
+    handle: "why-bioavailability-matters",
+    blogHandle: MOCK_BLOG_HANDLE,
+    publishedAt: "2026-05-10T08:00:00Z",
+    author: "NutriZen Team",
+    excerpt:
+      "Most supplements list impressive amounts on their label — but how much actually reaches your cells? We break down why form and absorption matter more than milligrams.",
+    contentHtml: `<p>When you pick up a supplement and scan the label, it's tempting to compare milligrams. More magnesium must be better, right? Not necessarily. The number that matters most is how much of that nutrient your body can actually absorb and use — what scientists call <strong>bioavailability</strong>.</p>
+<h2>The problem with cheap forms</h2>
+<p>Many budget supplements use oxide or carbonate forms of minerals because they're inexpensive to produce. Magnesium oxide, for example, has a bioavailability of around 4% — meaning the vast majority passes straight through you.</p>
+<p>At NutriZen, we choose forms like <strong>magnesium glycinate</strong> (a chelated form) and <strong>zinc picolinate</strong> because clinical research consistently shows superior absorption versus their cheaper counterparts.</p>
+<h2>What to look for</h2>
+<ul>
+<li>Minerals bound to amino acids (glycinate, picolinate, bisglycinate) absorb more efficiently</li>
+<li>Fat-soluble vitamins (A, D, E, K) need dietary fat present at time of ingestion</li>
+<li>Folate as methylfolate (5-MTHF) bypasses a genetic conversion step that affects up to 40% of people</li>
+</ul>
+<p>Reading the actual ingredient form — not just the nutrient name — is the single most useful habit you can build when choosing supplements.</p>`,
+    imageUrl: null,
+    imageAlt: "Supplement capsules and nutrient forms",
+    tags: ["nutrition", "bioavailability", "ingredients"],
+    seoTitle: "Why Bioavailability Matters | NutriZen Blog",
+    seoDescription:
+      "Learn why the form of a nutrient matters more than the milligram amount on your supplement label.",
+  },
+  {
+    id: "gid://shopify/Article/2",
+    title: "Magnesium: The Mineral Most People Are Missing",
+    handle: "magnesium-the-missing-mineral",
+    blogHandle: MOCK_BLOG_HANDLE,
+    publishedAt: "2026-04-22T08:00:00Z",
+    author: "NutriZen Team",
+    excerpt:
+      "Magnesium is involved in over 300 enzymatic reactions — yet surveys consistently show most adults fall short. Here's why it matters and how to choose the right form.",
+    contentHtml: `<p>Magnesium participates in more than 300 enzymatic reactions in the human body — from muscle contraction and nerve signalling to DNA synthesis and sleep regulation. Despite this, dietary surveys show the majority of adults in developed countries consume less than the recommended daily amount.</p>
+<h2>Signs you may be low</h2>
+<p>Muscle cramps and twitches, difficulty sleeping, low energy, and heightened stress response are among the most common signs of inadequate magnesium. None of these are definitive on their own, but together they paint a picture worth addressing.</p>
+<h2>Choosing the right form</h2>
+<p>There are several forms of supplemental magnesium. The most commonly studied for absorption and tolerability:</p>
+<ul>
+<li><strong>Magnesium glycinate</strong> — chelated to glycine, well absorbed, gentle on the gut, supports relaxation</li>
+<li><strong>Magnesium malate</strong> — bound to malic acid, often preferred for energy and muscle recovery</li>
+<li><strong>Magnesium oxide</strong> — cheap, poorly absorbed, best avoided for systemic benefit</li>
+</ul>
+<p>NutriZen's Magnesium Complex uses a glycinate-dominant blend to maximise absorption while keeping the formula gentle enough for daily use.</p>`,
+    imageUrl: null,
+    imageAlt: "Magnesium supplement and green vegetables",
+    tags: ["magnesium", "minerals", "sleep", "energy"],
+    seoTitle: "Magnesium: The Missing Mineral | NutriZen Blog",
+    seoDescription:
+      "Discover why magnesium deficiency is so common and which form of supplemental magnesium is worth taking.",
+  },
+  {
+    id: "gid://shopify/Article/3",
+    title: "Vitamin D3 and K2: Why They Work Better Together",
+    handle: "vitamin-d3-k2-synergy",
+    blogHandle: MOCK_BLOG_HANDLE,
+    publishedAt: "2026-03-18T08:00:00Z",
+    author: "NutriZen Team",
+    excerpt:
+      "D3 boosts calcium absorption — but without K2 to direct that calcium, you may not be getting the full benefit. We explain the synergy that makes this pairing so important.",
+    contentHtml: `<p>Vitamin D3 has received well-deserved attention for its role in immune function, mood regulation, and bone health. But many people don't realise that taking D3 without its cofactor, vitamin K2, may leave part of the equation unfulfilled.</p>
+<h2>What D3 does</h2>
+<p>D3 (cholecalciferol) dramatically increases your intestinal absorption of calcium. This is essential for bone mineralisation and a host of cellular processes — but it also means more calcium is circulating in your bloodstream.</p>
+<h2>Where K2 comes in</h2>
+<p>Vitamin K2 (specifically MK-7, the most bioavailable form) activates proteins that direct calcium into bones and teeth — and away from arterial walls and soft tissue. Without adequate K2, the extra calcium mobilised by D3 has no clear guidance system.</p>
+<h2>Practical takeaway</h2>
+<p>If you're supplementing with D3, pairing it with K2 MK-7 is a straightforward way to ensure the calcium loop is properly managed. NutriZen's Vitamin D3 + K2 combines both in a single softgel with a base of olive oil for optimal fat-soluble absorption.</p>`,
+    imageUrl: null,
+    imageAlt: "Vitamin D3 and K2 supplement",
+    tags: ["vitamin-d3", "vitamin-k2", "bone-health", "immune"],
+    seoTitle: "Vitamin D3 & K2 Synergy | NutriZen Blog",
+    seoDescription:
+      "Learn why vitamin D3 and K2 are best taken together — and how this pairing supports bone health and calcium balance.",
+  },
+];
+
+export function getMockBlog(handle: string): BlogSummary | null {
+  if (handle !== MOCK_BLOG_HANDLE) return null;
+  return {
+    id: "gid://shopify/Blog/1",
+    title: "NutriZen Journal",
+    handle: MOCK_BLOG_HANDLE,
+    articles: MOCK_ARTICLES.map(({ contentHtml: _ch, tags: _t, seoTitle: _st, seoDescription: _sd, ...summary }) => summary),
+  };
+}
+
+export function getMockBlogArticle(blogHandle: string, articleHandle: string): BlogArticleDetail | null {
+  if (blogHandle !== MOCK_BLOG_HANDLE) return null;
+  return MOCK_ARTICLES.find((a) => a.handle === articleHandle) ?? null;
 }

@@ -23,4 +23,33 @@
   .pdp-description ol {
     @apply mb-4 list-decimal pl-5 space-y-1;
   }
+
+  /* Blog article body */
+  .blog-content p {
+    @apply mb-5 last:mb-0;
+  }
+  .blog-content h2 {
+    @apply mt-8 mb-3 text-xl font-semibold text-neutral-darkest;
+  }
+  .blog-content h3 {
+    @apply mt-6 mb-2 text-lg font-semibold text-neutral-darkest;
+  }
+  .blog-content ul {
+    @apply mb-5 list-disc pl-6 space-y-1;
+  }
+  .blog-content ol {
+    @apply mb-5 list-decimal pl-6 space-y-1;
+  }
+  .blog-content li {
+    @apply text-neutral-dark;
+  }
+  .blog-content strong {
+    @apply font-semibold text-neutral-darkest;
+  }
+  .blog-content a {
+    @apply text-primary underline-offset-2 hover:underline;
+  }
+  .blog-content blockquote {
+    @apply border-l-4 border-primary/30 pl-4 italic text-neutral-dark my-6;
+  }
 }

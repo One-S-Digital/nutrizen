@@ -6,6 +6,7 @@ import type { FooterNavColumn, FooterNavLink } from "@/lib/shopify";
 
 const COMPANY_LINKS: FooterNavLink[] = [
   { id: "company-about", title: "About Us", href: "/pages/about", external: false },
+  { id: "company-journal", title: "Journal", href: "/blogs/news", external: false },
   { id: "company-contact", title: "Contact Us", href: "/pages/contact", external: false },
   { id: "company-shipping", title: "Shipping Policy", href: "/policies/shipping-policy", external: false },
   { id: "company-terms", title: "Terms and Conditions", href: "/policies/terms-of-service", external: false },

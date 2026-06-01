@@ -73,6 +73,7 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
   const secondaryLinks = [
     { href: "/pages/about", label: "Our Story" },
     { href: "/pages/science", label: "The Science" },
+    { href: "/blogs/news", label: "Journal" },
   ];
 
   return (

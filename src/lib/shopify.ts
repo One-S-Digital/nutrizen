@@ -35,6 +35,8 @@ import {
   getMockMainMenuLinks,
   getMockNavCollections,
   getMockProductDetail,
+  getMockBlog,
+  getMockBlogArticle,
 } from "@/lib/shopify-mock";
 
 /** Allowed HTML tags/attributes for product description rendering */
@@ -1355,6 +1357,244 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
 }
 
 // ---------------------------------------------------------------------------
+// Blog / Articles
+// ---------------------------------------------------------------------------
+
+export type BlogArticleSummary = {
+  id: string;
+  title: string;
+  handle: string;
+  blogHandle: string;
+  publishedAt: string;
+  author: string;
+  excerpt: string;
+  imageUrl: string | null;
+  imageAlt: string | null;
+};
+
+export type BlogArticleDetail = BlogArticleSummary & {
+  contentHtml: string;
+  tags: string[];
+  seoTitle: string | null;
+  seoDescription: string | null;
+};
+
+export type BlogSummary = {
+  id: string;
+  title: string;
+  handle: string;
+  articles: BlogArticleSummary[];
+};
+
+export async function getBlog(blogHandle: string): Promise<BlogSummary | null> {
+  const clean = blogHandle?.trim().toLowerCase();
+  if (!clean || clean.length > 255 || !HANDLE_RE.test(clean)) return null;
+
+  if (shouldUseShopifyMock()) {
+    return getMockBlog(clean);
+  }
+
+  const query = `
+    query getBlog($handle: String!) {
+      blog(handle: $handle) {
+        id
+        title
+        handle
+        articles(first: 50, sortKey: PUBLISHED_AT, reverse: true) {
+          edges {
+            node {
+              id
+              title
+              handle
+              publishedAt
+              author { name }
+              excerptHtml
+              image {
+                url
+                altText
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  let response: {
+    body: {
+      blog: {
+        id: string;
+        title: string;
+        handle: string;
+        articles: {
+          edges: {
+            node: {
+              id: string;
+              title: string;
+              handle: string;
+              publishedAt: string;
+              author: { name: string };
+              excerptHtml: string | null;
+              image: { url: string; altText: string | null } | null;
+            };
+          }[];
+        };
+      } | null;
+    } | undefined;
+  };
+
+  try {
+    response = await shopifyFetch<{
+      blog: {
+        id: string;
+        title: string;
+        handle: string;
+        articles: {
+          edges: {
+            node: {
+              id: string;
+              title: string;
+              handle: string;
+              publishedAt: string;
+              author: { name: string };
+              excerptHtml: string | null;
+              image: { url: string; altText: string | null } | null;
+            };
+          }[];
+        };
+      } | null;
+    }>({ query, variables: { handle: clean } });
+  } catch (err) {
+    console.error("[shopify] getBlog fetch error for handle:", clean, err);
+    return null;
+  }
+
+  const blog = response.body?.blog;
+  if (!blog) return null;
+
+  return {
+    id: blog.id,
+    title: blog.title,
+    handle: blog.handle,
+    articles: blog.articles.edges.map(({ node: a }) => ({
+      id: a.id,
+      title: a.title,
+      handle: a.handle,
+      blogHandle: blog.handle,
+      publishedAt: a.publishedAt,
+      author: a.author.name,
+      excerpt: a.excerptHtml ? stripHtml(a.excerptHtml) : "",
+      imageUrl: a.image?.url ?? null,
+      imageAlt: a.image?.altText ?? a.title,
+    })),
+  };
+}
+
+export async function getBlogArticle(
+  blogHandle: string,
+  articleHandle: string
+): Promise<BlogArticleDetail | null> {
+  const cleanBlog = blogHandle?.trim().toLowerCase();
+  const cleanArticle = articleHandle?.trim().toLowerCase();
+  if (
+    !cleanBlog || cleanBlog.length > 255 || !HANDLE_RE.test(cleanBlog) ||
+    !cleanArticle || cleanArticle.length > 255 || !HANDLE_RE.test(cleanArticle)
+  ) return null;
+
+  if (shouldUseShopifyMock()) {
+    return getMockBlogArticle(cleanBlog, cleanArticle);
+  }
+
+  const query = `
+    query getBlogArticle($blogHandle: String!, $articleHandle: String!) {
+      blog(handle: $blogHandle) {
+        handle
+        articleByHandle(handle: $articleHandle) {
+          id
+          title
+          handle
+          publishedAt
+          author { name }
+          contentHtml
+          excerptHtml
+          tags
+          image {
+            url
+            altText
+          }
+          seo {
+            title
+            description
+          }
+        }
+      }
+    }
+  `;
+
+  let response: {
+    body: {
+      blog: {
+        handle: string;
+        articleByHandle: {
+          id: string;
+          title: string;
+          handle: string;
+          publishedAt: string;
+          author: { name: string };
+          contentHtml: string;
+          excerptHtml: string | null;
+          tags: string[];
+          image: { url: string; altText: string | null } | null;
+          seo: { title: string | null; description: string | null } | null;
+        } | null;
+      } | null;
+    } | undefined;
+  };
+
+  try {
+    response = await shopifyFetch<{
+      blog: {
+        handle: string;
+        articleByHandle: {
+          id: string;
+          title: string;
+          handle: string;
+          publishedAt: string;
+          author: { name: string };
+          contentHtml: string;
+          excerptHtml: string | null;
+          tags: string[];
+          image: { url: string; altText: string | null } | null;
+          seo: { title: string | null; description: string | null } | null;
+        } | null;
+      } | null;
+    }>({ query, variables: { blogHandle: cleanBlog, articleHandle: cleanArticle } });
+  } catch (err) {
+    console.error("[shopify] getBlogArticle fetch error:", cleanBlog, cleanArticle, err);
+    return null;
+  }
+
+  const article = response.body?.blog?.articleByHandle;
+  if (!article) return null;
+
+  return {
+    id: article.id,
+    title: article.title,
+    handle: article.handle,
+    blogHandle: cleanBlog,
+    publishedAt: article.publishedAt,
+    author: article.author.name,
+    excerpt: article.excerptHtml ? stripHtml(article.excerptHtml) : "",
+    contentHtml: sanitizeDescriptionHtml(article.contentHtml),
+    imageUrl: article.image?.url ?? null,
+    imageAlt: article.image?.altText ?? article.title,
+    tags: article.tags ?? [],
+    seoTitle: article.seo?.title ?? null,
+    seoDescription: article.seo?.description ?? null,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Cached exports — use these in pages and layouts instead of the raw functions.
 // unstable_cache stores results in Next.js's server-side data cache, keyed by
 // the arguments, so concurrent requests and revalidations share one result.
@@ -1400,6 +1640,20 @@ export const getAllProductsForShopCached = unstable_cache(
   (limit?: number) => getAllProductsForShop(limit),
   ["all-products"],
   { revalidate: 300, tags: ["products"] }
+);
+
+/** Cached blog listing — 1 hour TTL. */
+export const getBlogCached = unstable_cache(
+  (handle: string) => getBlog(handle),
+  ["blog"],
+  { revalidate: 3600, tags: ["blog"] }
+);
+
+/** Cached blog article — 1 hour TTL. */
+export const getBlogArticleCached = unstable_cache(
+  (blogHandle: string, articleHandle: string) => getBlogArticle(blogHandle, articleHandle),
+  ["blog-article"],
+  { revalidate: 3600, tags: ["blog"] }
 );
 
 /** Cached collection page data — 5 min TTL. */
