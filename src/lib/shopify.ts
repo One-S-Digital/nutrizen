@@ -1585,7 +1585,7 @@ export async function getBlogArticle(
     publishedAt: article.publishedAt,
     author: article.author.name,
     excerpt: article.excerptHtml ? stripHtml(article.excerptHtml) : "",
-    contentHtml: sanitizeDescriptionHtml(article.contentHtml),
+    contentHtml: article.contentHtml,
     imageUrl: article.image?.url ?? null,
     imageAlt: article.image?.altText ?? article.title,
     tags: article.tags ?? [],
