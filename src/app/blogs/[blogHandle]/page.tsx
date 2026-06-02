@@ -80,7 +80,7 @@ export default async function BlogListingPage({ params }: Props) {
 
               <div className="flex flex-col flex-1 p-5">
                 <p className="text-xs text-neutral-dark mb-2">
-                  {formatDate(article.publishedAt)} · {article.author}
+                  {formatDate(article.publishedAt)} · NutriZen
                 </p>
                 <h2 className="text-base font-semibold text-neutral-darkest group-hover:text-primary transition-colors leading-snug mb-2">
                   {article.title}
