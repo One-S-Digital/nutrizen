@@ -912,6 +912,17 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
 
+/** Decode HTML entities so Shopify-escaped markup renders as real HTML. */
+function decodeHtmlEntities(str: string): string {
+  return str
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ");
+}
+
 /** PDP: live Storefront product or mock row (preview). */
 const HANDLE_RE = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/;
 
@@ -1585,7 +1596,7 @@ export async function getBlogArticle(
     publishedAt: article.publishedAt,
     author: article.author.name,
     excerpt: article.excerptHtml ? stripHtml(article.excerptHtml) : "",
-    contentHtml: article.contentHtml,
+    contentHtml: decodeHtmlEntities(article.contentHtml),
     imageUrl: article.image?.url ?? null,
     imageAlt: article.image?.altText ?? article.title,
     tags: article.tags ?? [],
