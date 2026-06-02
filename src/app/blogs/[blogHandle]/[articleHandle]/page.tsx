@@ -50,7 +50,7 @@ export default async function BlogArticlePage({ params }: Props) {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: article.title,
-    author: { "@type": "Person", name: article.author },
+    author: { "@type": "Organization", name: "NutriZen" },
     datePublished: article.publishedAt,
     url: `${SITE_URL}/blogs/${blogHandle}/${articleHandle}`,
     publisher: {
@@ -76,8 +76,8 @@ export default async function BlogArticlePage({ params }: Props) {
         </nav>
 
         <article>
-          {article.imageUrl && (
-            <div className="relative mb-8 h-64 w-full overflow-hidden rounded-2xl sm:h-80">
+          <div className="relative mb-8 h-64 w-full overflow-hidden rounded-2xl sm:h-80">
+            {article.imageUrl ? (
               <Image
                 src={article.imageUrl}
                 alt={article.imageAlt ?? article.title}
@@ -86,12 +86,18 @@ export default async function BlogArticlePage({ params }: Props) {
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 768px"
               />
-            </div>
-          )}
+            ) : (
+              <div className="h-full w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background-alt flex items-end p-8">
+                <span className="text-4xl font-bold text-primary/30 leading-none select-none line-clamp-2">
+                  {article.title}
+                </span>
+              </div>
+            )}
+          </div>
 
           <header className="mb-8">
             <p className="text-sm text-neutral-dark mb-3">
-              {formatDate(article.publishedAt)} · {article.author}
+              {formatDate(article.publishedAt)} · NutriZen
             </p>
             <h1 className="text-3xl font-bold tracking-tight text-neutral-darkest sm:text-4xl leading-tight">
               {article.title}
