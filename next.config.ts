@@ -30,13 +30,15 @@ const nextConfig: NextConfig = {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
   images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "cdn.shopify.com", pathname: "/**" },
-    ],
-    formats: ["image/avif", "image/webp"],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60 * 60 * 24 * 365, // 1 year cache for optimized images
+    // Custom loader: Shopify CDN handles resizing/format via URL params.
+    // Images are served directly from cdn.shopify.com (Fastly edge) — Render
+    // server is never involved in image delivery.
+    loader: "custom",
+    loaderFile: "./src/lib/shopify-image-loader.ts",
+    // deviceSizes drives the srcset widths passed to the loader.
+    // Shopify CDN transforms to exactly these pixel widths.
+    deviceSizes: [480, 640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [64, 128, 256, 384],
   },
 };
 
