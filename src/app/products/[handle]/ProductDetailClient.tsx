@@ -8,6 +8,7 @@ import { useCartStore } from "@/store/cartStore";
 import { motion } from "framer-motion";
 import { formatPrice } from "@/lib/formatPrice";
 import type { ProductDetail } from "@/lib/shopify";
+import { ShippingProgressBanner } from "@/components/ui/ShippingProgressBar";
 import { BundleSaveSection } from "@/components/product/BundleSaveSection";
 import { FrequentlyBoughtTogetherSection } from "@/components/product/FrequentlyBoughtTogetherSection";
 import { ProductInfoStrip } from "@/components/product/ProductInfoStrip";
@@ -148,6 +149,7 @@ export default function ProductDetailClient({ product }: Props) {
 
           <div className="py-10">
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+              <ShippingProgressBanner />
               <nav className="mb-4 text-sm text-neutral-dark" aria-label="Breadcrumb">
                 <Link href="/" className="hover:text-primary">
                   Home

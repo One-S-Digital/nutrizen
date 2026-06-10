@@ -9,6 +9,99 @@ import { useCartStore } from "@/store/cartStore";
 import { useUIStore } from "@/store/uiStore";
 import type { NavCollection, FooterNavLink } from "@/lib/shopify";
 
+// ── Category icon map ────────────────────────────────────────────────────────
+// Matches on lowercased title substrings; first match wins.
+type IconDef = { bg: string; icon: React.ReactNode };
+
+function getCategoryIcon(title: string): IconDef {
+  const t = title.toLowerCase();
+
+  if (t.includes("energy") || t.includes("vitality"))
+    return {
+      bg: "bg-amber-50",
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-amber-500" aria-hidden>
+          <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
+        </svg>
+      ),
+    };
+
+  if (t.includes("stress") || t.includes("sleep") || t.includes("mood"))
+    return {
+      bg: "bg-indigo-50",
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-indigo-500" aria-hidden>
+          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+        </svg>
+      ),
+    };
+
+  if (t.includes("immun") || t.includes("defense") || t.includes("defence"))
+    return {
+      bg: "bg-emerald-50",
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-emerald-600" aria-hidden>
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+      ),
+    };
+
+  if (t.includes("detox") || t.includes("digest"))
+    return {
+      bg: "bg-teal-50",
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-teal-500" aria-hidden>
+          <path d="M12 2a7 7 0 0 1 7 7c0 4.97-7 13-7 13S5 13.97 5 9a7 7 0 0 1 7-7z" />
+          <circle cx="12" cy="9" r="2.5" />
+        </svg>
+      ),
+    };
+
+  if (t.includes("metabol") || t.includes("blood sugar"))
+    return {
+      bg: "bg-rose-50",
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-rose-500" aria-hidden>
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+      ),
+    };
+
+  if (t.includes("bone") || t.includes("muscle") || t.includes("recovery"))
+    return {
+      bg: "bg-orange-50",
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-orange-500" aria-hidden>
+          <path d="M6.5 6.5a4.5 4.5 0 0 0 0 6.36l4.59 4.59a1 1 0 0 0 1.41 0l4.59-4.59a4.5 4.5 0 0 0-6.36-6.36L9 8.27" />
+          <path d="M9 8.27 6.5 6.5" />
+          <path d="M17.5 17.5a4.5 4.5 0 0 0 0-6.36l-1.09-1.09" />
+        </svg>
+      ),
+    };
+
+  if (t.includes("cellular") || t.includes("longev"))
+    return {
+      bg: "bg-violet-50",
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-violet-500" aria-hidden>
+          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+          <path d="M5 3 4 6l-3 1 3 1 1 3 1-3 3-1-3-1-1-3z" />
+        </svg>
+      ),
+    };
+
+  // Default fallback
+  return {
+    bg: "bg-primary/10",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-primary" aria-hidden>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 8v4l3 3" />
+      </svg>
+    ),
+  };
+}
+
 type NavbarProps = {
   collections?: NavCollection[];
   mainMenuLinks?: FooterNavLink[];
@@ -194,7 +287,7 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                                   <li key={item.id}>
                                     <Link
                                       href={item.href}
-                                      className="flex items-center gap-3 rounded-xl p-2 -m-2 text-sm font-medium text-neutral-darkest hover:bg-background-main transition-colors"
+                                      className="flex items-center gap-3 rounded-xl p-2 -m-2 text-sm font-medium text-neutral-darkest hover:bg-background-main transition-colors group"
                                       onClick={() => setShopOpen(false)}
                                     >
                                       {item.imageUrl ? (
@@ -205,9 +298,14 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                                           height={44}
                                           className="h-11 w-11 shrink-0 rounded-lg object-cover bg-neutral-light/40"
                                         />
-                                      ) : (
-                                        <span className="h-11 w-11 shrink-0 rounded-lg bg-primary/10" aria-hidden />
-                                      )}
+                                      ) : (() => {
+                                        const { bg, icon } = getCategoryIcon(item.title);
+                                        return (
+                                          <span className={`h-11 w-11 shrink-0 rounded-lg ${bg} flex items-center justify-center transition-transform duration-200 group-hover:scale-110`} aria-hidden>
+                                            {icon}
+                                          </span>
+                                        );
+                                      })()}
                                       <span className="leading-snug">{item.title}</span>
                                     </Link>
                                   </li>
@@ -349,16 +447,26 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                 {dropdownItems.length > 0 && (
                   <>
                     <p className="text-xs font-semibold uppercase tracking-wide text-neutral-dark pt-4 pb-2">Categories</p>
-                    {dropdownItems.map((item) => (
-                      <Link
-                        key={item.id}
-                        href={item.href}
-                        className="py-2.5 border-b border-neutral-light/50 text-sm hover:text-primary transition-colors"
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        {item.title}
-                      </Link>
-                    ))}
+                    {dropdownItems.map((item) => {
+                      const { bg, icon } = getCategoryIcon(item.title);
+                      return (
+                        <Link
+                          key={item.id}
+                          href={item.href}
+                          className="flex items-center gap-3 py-2.5 border-b border-neutral-light/50 text-sm hover:text-primary transition-colors"
+                          onClick={() => setMobileOpen(false)}
+                        >
+                          {item.imageUrl ? (
+                            <Image src={item.imageUrl} alt="" width={32} height={32} className="h-8 w-8 shrink-0 rounded-md object-cover" />
+                          ) : (
+                            <span className={`h-8 w-8 shrink-0 rounded-md ${bg} flex items-center justify-center`} aria-hidden>
+                              {icon}
+                            </span>
+                          )}
+                          {item.title}
+                        </Link>
+                      );
+                    })}
                   </>
                 )}
 

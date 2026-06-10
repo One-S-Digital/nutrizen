@@ -10,12 +10,30 @@ export default function WelcomePopup() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 2500);
+    // Only show on a genuine fresh page load — not on browser back/forward
+    // and not if the popup already fired earlier in this tab session.
+    const navEntries = performance.getEntriesByType(
+      "navigation"
+    ) as PerformanceNavigationTiming[];
+    const navType = navEntries[0]?.type; // 'navigate' | 'reload' | 'back_forward' | 'prerender'
+
+    // Back/forward cache hit → skip
+    if (navType === "back_forward") return;
+
+    // Already shown during this tab session → skip
+    if (sessionStorage.getItem("nz_welcome_shown")) return;
+
+    const timer = setTimeout(() => {
+      setVisible(true);
+      sessionStorage.setItem("nz_welcome_shown", "1");
+    }, 2500);
+
     return () => clearTimeout(timer);
   }, []);
 
   function dismiss() {
     setVisible(false);
+    sessionStorage.setItem("nz_welcome_shown", "1");
   }
 
   function copyCode() {
