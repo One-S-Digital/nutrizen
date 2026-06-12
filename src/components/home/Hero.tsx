@@ -1,398 +1,512 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
+  animate,
   motion,
-  useReducedMotion,
+  useMotionTemplate,
   useMotionValue,
+  useReducedMotion,
+  useScroll,
   useSpring,
   useTransform,
-  useScroll,
   type Variants,
 } from "framer-motion";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import DNAHelix from "@/components/ui/DNAHelix";
-import AuroraBackground from "@/components/ui/AuroraBackground";
+import {
+  BotanicalFrond,
+  BotanicalSprig,
+  ContourField,
+  GrainOverlay,
+} from "@/components/ui/Texture";
+import InfusionField from "@/components/home/InfusionField";
+import { scrollEase, springLag, springTilt } from "@/lib/motion";
 
-type ProductBottleProps = {
-  src: string;
-  alt: string;
-  className?: string;
-  baseRotate?: number;
-  initialX: number;
-  initialY: number;
-  delay: number;
-  floatDelay?: number;
-  hoverTilt: { x: number; y: number };
-  innerFloat?: boolean;
-};
-
-type HeroBottleConfig = {
-  src: string;
-  alt: string;
-  mobileClassName: string;
-  desktopClassName: string;
-  baseRotate: number;
-  initialX: number;
-  initialY: number;
-  delay: number;
-  floatDelay: number;
-  hoverTilt: { x: number; y: number };
-};
-
-const HERO_BOTTLES: HeroBottleConfig[] = [
+const ANNOTATIONS = [
   {
-    src: "/vitacore.png",
-    alt: "Vitacore B-Complex",
-    mobileClassName: "w-36 h-36",
-    desktopClassName:
-      "absolute left-[-20%] md:left-[-14%] lg:left-[-8%] xl:left-[2%] top-[8%] md:top-[10%] lg:top-[12%] w-44 md:w-56 lg:w-72 xl:w-[380px] aspect-square z-10",
-    baseRotate: -20,
-    initialX: 260,
-    initialY: 180,
-    delay: 0.1,
-    floatDelay: 0.05,
-    hoverTilt: { x: -4, y: 5 },
+    title: "Zinc",
+    sub: "immune defense · daily essential",
+    side: "left" as const,
+    top: "21%",
+    delay: 1.05,
   },
   {
-    src: "/cellunex.png",
-    alt: "Cellunex Insulin Support",
-    mobileClassName: "w-32 h-32",
-    desktopClassName:
-      "absolute left-[4%] md:left-[8%] lg:left-[13%] xl:left-[17%] bottom-[3%] md:bottom-[6%] lg:bottom-[10%] w-[130px] md:w-[190px] lg:w-[260px] xl:w-[315px] aspect-square z-20",
-    baseRotate: 23,
-    initialX: 210,
-    initialY: -120,
-    delay: 0.18,
-    floatDelay: 0.25,
-    hoverTilt: { x: 4, y: -5 },
+    title: "Copper + Selenium",
+    sub: "antioxidant co-factors",
+    side: "right" as const,
+    top: "46%",
+    delay: 1.2,
   },
   {
-    src: "/zinc.png",
-    alt: "Nutrizen Zinc + Copper & Selenium",
-    mobileClassName: "w-32 h-32",
-    desktopClassName: "",
-    baseRotate: 0,
-    initialX: -220,
-    initialY: 120,
-    delay: 0.22,
-    floatDelay: 0.35,
-    hoverTilt: { x: -4, y: 5 },
+    title: "Clean label",
+    sub: "no fillers · full disclosure",
+    side: "left" as const,
+    top: "71%",
+    delay: 1.35,
   },
 ];
 
-function ProductBottle({
-  src,
-  alt,
-  className = "",
-  baseRotate = 0,
-  initialX,
-  initialY,
-  delay,
-  floatDelay = 0,
-  hoverTilt,
-  innerFloat = true,
-}: ProductBottleProps) {
-  const reduceMotion = useReducedMotion();
-  const [canHover, setCanHover] = useState(false);
+const TRUST_ITEMS = [
+  "Free shipping over R690",
+  "30-day guarantee",
+  "4.9★ · 15 000+ customers",
+];
 
+function useCanHover() {
+  const [canHover, setCanHover] = useState(false);
   useEffect(() => {
-    if (typeof window === "undefined") return;
     const media = window.matchMedia("(hover: hover) and (pointer: fine)");
     const update = () => setCanHover(media.matches);
     update();
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
   }, []);
+  return canHover;
+}
+
+function Magnetic({
+  children,
+  strength = 0.22,
+  className = "",
+}: {
+  children: React.ReactNode;
+  strength?: number;
+  className?: string;
+}) {
+  const reduceMotion = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 180, damping: 16, mass: 0.4 });
+  const sy = useSpring(y, { stiffness: 180, damping: 16, mass: 0.4 });
+
+  const handleMove = (e: React.MouseEvent) => {
+    if (reduceMotion || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    x.set((e.clientX - (rect.left + rect.width / 2)) * strength);
+    y.set((e.clientY - (rect.top + rect.height / 2)) * strength);
+  };
+
+  const handleLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   return (
-    <div className={className}>
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      style={{ x: sx, y: sy }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function AnnotationLine({
+  title,
+  sub,
+  side,
+  top,
+  delay,
+  reduceMotion,
+}: (typeof ANNOTATIONS)[number] & { reduceMotion: boolean }) {
+  const isLeft = side === "left";
+  return (
+    <div
+      className={`absolute z-20 hidden lg:flex items-center gap-3 ${
+        isLeft ? "" : "flex-row-reverse"
+      }`}
+      style={{
+        top,
+        [isLeft ? "left" : "right"]: "-16%",
+        width: "44%",
+      }}
+    >
       <motion.div
-        className="h-full w-full min-h-0"
-        initial={!reduceMotion ? { opacity: 0, x: initialX, y: initialY, scale: 0.9 } : false}
-        animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-        transition={
-          reduceMotion
-            ? { duration: 0 }
-            : { duration: 1.3, delay, ease: [0.22, 1, 0.36, 1] }
-        }
-        style={{ willChange: "transform, opacity" }}
+        initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: delay + 0.25, ease: scrollEase }}
+        className={isLeft ? "text-right" : "text-left"}
       >
-        <motion.div
-          className="h-full w-full min-h-0"
-          animate={
-            innerFloat && !reduceMotion ? { y: [0, -10, 0, 6, 0] } : undefined
-          }
-          transition={
-            innerFloat && !reduceMotion
-              ? { duration: 9, ease: "easeInOut", repeat: Infinity, delay: floatDelay }
-              : undefined
-          }
-        >
-          <motion.div
-            className="select-none h-full w-full min-h-0 relative"
-            initial={false}
-            animate={{ rotateZ: baseRotate, rotateX: 0, rotateY: 0, y: 0 }}
-            whileHover={
-              !reduceMotion && canHover
-                ? { rotateZ: baseRotate, rotateX: hoverTilt.x, rotateY: hoverTilt.y, y: -4 }
-                : undefined
-            }
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            style={{
-              transformOrigin: "center center",
-              transformStyle: "preserve-3d",
-              willChange: "transform",
-            }}
-          >
-            <Image
-              src={src}
-              alt={alt}
-              fill
-              className="object-contain filter drop-shadow-2xl opacity-90 pointer-events-none select-none"
-              sizes="(max-width: 640px) 144px, (max-width: 1024px) 224px, (max-width: 1280px) 288px, 380px"
-              priority
-            />
-          </motion.div>
-        </motion.div>
+        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-glow/90 whitespace-nowrap">
+          {title}
+        </p>
+        <p className="font-mono text-[10px] tracking-[0.08em] text-white/40 whitespace-nowrap mt-1">
+          {sub}
+        </p>
       </motion.div>
+      <div className="relative h-px flex-1">
+        <motion.span
+          initial={reduceMotion ? false : { scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 0.9, delay, ease: scrollEase }}
+          className={`absolute inset-0 bg-gradient-to-r ${
+            isLeft
+              ? "from-glow/10 via-glow/40 to-glow/70 origin-left"
+              : "from-glow/70 via-glow/40 to-glow/10 origin-right"
+          }`}
+        />
+      </div>
+      <motion.span
+        initial={reduceMotion ? false : { opacity: 0, scale: 0.4 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: delay + 0.7, ease: scrollEase }}
+        className="relative block h-1.5 w-1.5 flex-shrink-0"
+      >
+        <span className="absolute inset-0 rounded-full bg-glow" />
+        <span className="absolute -inset-1 rounded-full border border-glow/40 animate-pulse-soft" />
+      </motion.span>
     </div>
   );
 }
 
 export default function Hero() {
-  const reduceMotion = useReducedMotion();
-  const desktopBottles = [HERO_BOTTLES[0], HERO_BOTTLES[1]];
-  const zincBottle = HERO_BOTTLES[2];
+  const reduceMotion = !!useReducedMotion();
+  const canHover = useCanHover();
+  const sectionRef = useRef<HTMLElement>(null);
 
-  // Scroll: fade + lift text only
+  // Light-field cursor tracking (px within section) + normalized for tilt.
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const nx = useMotionValue(0.62);
+  const ny = useMotionValue(0.42);
+  const sx = useSpring(mx, springLag);
+  const sy = useSpring(my, springLag);
+  const snx = useSpring(nx, springTilt);
+  const sny = useSpring(ny, springTilt);
+
+  const maskImage = useMotionTemplate`radial-gradient(520px circle at ${sx}px ${sy}px, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.35) 46%, transparent 74%)`;
+  const glowX = useTransform(sx, (v) => v - 340);
+  const glowY = useTransform(sy, (v) => v - 340);
+
+  const tiltX = useTransform(sny, [0, 1], [5.5, -5.5]);
+  const tiltY = useTransform(snx, [0, 1], [-7, 7]);
+
+  // Botanical depth layers drift against the cursor.
+  const frondX = useTransform(snx, [0, 1], [16, -16]);
+  const frondY = useTransform(sny, [0, 1], [9, -9]);
+  const sprigX = useTransform(snx, [0, 1], [-22, 22]);
+  const sprigY = useTransform(sny, [0, 1], [-12, 12]);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    mx.set(rect.width * 0.66);
+    my.set(rect.height * 0.42);
+  }, [mx, my]);
+
+  useEffect(() => {
+    if (canHover || reduceMotion) return;
+    const el = sectionRef.current;
+    if (!el) return;
+    const { width: w, height: h } = el.getBoundingClientRect();
+    const controls = [
+      animate(mx, [w * 0.2, w * 0.85, w * 0.45, w * 0.75, w * 0.2], {
+        duration: 30,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }),
+      animate(my, [h * 0.3, h * 0.55, h * 0.85, h * 0.4, h * 0.3], {
+        duration: 30,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }),
+    ];
+    return () => controls.forEach((c) => c.stop());
+  }, [canHover, reduceMotion, mx, my]);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!sectionRef.current) return;
+    const rect = sectionRef.current.getBoundingClientRect();
+    mx.set(e.clientX - rect.left);
+    my.set(e.clientY - rect.top);
+    nx.set((e.clientX - rect.left) / rect.width);
+    ny.set((e.clientY - rect.top) / rect.height);
+  };
+
+  // Scroll: text lifts and fades, specimen drifts slower.
   const { scrollY } = useScroll();
-  const textY = useTransform(scrollY, [0, 400], [0, -40]);
-  const textOpacity = useTransform(scrollY, [0, 350], [1, 0]);
+  const textY = useTransform(scrollY, [0, 500], [0, -56]);
+  const textOpacity = useTransform(scrollY, [0, 420], [1, 0]);
+  const specimenY = useTransform(scrollY, [0, 600], [0, 60]);
 
-  const textVariants: Variants = {
-    hidden: { opacity: 0, y: 18 },
+  const containerVariants: Variants = {
+    hidden: {},
     visible: {
-      opacity: 1,
-      y: 0,
       transition: {
-        duration: reduceMotion ? 0 : 0.95,
-        ease: [0.22, 1, 0.36, 1],
-        staggerChildren: reduceMotion ? 0 : 0.12,
+        staggerChildren: reduceMotion ? 0 : 0.1,
+        delayChildren: reduceMotion ? 0 : 0.15,
       },
     },
   };
-
-  const textChildVariants: Variants = {
-    hidden: { opacity: 0, y: 14 },
+  const childVariants: Variants = {
+    hidden: reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: reduceMotion ? 0 : 0.85, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 0.85, ease: scrollEase },
     },
   };
 
   return (
-    <AuroraBackground>
-      {/* section is the positioning context for all absolute bottles */}
-      <section className="relative min-h-[90vh] flex flex-col items-center justify-center pt-20 w-full overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+    <section
+      ref={sectionRef}
+      onMouseMove={canHover ? handleMouseMove : undefined}
+      className="relative isolate min-h-[100svh] overflow-hidden bg-ink-deep"
+    >
+      {/* ── The Infusion Field ── */}
+      <div className="absolute inset-0 bg-[radial-gradient(130%_100%_at_72%_18%,#1E3326_0%,#0E1B14_50%,#070F0B_100%)]" aria-hidden />
+      <motion.div
+        style={reduceMotion ? undefined : { x: frondX, y: frondY }}
+        className="absolute -bottom-28 -left-20 w-[400px] text-[#18291F] blur-[2px] lg:w-[560px]"
+        aria-hidden
+      >
+        <BotanicalFrond className="h-auto w-full rotate-[26deg]" />
+      </motion.div>
+      <motion.div
+        style={reduceMotion ? undefined : { x: sprigX, y: sprigY }}
+        className="absolute -top-24 right-[-70px] w-[330px] text-[#16261D] blur-[3px] lg:w-[440px]"
+        aria-hidden
+      >
+        <BotanicalSprig className="h-auto w-full rotate-[148deg]" />
+      </motion.div>
+      <ContourField className="absolute inset-0 h-full w-full text-primary opacity-[0.05]" />
+      <motion.div
+        className="absolute inset-0"
+        style={{ maskImage, WebkitMaskImage: maskImage }}
+        aria-hidden
+      >
+        <ContourField className="absolute inset-0 h-full w-full text-glow opacity-40" />
+      </motion.div>
+      <InfusionField
+        getCursor={() => ({ x: sx.get(), y: sy.get() })}
+        reduceMotion={reduceMotion}
+        className="absolute inset-0 h-full w-full"
+      />
+      <motion.div
+        className="pointer-events-none absolute left-0 top-0 h-[680px] w-[680px] rounded-full"
+        style={{
+          x: glowX,
+          y: glowY,
+          background:
+            "radial-gradient(circle, rgba(217,232,196,0.1) 0%, rgba(217,232,196,0.035) 40%, transparent 65%)",
+        }}
+        aria-hidden
+      />
+      <GrainOverlay className="opacity-[0.055]" />
 
-        {/* Mobile: bottles above text */}
-        <div className="relative z-20 w-full md:hidden px-6">
-          <div className="mx-auto max-w-sm flex items-end justify-between gap-4">
-            {HERO_BOTTLES.slice(0, 2).map((bottle) => (
-              <ProductBottle
-                key={`mobile-top-${bottle.src}`}
-                src={bottle.src}
-                alt={bottle.alt}
-                className={bottle.mobileClassName}
-                baseRotate={bottle.baseRotate}
-                initialX={bottle.initialX}
-                initialY={bottle.initialY}
-                delay={bottle.delay}
-                floatDelay={bottle.floatDelay}
-                hoverTilt={bottle.hoverTilt}
-              />
-            ))}
-          </div>
-          <div className="mx-auto mt-2 max-w-sm flex items-center justify-center">
-            {HERO_BOTTLES.slice(2).map((bottle) => (
-              <ProductBottle
-                key={`mobile-bottom-${bottle.src}`}
-                src={bottle.src}
-                alt={bottle.alt}
-                className={bottle.mobileClassName}
-                baseRotate={bottle.baseRotate}
-                initialX={0}
-                initialY={24}
-                delay={bottle.delay}
-                floatDelay={bottle.floatDelay}
-                hoverTilt={{ x: -3, y: 4 }}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Text — scroll parallax via motion.style, NOT position */}
+      {/* ── Content grid ── */}
+      <div className="relative z-10 mx-auto grid min-h-[100svh] w-full max-w-7xl grid-cols-1 items-center gap-x-8 px-6 pb-20 pt-32 md:pt-36 lg:grid-cols-[1.04fr_0.96fr] lg:pb-12 lg:pt-28">
+        {/* Editorial column */}
         <motion.div
-          className="relative z-20 max-w-4xl mx-auto px-6 text-center max-md:mt-8 md:-mt-[15vh]"
+          variants={containerVariants}
+          initial={reduceMotion ? false : "hidden"}
+          animate="visible"
           style={reduceMotion ? {} : { y: textY, opacity: textOpacity }}
+          className="relative z-20 max-w-2xl"
         >
-          <motion.div
-            variants={textVariants}
-            initial={reduceMotion ? false : "hidden"}
-            animate="visible"
+          <motion.p
+            variants={childVariants}
+            className="mb-7 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.3em] text-primary"
           >
-            <motion.span
-              variants={textChildVariants}
-              className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-4"
-            >
-              Precision Wellness
-            </motion.span>
+            <span className="h-px w-9 bg-primary/50" aria-hidden />
+            NutriZen · Precision Wellness
+          </motion.p>
 
-            <motion.h1
-              variants={textChildVariants}
-              className="text-5xl md:text-7xl font-bold tracking-tight text-neutral-darkest mb-6 leading-[1.1]"
-            >
-              Clean Supplements. <br />
-              <span className="text-primary relative inline-block mt-2">
-                Real Results.
-                <motion.span
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.8, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ originX: 0 }}
-                  className="absolute -bottom-2 left-0 w-full h-[3px] bg-secondary/40 rounded-full"
-                />
-              </span>
-            </motion.h1>
+          <motion.h1
+            variants={childVariants}
+            className="font-serif text-[2.35rem] leading-[1.06] tracking-[-0.015em] text-paper min-[420px]:text-[2.7rem] sm:text-[3.5rem] lg:text-[4.1rem] xl:text-[4.7rem]"
+          >
+            Supplements with
+            <br />
+            <em className="italic text-glow">nothing to hide.</em>
+          </motion.h1>
 
-            <motion.p
-              variants={textChildVariants}
-              className="text-lg md:text-xl text-neutral-dark mb-10 max-w-2xl mx-auto leading-relaxed"
-            >
-              No fillers. No hidden blends. Just scientifically formulated nutrients your body actually uses.
-            </motion.p>
+          <motion.p
+            variants={childVariants}
+            className="mt-7 max-w-[46ch] text-base leading-relaxed text-white/55 md:text-lg"
+          >
+            No fillers. No proprietary blends. Clinically dosed nutrients in
+            the forms your body actually absorbs — formulated in the open,
+            delivered across South Africa.
+          </motion.p>
 
-            <motion.div variants={textChildVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                <Link href="/shop">
-                  <Button size="lg" variant="primary" className="px-10 text-lg group shadow-[0_8px_24px_-6px_rgba(140,171,119,0.5)]">
-                    Shop Now
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2 group-hover:translate-x-1 transition-transform">
-                      <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
-                    </svg>
-                  </Button>
-                </Link>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                <Link href="/pages/science">
-                  <Button size="lg" variant="outline" className="px-8 text-lg">
-                    The Science
-                  </Button>
-                </Link>
-              </motion.div>
-            </motion.div>
-
-            <motion.div
-              variants={textChildVariants}
-              className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8 text-sm font-medium text-neutral-dark/80"
+          <motion.div
+            variants={childVariants}
+            className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center"
+          >
+            <Magnetic>
+              <Link
+                href="/shop"
+                className="group inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-primary px-9 py-4 text-[15px] font-semibold text-ink-deep shadow-[0_14px_40px_-12px_rgba(140,171,119,0.7)] transition-colors duration-300 hover:bg-glow sm:w-auto"
+              >
+                Shop bestsellers
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="transition-transform duration-300 group-hover:translate-x-1"
+                  aria-hidden
+                >
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+              </Link>
+            </Magnetic>
+            <a
+              href="#goals"
+              className="group inline-flex w-full items-center justify-center gap-2.5 rounded-full border border-white/15 px-7 py-4 text-[15px] font-medium text-white/75 transition-colors duration-300 hover:border-white/35 hover:text-white sm:w-auto"
             >
-              {["Transparent ingredients", "Clinically effective doses", "Fast delivery"].map((trust) => (
-                <span key={trust} className="flex items-center gap-1.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-secondary flex-shrink-0">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  {trust}
-                </span>
-              ))}
-            </motion.div>
+              How do you want to feel?
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="transition-transform duration-300 group-hover:translate-y-0.5"
+                aria-hidden
+              >
+                <path d="M12 5v14" />
+                <path d="m19 12-7 7-7-7" />
+              </svg>
+            </a>
           </motion.div>
+
+          <motion.ul
+            variants={childVariants}
+            className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2.5"
+          >
+            {TRUST_ITEMS.map((item, i) => (
+              <li
+                key={item}
+                className="flex items-center gap-x-6 font-mono text-[10px] uppercase tracking-[0.2em] text-white/35"
+              >
+                {i > 0 && (
+                  <span className="text-glow/40" aria-hidden>
+                    ✦
+                  </span>
+                )}
+                {item}
+              </li>
+            ))}
+          </motion.ul>
         </motion.div>
 
-        {/* Desktop: vitacore + cellunex — absolutely positioned, section is containing block */}
-        <div className="hidden md:block">
-          {desktopBottles.map((bottle) => (
-            <ProductBottle
-              key={`desktop-${bottle.src}`}
-              src={bottle.src}
-              alt={bottle.alt}
-              className={bottle.desktopClassName}
-              baseRotate={bottle.baseRotate}
-              initialX={bottle.initialX}
-              initialY={bottle.initialY}
-              delay={bottle.delay}
-              floatDelay={bottle.floatDelay}
-              hoverTilt={bottle.hoverTilt}
+        {/* Specimen column */}
+        <motion.div
+          style={reduceMotion ? {} : { y: specimenY }}
+          className="relative z-10 mx-auto mt-14 w-full max-w-[300px] sm:max-w-[360px] lg:mt-0 lg:max-w-[520px]"
+        >
+          <div className="relative" style={{ perspective: 1000 }}>
+            {/* Backlight */}
+            <div
+              className="absolute left-1/2 top-1/2 h-[115%] w-[115%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(140,171,119,0.16)_0%,transparent_62%)]"
+              aria-hidden
             />
-          ))}
 
-          {/* DNA + Zinc cluster — right side, original position */}
-          <motion.div
-            initial={!reduceMotion ? { opacity: 0, x: -260, y: 120, scale: 0.92 } : false}
-            animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+            {ANNOTATIONS.map((a) => (
+              <AnnotationLine key={a.title} {...a} reduceMotion={reduceMotion} />
+            ))}
+
+            <motion.div
+              initial={
+                reduceMotion ? false : { opacity: 0, y: 36, scale: 0.93 }
+              }
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 1.25, delay: 0.2, ease: scrollEase }}
+            >
+              <motion.div
+                animate={reduceMotion ? undefined : { y: [0, -11, 0] }}
+                transition={
+                  reduceMotion
+                    ? undefined
+                    : { duration: 7.5, repeat: Infinity, ease: "easeInOut" }
+                }
+              >
+                <motion.div
+                  style={
+                    reduceMotion || !canHover
+                      ? {}
+                      : {
+                          rotateX: tiltX,
+                          rotateY: tiltY,
+                          transformStyle: "preserve-3d",
+                        }
+                  }
+                  className="relative aspect-square w-full"
+                >
+                  <Image
+                    src="/zinc.png"
+                    alt="NutriZen Zinc + Copper & Selenium — immune and antioxidant support"
+                    fill
+                    priority
+                    sizes="(max-width: 640px) 300px, (max-width: 1024px) 360px, 520px"
+                    className="select-none object-contain drop-shadow-[0_36px_44px_rgba(0,0,0,0.5)]"
+                  />
+                </motion.div>
+              </motion.div>
+            </motion.div>
+
+            {/* Floor shadow */}
+            <div
+              className="absolute -bottom-2 left-1/2 h-7 w-[52%] -translate-x-1/2 rounded-[50%] bg-black/50 blur-xl"
+              aria-hidden
+            />
+          </div>
+
+          <motion.p
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.9, delay: 1.5 }}
+            className="mt-7 text-center font-mono text-[10px] uppercase tracking-[0.3em] text-white/30"
+          >
+            Specimen 03 — Zinc · Copper · Selenium
+          </motion.p>
+        </motion.div>
+      </div>
+
+      {/* Scroll cue */}
+      <motion.div
+        initial={reduceMotion ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.8, duration: 0.9 }}
+        className="absolute bottom-6 left-1/2 z-20 hidden -translate-x-1/2 flex-col items-center gap-3 md:flex"
+      >
+        <span className="font-mono text-[9px] uppercase tracking-[0.4em] text-white/30">
+          Scroll
+        </span>
+        <span className="relative block h-10 w-px overflow-hidden bg-white/10">
+          <motion.span
+            animate={reduceMotion ? undefined : { y: [-14, 44] }}
             transition={
               reduceMotion
-                ? { duration: 0 }
-                : { duration: 1.35, delay: 0.28, ease: [0.22, 1, 0.36, 1] }
+                ? undefined
+                : {
+                    duration: 1.9,
+                    repeat: Infinity,
+                    ease: [0.4, 0, 0.6, 1],
+                  }
             }
-            className="absolute top-[8%] lg:top-[10%] right-[0%] lg:right-[5%] z-10 scale-[1] lg:scale-[1.2]"
-            style={{ willChange: "transform, opacity" }}
-          >
-            <motion.div
-              animate={reduceMotion ? undefined : { y: [0, -8, 0] }}
-              transition={
-                reduceMotion
-                  ? undefined
-                  : { duration: 8, ease: "easeInOut", repeat: Infinity, repeatType: "mirror" }
-              }
-              className="relative"
-            >
-              <div className="relative inline-block max-w-[min(92vw,420px)]">
-                <div className="pointer-events-none opacity-[0.55]">
-                  <DNAHelix />
-                </div>
-                <div className="pointer-events-auto absolute left-1/2 top-[25%] z-10 h-[252px] w-[189px] -translate-x-1/2 -translate-y-1/2 md:h-[315px] md:w-[231px] lg:h-[399px] lg:w-[273px] xl:h-[462px] xl:w-[315px]">
-                  <ProductBottle
-                    key="desktop-zinc-dna"
-                    src={zincBottle.src}
-                    alt={zincBottle.alt}
-                    className="relative h-full w-full"
-                    baseRotate={zincBottle.baseRotate}
-                    initialX={zincBottle.initialX}
-                    initialY={zincBottle.initialY}
-                    delay={zincBottle.delay}
-                    floatDelay={zincBottle.floatDelay}
-                    hoverTilt={zincBottle.hoverTilt}
-                    innerFloat={false}
-                  />
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.5, duration: 0.8 }}
-          className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
-        >
-          <span className="text-xs font-medium text-neutral-dark/50 tracking-widest uppercase">Scroll</span>
-          <motion.div
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-            className="w-5 h-8 rounded-full border-2 border-neutral-dark/20 flex items-start justify-center pt-1.5"
-          >
-            <div className="w-1 h-1.5 bg-neutral-dark/30 rounded-full" />
-          </motion.div>
-        </motion.div>
-      </section>
-    </AuroraBackground>
+            className="absolute left-0 top-0 h-3.5 w-px bg-glow/80"
+          />
+        </span>
+      </motion.div>
+    </section>
   );
 }

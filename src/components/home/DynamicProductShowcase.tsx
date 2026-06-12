@@ -150,17 +150,17 @@ export default function DynamicProductShowcase() {
           >
             <motion.span
               variants={itemVariants}
-              className="inline-flex items-center gap-2 text-[#DE9E48] font-bold tracking-widest uppercase text-[11px] mb-5 bg-[#DE9E48]/10 px-4 py-2 rounded-full"
+              className="mb-5 inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.3em] text-goal-energy"
             >
-              <span>✦</span> Immunity Power Pack
+              <span className="h-px w-9 bg-goal-energy/50" aria-hidden />
+              04 · The protocol
             </motion.span>
 
             <motion.h2
               variants={itemVariants}
-              className="text-4xl md:text-5xl font-semibold text-[#3B4A3F] mb-5 tracking-tight max-w-xl"
-              style={{ fontFamily: "ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif" }}
+              className="font-serif text-4xl md:text-[3.2rem] text-ink mb-5 leading-[1.06] tracking-[-0.01em] max-w-xl"
             >
-              Your Daily Immunity &amp; Recovery Stack
+              Your daily immunity &amp; <em className="italic">recovery stack</em>
             </motion.h2>
 
             <motion.p
@@ -210,7 +210,7 @@ export default function DynamicProductShowcase() {
               <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
                 <Link
                   href="/products/nutrizen-daily-immunity-recovery-stack"
-                  className="group inline-flex items-center gap-3 rounded-full bg-[#425244] px-10 py-4 text-[13px] font-bold uppercase tracking-wider text-white shadow-[0_8px_24px_-4px_rgba(66,82,68,0.4)] hover:bg-[#344136] transition-colors duration-300"
+                  className="group inline-flex items-center gap-3 rounded-full bg-ink px-10 py-4 text-[13px] font-bold uppercase tracking-wider text-white shadow-[0_8px_24px_-4px_rgba(16,32,26,0.4)] hover:bg-ink-soft transition-colors duration-300"
                 >
                   Get the Combo &amp; Save
                   <svg

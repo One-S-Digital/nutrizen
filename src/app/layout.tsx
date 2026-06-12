@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Fraunces, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -12,6 +12,21 @@ import { getFooterColumnsCached, getMainMenuLinksCached, getNavCollectionsCached
 import { shouldUseShopifyMock } from "@/lib/shopify-mode";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  style: ["normal", "italic"],
+  axes: ["opsz"],
+  display: "swap",
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  weight: ["400", "500"],
+  display: "swap",
+});
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
 const SITE_NAME = "NutriZen";
@@ -143,7 +158,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} font-sans bg-background-main text-neutral-darkest antialiased flex flex-col min-h-screen`}
+        className={`${inter.variable} ${fraunces.variable} ${plexMono.variable} font-sans bg-background-main text-neutral-darkest antialiased flex flex-col min-h-screen`}
       >
         <AnnouncementBanner />
         {previewMockCatalog ? (

@@ -81,8 +81,6 @@ export default async function Home() {
       <JsonLd data={homePageSchema} />
       <Hero />
       <ProductMarquee products={marqueeProducts} />
-      <DynamicProductShowcase />
-      <ProblemSolution />
       {collections.length > 0 ? (
         <CategoryShowcase categories={collections} />
       ) : (
@@ -106,6 +104,8 @@ export default async function Home() {
           </div>
         </section>
       )}
+      <ProblemSolution />
+      <DynamicProductShowcase />
       <IngredientBreakdown />
       <SocialProof />
     </div>

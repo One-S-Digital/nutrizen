@@ -8,6 +8,22 @@
     color: theme('colors.neutral.darkest');
     @apply antialiased selection:bg-primary/30;
   }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @layer components {

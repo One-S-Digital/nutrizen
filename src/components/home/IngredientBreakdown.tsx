@@ -4,88 +4,124 @@ import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { scrollEase, scrollViewport } from "@/lib/motion";
 
 const ingredients = [
-  { title: "Ashwagandha KSM-66", desc: "Clinically proven to reduce cortisol and manage stress naturally." },
-  { title: "Liposomal C", desc: "Highest absorption rate for maximum immune system support." },
-  { title: "L-Theanine", desc: "Promotes a calm, relaxed state without causing drowsiness." },
+  {
+    index: "01",
+    title: "Ashwagandha KSM-66",
+    desc: "Clinically studied root extract shown to reduce cortisol and manage stress naturally.",
+    tag: "Stress & mood",
+    hue: "#5B5E80",
+  },
+  {
+    index: "02",
+    title: "Liposomal C",
+    desc: "Vitamin C wrapped for absorption — more of every dose reaches your immune system.",
+    tag: "Immunity",
+    hue: "#42634C",
+  },
+  {
+    index: "03",
+    title: "L-Theanine",
+    desc: "Promotes a calm, focused state without drowsiness. The quiet half of clear energy.",
+    tag: "Calm focus",
+    hue: "#2F5D5C",
+  },
 ];
 
 export default function IngredientBreakdown() {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = !!useReducedMotion();
 
   const containerVariants: Variants = {
     hidden: {},
     visible: {
       transition: reduceMotion
         ? { staggerChildren: 0, delayChildren: 0 }
-        : { staggerChildren: 0.06, delayChildren: 0.04 },
+        : { staggerChildren: 0.1, delayChildren: 0.05 },
     },
   };
 
   const itemVariants: Variants = {
-    hidden: reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 },
+    hidden: reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 26 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: reduceMotion ? 0 : 0.45, ease: scrollEase },
+      transition: { duration: reduceMotion ? 0 : 0.65, ease: scrollEase },
     },
   };
 
   return (
-    <section className="relative overflow-hidden bg-primary py-32 text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/20 via-transparent to-transparent opacity-80" />
-
-      <motion.div
-        className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 md:grid-cols-3"
-        initial="hidden"
-        whileInView="visible"
-        viewport={scrollViewport}
-        variants={containerVariants}
-      >
-        <motion.div className="mx-auto mb-12 max-w-3xl text-center text-white md:col-span-3 md:mb-20" variants={itemVariants}>
-          <span className="mb-4 block text-sm font-bold uppercase tracking-wider text-white/80">
-            Precision Nutrition
-          </span>
-          <h2 className="mb-6 text-3xl font-bold md:text-5xl">Not Just Vitamins. Precision Nutrition.</h2>
-          <p className="text-lg text-white/90">
-            NutriZen products are developed with carefully selected ingredients, optimized for absorption and
-            effectiveness. No artificial fillers. No misleading labels. No wasted money on ineffective supplements.
-            <br />
-            <br />
-            Just clean, targeted formulas that support your health at a deeper level.
+    <section className="relative overflow-hidden bg-paper-warm py-24 md:py-32">
+      <div className="relative z-10 mx-auto max-w-7xl px-6">
+        <motion.div
+          className="mb-12 grid grid-cols-1 items-end gap-6 md:mb-16 md:grid-cols-[1fr_auto]"
+          initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={scrollViewport}
+          transition={{ duration: 0.85, ease: scrollEase }}
+        >
+          <div>
+            <p className="mb-5 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.3em] text-goal-cellular">
+              <span className="h-px w-9 bg-goal-cellular/50" aria-hidden />
+              05 · Inside the formulas
+            </p>
+            <h2 className="font-serif text-4xl leading-[1.06] tracking-[-0.01em] text-ink sm:text-5xl md:text-[3.4rem]">
+              Not just vitamins.
+              <br />
+              <em className="italic">Precision nutrition.</em>
+            </h2>
+          </div>
+          <p className="max-w-xs text-sm leading-relaxed text-ink/60 md:pb-2 md:text-right">
+            Ingredients chosen for evidence and absorption — never to pad a
+            label. A few worth knowing by name:
           </p>
         </motion.div>
 
-        {ingredients.map((item) => (
-          <motion.div
-            key={item.title}
-            variants={itemVariants}
-            className="rounded-[2.5rem] border border-white/25 bg-white/[0.12] p-10 transition-colors duration-200 hover:bg-white/[0.18] [transform:translateZ(0)]"
-          >
-            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white/20">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
+        <motion.div
+          className="grid grid-cols-1 gap-5 md:grid-cols-3"
+          initial="hidden"
+          whileInView="visible"
+          viewport={scrollViewport}
+          variants={containerVariants}
+        >
+          {ingredients.map((item) => (
+            <motion.div
+              key={item.title}
+              variants={itemVariants}
+              whileHover={
+                reduceMotion
+                  ? undefined
+                  : { y: -5, transition: { duration: 0.3, ease: scrollEase } }
+              }
+              className="group relative rounded-2xl border border-ink/10 bg-paper-white p-8 shadow-[0_10px_30px_-18px_rgba(16,32,26,0.25)]"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[11px] tracking-[0.25em] text-ink/40">
+                  {item.index}
+                </span>
+                <span
+                  className="h-2 w-2 rounded-full transition-transform duration-300 group-hover:scale-125"
+                  style={{ backgroundColor: item.hue }}
+                  aria-hidden
+                />
+              </div>
+              <h3 className="mt-6 font-serif text-2xl text-ink">{item.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-neutral-dark">
+                {item.desc}
+              </p>
+              <p
+                className="mt-7 flex items-center gap-2.5 font-mono text-[10px] uppercase tracking-[0.22em]"
+                style={{ color: item.hue }}
               >
-                <path d="M10 2v7.31" />
-                <path d="M14 9.3V1.99" />
-                <path d="M8.5 2h7" />
-                <path d="M14 9.3a6.5 6.5 0 1 1-4 0" />
-                <path d="M5.52 16h12.96" />
-              </svg>
-            </div>
-            <h3 className="mb-4 text-2xl font-bold">{item.title}</h3>
-            <p className="leading-relaxed text-white/80">{item.desc}</p>
-          </motion.div>
-        ))}
-      </motion.div>
+                <span
+                  className="block h-px w-7 transition-all duration-300 group-hover:w-11"
+                  style={{ backgroundColor: `${item.hue}66` }}
+                  aria-hidden
+                />
+                {item.tag}
+              </p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
     </section>
   );
 }
