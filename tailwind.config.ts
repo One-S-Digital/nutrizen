@@ -88,10 +88,16 @@ export default {
           "0%, 100%": { opacity: "0.55", transform: "scale(1)" },
           "50%": { opacity: "1", transform: "scale(1.4)" },
         },
+        orbit: {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
       },
       animation: {
         marquee: "marquee 40s linear infinite",
         "pulse-soft": "pulse-soft 2.8s ease-in-out infinite",
+        orbit: "orbit 3.6s linear infinite",
+        "orbit-reverse": "orbit 5.2s linear infinite reverse",
       },
     },
   },

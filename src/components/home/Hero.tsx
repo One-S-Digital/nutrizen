@@ -21,19 +21,20 @@ import {
   GrainOverlay,
 } from "@/components/ui/Texture";
 import InfusionField from "@/components/home/InfusionField";
+import DNAHelixMotion from "@/components/home/DNAHelixMotion";
 import { scrollEase, springLag, springTilt } from "@/lib/motion";
 
 const ANNOTATIONS = [
   {
-    title: "Zinc",
-    sub: "immune defense · daily essential",
+    title: "Metabolic support",
+    sub: "500 mg · 60 capsules",
     side: "left" as const,
     top: "21%",
     delay: 1.05,
   },
   {
-    title: "Copper + Selenium",
-    sub: "antioxidant co-factors",
+    title: "Digestive health",
+    sub: "cellular detox support",
     side: "right" as const,
     top: "46%",
     delay: 1.2,
@@ -132,10 +133,10 @@ function AnnotationLine({
         transition={{ duration: 0.7, delay: delay + 0.25, ease: scrollEase }}
         className={isLeft ? "text-right" : "text-left"}
       >
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-glow/90 whitespace-nowrap">
+        <p className="whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.22em] text-glow [text-shadow:0_0_12px_rgba(217,232,196,0.55),0_0_28px_rgba(217,232,196,0.2)]">
           {title}
         </p>
-        <p className="font-mono text-[10px] tracking-[0.08em] text-white/40 whitespace-nowrap mt-1">
+        <p className="mt-1 whitespace-nowrap font-mono text-[10px] tracking-[0.08em] text-white/85">
           {sub}
         </p>
       </motion.div>
@@ -146,8 +147,8 @@ function AnnotationLine({
           transition={{ duration: 0.9, delay, ease: scrollEase }}
           className={`absolute inset-0 bg-gradient-to-r ${
             isLeft
-              ? "from-glow/10 via-glow/40 to-glow/70 origin-left"
-              : "from-glow/70 via-glow/40 to-glow/10 origin-right"
+              ? "from-glow/15 via-glow/60 to-glow origin-left"
+              : "from-glow via-glow/60 to-glow/15 origin-right"
           }`}
         />
       </div>
@@ -155,10 +156,25 @@ function AnnotationLine({
         initial={reduceMotion ? false : { opacity: 0, scale: 0.4 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: delay + 0.7, ease: scrollEase }}
-        className="relative block h-1.5 w-1.5 flex-shrink-0"
+        className="relative block h-7 w-7 flex-shrink-0"
       >
-        <span className="absolute inset-0 rounded-full bg-glow" />
-        <span className="absolute -inset-1 rounded-full border border-glow/40 animate-pulse-soft" />
+        <span className="absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-glow shadow-[0_0_10px_rgba(217,232,196,0.9)]" />
+        <span
+          className="absolute inset-0"
+          style={{ transform: `scaleY(0.42) rotate(${isLeft ? -18 : 18}deg)` }}
+        >
+          <span className="absolute inset-0 rounded-full border border-glow/30" />
+          {!reduceMotion && (
+            <>
+              <span className="absolute inset-0 animate-orbit">
+                <span className="absolute left-1/2 top-0 h-1 w-1 -translate-x-1/2 rounded-full bg-glow" />
+              </span>
+              <span className="absolute inset-1 animate-orbit-reverse">
+                <span className="absolute bottom-0 left-1/2 h-[3px] w-[3px] -translate-x-1/2 rounded-full bg-primary" />
+              </span>
+            </>
+          )}
+        </span>
       </motion.span>
     </div>
   );
@@ -312,9 +328,9 @@ export default function Hero() {
         >
           <motion.p
             variants={childVariants}
-            className="mb-7 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.3em] text-primary"
+            className="mb-7 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.3em] text-glow"
           >
-            <span className="h-px w-9 bg-primary/50" aria-hidden />
+            <span className="h-px w-9 bg-glow/50" aria-hidden />
             NutriZen · Precision Wellness
           </motion.p>
 
@@ -395,7 +411,7 @@ export default function Hero() {
             {TRUST_ITEMS.map((item, i) => (
               <li
                 key={item}
-                className="flex items-center gap-x-6 font-mono text-[10px] uppercase tracking-[0.2em] text-white/35"
+                className="flex items-center gap-x-6 font-mono text-[10px] uppercase tracking-[0.2em] text-white/60"
               >
                 {i > 0 && (
                   <span className="text-glow/40" aria-hidden>
@@ -419,6 +435,17 @@ export default function Hero() {
               className="absolute left-1/2 top-1/2 h-[115%] w-[115%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(140,171,119,0.16)_0%,transparent_62%)]"
               aria-hidden
             />
+
+            {/* Rotating helix behind the specimen */}
+            <div
+              className="absolute left-1/2 top-1/2 h-[118%] w-[126%] -translate-x-1/2 -translate-y-1/2 opacity-70"
+              aria-hidden
+            >
+              <DNAHelixMotion
+                reduceMotion={reduceMotion}
+                className="h-full w-full"
+              />
+            </div>
 
             {ANNOTATIONS.map((a) => (
               <AnnotationLine key={a.title} {...a} reduceMotion={reduceMotion} />
@@ -452,8 +479,8 @@ export default function Hero() {
                   className="relative aspect-square w-full"
                 >
                   <Image
-                    src="/zinc.png"
-                    alt="NutriZen Zinc + Copper & Selenium — immune and antioxidant support"
+                    src="/metabol.png"
+                    alt="NutriZen Metabol+ — improve metabolism, digestive health and cellular detox"
                     fill
                     priority
                     sizes="(max-width: 640px) 300px, (max-width: 1024px) 360px, 520px"
@@ -474,9 +501,9 @@ export default function Hero() {
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.9, delay: 1.5 }}
-            className="mt-7 text-center font-mono text-[10px] uppercase tracking-[0.3em] text-white/30"
+            className="mt-7 text-center font-mono text-[10px] uppercase tracking-[0.3em] text-glow/60"
           >
-            Specimen 03 — Zinc · Copper · Selenium
+            Specimen 05 — Metabol+ · 500 mg · 60 capsules
           </motion.p>
         </motion.div>
       </div>
