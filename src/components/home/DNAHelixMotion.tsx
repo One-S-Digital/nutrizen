@@ -9,17 +9,20 @@ const C_GOLD: [number, number, number] = [232, 168, 92];
 const C_PALE: [number, number, number] = [248, 222, 176];
 
 const TURNS = 4; // full twists over the visible height
-const BACKBONE_PER_STRAND = 672; // +40% density
-const RUNGS = 40; // distinct ladder cross-bars (with vertical gaps)
-const PER_RUNG = 34; // dense particles per bar so the rung reads as a line
-const DUST_COUNT = 504;
+const BACKBONE_PER_STRAND = 1344; // doubled density
+const RUNGS = 46; // distinct ladder cross-bars (with vertical gaps)
+const PER_RUNG = 60; // very dense so each rung reads as a solid line across
 
-// Local hover dispersion — a big rising burst, like the top fray
+// Local hover dispersion — a big rising burst
 const DISPERSE_R = 180;
 const PUSH = 14;
 const LIFT = 3.0;
 const SPRING = 0.038;
 const DAMP = 0.88;
+
+// Render LUT resolution
+const CN = 36; // colour buckets (depth)
+const AN = 24; // alpha buckets
 
 interface P {
   x: number;
@@ -32,19 +35,9 @@ interface P {
   frac: number; // across-rung position
   ox: number; // dust jitter offset
   oy: number;
-  r: number;
+  r: number; // base size (px)
   jitter: number;
-  z: number; // current depth (paint sort)
-}
-
-interface Dust {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  life: number;
-  max: number;
-  r: number;
+  z: number; // current depth (paint order)
 }
 
 function seeded(n: number) {
@@ -89,34 +82,31 @@ export default function DNAHelixMotion({
     let clientY = -99999;
 
     const particles: P[] = [];
-    const dust: Dust[] = [];
 
-    // Precomputed "r,g,b" strings keyed by depth — avoids per-particle
-    // array allocation (lerp3) and GC churn in the hot draw loop.
-    const LUT_N = 64;
-    const colLUT: string[] = [];
-    for (let i = 0; i < LUT_N; i++) {
-      const z = i / (LUT_N - 1);
+    // Precomputed rgba strings keyed by (depth, alpha) — no per-particle
+    // string allocation in the hot loop, so ~5k particles stay cheap.
+    const rgbaLUT: string[] = new Array(CN * AN);
+    for (let ci = 0; ci < CN; ci++) {
+      const z = ci / (CN - 1);
       const c =
         z < 0.55
           ? lerp3(C_SHADOW, C_COPPER, z / 0.55)
           : lerp3(C_COPPER, z > 0.85 ? C_PALE : C_GOLD, (z - 0.55) / 0.45);
-      colLUT[i] = `${c[0] | 0},${c[1] | 0},${c[2] | 0}`;
-    }
-    const colStr = (z: number) => colLUT[(z * (LUT_N - 1)) | 0];
-    const dustLUT: string[] = [];
-    for (let i = 0; i < LUT_N; i++) {
-      const c = lerp3(C_GOLD, C_PALE, i / (LUT_N - 1));
-      dustLUT[i] = `${c[0] | 0},${c[1] | 0},${c[2] | 0}`;
+      const r = c[0] | 0;
+      const g = c[1] | 0;
+      const b = c[2] | 0;
+      for (let ai = 0; ai < AN; ai++) {
+        rgbaLUT[ci * AN + ai] = `rgba(${r},${g},${b},${(ai / (AN - 1)).toFixed(3)})`;
+      }
     }
 
     type Geom = { cx: number; amp: number; k: number; top: number; usable: number };
     const geom = (): Geom => ({
       cx: w * 0.5,
-      amp: w * 0.253, // +15% width
+      amp: w * 0.291, // width
       k: Math.PI * 2 * TURNS,
-      top: h * 0.06,
-      usable: h * 0.88,
+      top: h * 0.05,
+      usable: h * 0.9,
     });
 
     const home = (p: P, ph: number, g: Geom) => {
@@ -154,9 +144,9 @@ export default function DNAHelixMotion({
             t: i / (BACKBONE_PER_STRAND - 1),
             isRung: false,
             frac: 0,
-            ox: (seeded(idx * 5 + 1) - 0.5) * 5.5,
-            oy: (seeded(idx * 5 + 2) - 0.5) * 5.5,
-            r: 0.55 + seeded(idx * 5 + 3) * 1.0,
+            ox: (seeded(idx * 5 + 1) - 0.5) * 5,
+            oy: (seeded(idx * 5 + 2) - 0.5) * 5,
+            r: 0.7 + seeded(idx * 5 + 3) * 0.9, // smaller dust
             jitter: seeded(idx * 5 + 4),
             z: 0,
           });
@@ -171,43 +161,19 @@ export default function DNAHelixMotion({
             t: (r + 0.5) / RUNGS,
             isRung: true,
             frac: PER_RUNG > 1 ? j / (PER_RUNG - 1) : 0.5,
-            ox: (seeded(idx * 5 + 1) - 0.5) * 4,
+            ox: (seeded(idx * 5 + 1) - 0.5) * 3,
             oy: (seeded(idx * 5 + 2) - 0.5) * 2,
-            r: 0.55 + seeded(idx * 5 + 3) * 1.0,
+            r: 0.7 + seeded(idx * 5 + 3) * 0.8,
             jitter: seeded(idx * 5 + 4),
             z: 0,
           });
         }
       }
-
       const g = geom();
       for (const p of particles) {
         const pos = home(p, phase, g);
         p.x = pos.x;
         p.y = pos.y;
-      }
-    };
-
-    const spawnDust = (d: Dust, g: Geom) => {
-      d.x = g.cx + (Math.random() - 0.5) * g.amp * 0.7;
-      d.y = g.top + Math.random() * g.usable * 0.05;
-      d.vx = (Math.random() - 0.5) * 0.8;
-      d.vy = -(0.45 + Math.random() * 1.3);
-      d.max = 70 + Math.random() * 130;
-      d.life = d.max;
-      d.r = 0.4 + Math.random() * 1.0;
-    };
-
-    const buildDust = () => {
-      dust.length = 0;
-      const g = geom();
-      for (let i = 0; i < DUST_COUNT; i++) {
-        const d: Dust = { x: 0, y: 0, vx: 0, vy: 0, life: 0, max: 1, r: 1 };
-        spawnDust(d, g);
-        // stagger initial life so the column is populated immediately
-        d.life = Math.random() * d.max;
-        d.y -= (d.max - d.life) * 0.6;
-        dust.push(d);
       }
     };
 
@@ -233,7 +199,7 @@ export default function DNAHelixMotion({
       const cmy = clientY - rect.top;
       const active = clientX > -9999;
 
-      // ── Pass 1: helix physics ──
+      // ── Pass 1: physics ──
       for (const p of particles) {
         const hpos = home(p, phase, g);
         p.z = hpos.z;
@@ -246,8 +212,6 @@ export default function DNAHelixMotion({
             const d = Math.sqrt(d2) || 0.001;
             const fall = 1 - d / DISPERSE_R;
             const f = fall * fall * PUSH;
-            // Big rising burst: outward push + strong upward lift + spread,
-            // so the hovered section evaporates into a dust cloud like the top.
             const jit = (p.jitter - 0.5) * fall * 6;
             p.vx += (dx / d) * f + jit;
             p.vy += (dy / d) * f - fall * fall * LIFT + (Math.random() - 0.5) * fall * 4;
@@ -262,50 +226,28 @@ export default function DNAHelixMotion({
         p.y += p.vy;
       }
 
-      // ── Pass 2: paint helix particles, back half then front half ──
-      // (Two-bucket depth ordering — cheaper than a full per-frame sort.)
-      // Rails are the bright curving envelope; rung particles form the
-      // ladder cross-bars — dense and bright so they read as lines across.
+      // ── Pass 2: paint, back half then front half (cheap depth ordering) ──
       const paintParticle = (p: P) => {
         const z = p.z;
-        // Top of the rope fades as it gives way to the rising dust.
-        const fade = smooth(0.0, 0.12, p.t);
-        // Rungs are now as visible as the rails (same alpha/size curve).
-        const alpha = (0.58 + z * 0.42) * fade;
-        const rad = p.r * (0.7 + z * 0.95);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, rad, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${colStr(z)},${alpha})`;
-        ctx.fill();
+        const fade = smooth(0.0, 0.05, p.t); // soft top edge only
+        // Rungs get a brighter floor so the cross-lines read strongly.
+        const alpha = (p.isRung ? 0.74 + z * 0.26 : 0.58 + z * 0.42) * fade;
+        const ci = (z * (CN - 1)) | 0;
+        let ai = (alpha * (AN - 1)) | 0;
+        if (ai < 0) ai = 0;
+        else if (ai >= AN) ai = AN - 1;
+        ctx.fillStyle = rgbaLUT[ci * AN + ai];
+        const s = p.r * (0.5 + z * 0.7);
+        ctx.fillRect(p.x - s * 0.5, p.y - s * 0.5, s, s);
       };
       for (const p of particles) if (p.z < 0.5) paintParticle(p);
       for (const p of particles) if (p.z >= 0.5) paintParticle(p);
-
-      // ── Pass 3: rising dust cloud (top fray) ──
-      if (!reduceMotion) {
-        for (const d of dust) {
-          d.x += d.vx;
-          d.y += d.vy;
-          d.vy *= 0.992;
-          d.vx += (d.x - g.cx) * 0.0009; // gentle outward fan
-          d.vx *= 0.997;
-          d.life -= 1;
-          if (d.life <= 0 || d.y < -12) spawnDust(d, g);
-
-          const lf = d.life / d.max;
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, d.r * (0.6 + lf * 0.7), 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${dustLUT[((1 - lf) * (LUT_N - 1)) | 0]},${lf * 0.6})`;
-          ctx.fill();
-        }
-      }
 
       raf = pageVisible && inView && !reduceMotion ? requestAnimationFrame(draw) : 0;
     };
 
     resize();
     build();
-    buildDust();
     if (reduceMotion) draw(0);
     else raf = requestAnimationFrame(draw);
 
@@ -323,7 +265,6 @@ export default function DNAHelixMotion({
     const ro = new ResizeObserver(() => {
       resize();
       build();
-      buildDust();
       if (reduceMotion) draw(0);
     });
     if (canvas.parentElement) ro.observe(canvas.parentElement);
