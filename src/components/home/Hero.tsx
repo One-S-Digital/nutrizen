@@ -20,7 +20,6 @@ import {
   ContourField,
   GrainOverlay,
 } from "@/components/ui/Texture";
-import InfusionField from "@/components/home/InfusionField";
 import DNAHelixMotion from "@/components/home/DNAHelixMotion";
 import { scrollEase, springLag, springTilt } from "@/lib/motion";
 
@@ -133,10 +132,10 @@ function AnnotationLine({
         transition={{ duration: 0.7, delay: delay + 0.25, ease: scrollEase }}
         className={isLeft ? "text-right" : "text-left"}
       >
-        <p className="whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.22em] text-glow [text-shadow:0_0_12px_rgba(217,232,196,0.55),0_0_28px_rgba(217,232,196,0.2)]">
+        <p className="whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.95),0_0_14px_rgba(217,232,196,0.5)]">
           {title}
         </p>
-        <p className="mt-1 whitespace-nowrap font-mono text-[10px] tracking-[0.08em] text-white/85">
+        <p className="mt-1 whitespace-nowrap font-mono text-[10px] tracking-[0.08em] text-glow [text-shadow:0_1px_2px_rgba(0,0,0,0.9)]">
           {sub}
         </p>
       </motion.div>
@@ -184,6 +183,7 @@ export default function Hero() {
   const reduceMotion = !!useReducedMotion();
   const canHover = useCanHover();
   const sectionRef = useRef<HTMLElement>(null);
+  const [helixHovered, setHelixHovered] = useState(false);
 
   // Light-field cursor tracking (px within section) + normalized for tilt.
   const mx = useMotionValue(0);
@@ -299,11 +299,6 @@ export default function Hero() {
       >
         <ContourField className="absolute inset-0 h-full w-full text-glow opacity-40" />
       </motion.div>
-      <InfusionField
-        getCursor={() => ({ x: sx.get(), y: sy.get() })}
-        reduceMotion={reduceMotion}
-        className="absolute inset-0 h-full w-full"
-      />
       <motion.div
         className="pointer-events-none absolute left-0 top-0 h-[680px] w-[680px] rounded-full"
         style={{
@@ -328,7 +323,7 @@ export default function Hero() {
         >
           <motion.p
             variants={childVariants}
-            className="mb-7 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.3em] text-glow"
+            className="mb-7 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.3em] text-white"
           >
             <span className="h-px w-9 bg-glow/50" aria-hidden />
             NutriZen · Precision Wellness
@@ -411,7 +406,7 @@ export default function Hero() {
             {TRUST_ITEMS.map((item, i) => (
               <li
                 key={item}
-                className="flex items-center gap-x-6 font-mono text-[10px] uppercase tracking-[0.2em] text-white/60"
+                className="flex items-center gap-x-6 font-mono text-[10px] uppercase tracking-[0.2em] text-white/80"
               >
                 {i > 0 && (
                   <span className="text-glow/40" aria-hidden>
@@ -428,6 +423,8 @@ export default function Hero() {
         <motion.div
           style={reduceMotion ? {} : { y: specimenY }}
           className="relative z-10 mx-auto mt-14 w-full max-w-[300px] sm:max-w-[360px] lg:mt-0 lg:max-w-[520px]"
+          onMouseEnter={() => setHelixHovered(true)}
+          onMouseLeave={() => setHelixHovered(false)}
         >
           <div className="relative" style={{ perspective: 1000 }}>
             {/* Backlight */}
@@ -443,6 +440,7 @@ export default function Hero() {
             >
               <DNAHelixMotion
                 reduceMotion={reduceMotion}
+                hovered={helixHovered}
                 className="h-full w-full"
               />
             </div>
@@ -501,7 +499,7 @@ export default function Hero() {
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.9, delay: 1.5 }}
-            className="mt-7 text-center font-mono text-[10px] uppercase tracking-[0.3em] text-glow/60"
+            className="mt-7 text-center font-mono text-[10px] uppercase tracking-[0.3em] text-glow/90"
           >
             Specimen 05 — Metabol+ · 500 mg · 60 capsules
           </motion.p>
