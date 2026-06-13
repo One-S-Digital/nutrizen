@@ -183,7 +183,6 @@ export default function Hero() {
   const reduceMotion = !!useReducedMotion();
   const canHover = useCanHover();
   const sectionRef = useRef<HTMLElement>(null);
-  const [helixHovered, setHelixHovered] = useState(false);
 
   // Light-field cursor tracking (px within section) + normalized for tilt.
   const mx = useMotionValue(0);
@@ -423,8 +422,6 @@ export default function Hero() {
         <motion.div
           style={reduceMotion ? {} : { y: specimenY }}
           className="relative z-10 mx-auto mt-14 w-full max-w-[300px] sm:max-w-[360px] lg:mt-0 lg:max-w-[520px]"
-          onMouseEnter={() => setHelixHovered(true)}
-          onMouseLeave={() => setHelixHovered(false)}
         >
           <div className="relative" style={{ perspective: 1000 }}>
             {/* Backlight */}
@@ -433,14 +430,13 @@ export default function Hero() {
               aria-hidden
             />
 
-            {/* Rotating helix behind the specimen */}
+            {/* Rotating double helix behind the specimen — disperses locally on hover */}
             <div
-              className="absolute left-1/2 top-1/2 h-[118%] w-[126%] -translate-x-1/2 -translate-y-1/2 opacity-70"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[168%] w-[104%] -translate-x-1/2 -translate-y-1/2 opacity-90"
               aria-hidden
             >
               <DNAHelixMotion
                 reduceMotion={reduceMotion}
-                hovered={helixHovered}
                 className="h-full w-full"
               />
             </div>
