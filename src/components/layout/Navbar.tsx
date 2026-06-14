@@ -111,6 +111,7 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
       >
         <motion.div
           className="pointer-events-auto w-full"
+          initial={{ maxWidth: 1540, marginTop: 0, borderRadius: 0 }}
           animate={
             isScrolled
               ? { maxWidth: "58rem", marginTop: 12, borderRadius: 9999 }
@@ -120,6 +121,14 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
           style={{ marginLeft: "auto", marginRight: "auto" }}
         >
           <motion.div
+            initial={{
+              backgroundColor: isHomePage ? "rgba(7,18,9,0)" : "rgba(247,249,246,0)",
+              boxShadow: "0 0 0 0 transparent",
+              paddingLeft: 40,
+              paddingRight: 40,
+              paddingTop: 22,
+              paddingBottom: 22,
+            }}
             animate={
               isScrolled
                 ? {
