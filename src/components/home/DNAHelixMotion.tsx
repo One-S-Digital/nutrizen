@@ -2,42 +2,41 @@
 
 import { useEffect, useRef } from "react";
 
-/* Copper-dust palette (shadow → highlight), matching the reference helix. */
 const C_SHADOW: [number, number, number] = [92, 51, 24];
 const C_COPPER: [number, number, number] = [181, 112, 46];
 const C_GOLD: [number, number, number] = [232, 168, 92];
 const C_PALE: [number, number, number] = [248, 222, 176];
 
-const TURNS = 4; // full twists over the visible height
-const BACKBONE_PER_STRAND = 1344; // doubled density
-const RUNGS = 46; // distinct ladder cross-bars (with vertical gaps)
-const PER_RUNG = 60; // very dense so each rung reads as a solid line across
+const TURNS = 4;
+const BACKBONE_PER_STRAND = 2016;
+const RUNGS = 52;
+const PER_RUNG = 80;
 
-// Local hover dispersion — a big rising burst
+// Cursor dispersion — particles spring away from the cursor and snap back.
 const DISPERSE_R = 180;
 const PUSH = 14;
 const LIFT = 3.0;
 const SPRING = 0.038;
 const DAMP = 0.88;
 
-// Render LUT resolution
-const CN = 36; // colour buckets (depth)
-const AN = 24; // alpha buckets
+// LUT resolution
+const CN = 36;
+const AN = 24;
 
 interface P {
+  strand: 0 | 1;
+  t: number;
+  isRung: boolean;
+  frac: number;
+  ox: number;
+  oy: number;
+  r: number;
+  jitter: number;
   x: number;
   y: number;
   vx: number;
   vy: number;
-  strand: 0 | 1;
-  t: number; // 0..1 down the height
-  isRung: boolean;
-  frac: number; // across-rung position
-  ox: number; // dust jitter offset
-  oy: number;
-  r: number; // base size (px)
-  jitter: number;
-  z: number; // current depth (paint order)
+  z: number;
 }
 
 function seeded(n: number) {
@@ -83,8 +82,8 @@ export default function DNAHelixMotion({
 
     const particles: P[] = [];
 
-    // Precomputed rgba strings keyed by (depth, alpha) — no per-particle
-    // string allocation in the hot loop, so ~5k particles stay cheap.
+    // Precomputed rgba strings: CN depth buckets × AN alpha buckets.
+    // Avoids per-particle string allocation in the hot loop.
     const rgbaLUT: string[] = new Array(CN * AN);
     for (let ci = 0; ci < CN; ci++) {
       const z = ci / (CN - 1);
@@ -103,13 +102,14 @@ export default function DNAHelixMotion({
     type Geom = { cx: number; amp: number; k: number; top: number; usable: number };
     const geom = (): Geom => ({
       cx: w * 0.5,
-      amp: w * 0.291, // width
+      amp: w * 0.291,
       k: Math.PI * 2 * TURNS,
       top: h * 0.05,
       usable: h * 0.9,
     });
 
-    const home = (p: P, ph: number, g: Geom) => {
+    // Returns the rest (home) position + depth without mutating the particle.
+    const home = (p: P, ph: number, g: Geom): { x: number; y: number; z: number } => {
       const y = g.top + p.t * g.usable;
       if (p.isRung) {
         const aA = p.t * g.k + ph;
@@ -139,16 +139,15 @@ export default function DNAHelixMotion({
         for (let i = 0; i < BACKBONE_PER_STRAND; i++) {
           idx++;
           particles.push({
-            x: 0, y: 0, vx: 0, vy: 0,
             strand: s as 0 | 1,
             t: i / (BACKBONE_PER_STRAND - 1),
             isRung: false,
             frac: 0,
             ox: (seeded(idx * 5 + 1) - 0.5) * 5,
             oy: (seeded(idx * 5 + 2) - 0.5) * 5,
-            r: 0.7 + seeded(idx * 5 + 3) * 0.9, // smaller dust
+            r: 0.7 + seeded(idx * 5 + 3) * 0.9,
             jitter: seeded(idx * 5 + 4),
-            z: 0,
+            x: 0, y: 0, vx: 0, vy: 0, z: 0,
           });
         }
       }
@@ -156,7 +155,6 @@ export default function DNAHelixMotion({
         for (let j = 0; j < PER_RUNG; j++) {
           idx++;
           particles.push({
-            x: 0, y: 0, vx: 0, vy: 0,
             strand: 0,
             t: (r + 0.5) / RUNGS,
             isRung: true,
@@ -165,15 +163,17 @@ export default function DNAHelixMotion({
             oy: (seeded(idx * 5 + 2) - 0.5) * 2,
             r: 0.7 + seeded(idx * 5 + 3) * 0.8,
             jitter: seeded(idx * 5 + 4),
-            z: 0,
+            x: 0, y: 0, vx: 0, vy: 0, z: 0,
           });
         }
       }
+      // Pre-place so particles start at their home positions.
       const g = geom();
       for (const p of particles) {
         const pos = home(p, phase, g);
         p.x = pos.x;
         p.y = pos.y;
+        p.z = pos.z;
       }
     };
 
@@ -191,20 +191,19 @@ export default function DNAHelixMotion({
 
     const draw = (time: number) => {
       ctx.clearRect(0, 0, w, h);
-      if (!reduceMotion) phase = time * 0.0004;
+      phase = reduceMotion ? 0.6 : time * 0.0004;
       const g = geom();
 
       const rect = canvas.getBoundingClientRect();
       const cmx = clientX - rect.left;
       const cmy = clientY - rect.top;
-      const active = clientX > -9999;
+      const active = clientX > -9999 && !reduceMotion;
 
-      // ── Pass 1: physics ──
       for (const p of particles) {
         const hpos = home(p, phase, g);
         p.z = hpos.z;
 
-        if (active && !reduceMotion) {
+        if (active) {
           const dx = p.x - cmx;
           const dy = p.y - cmy;
           const d2 = dx * dx + dy * dy;
@@ -226,11 +225,10 @@ export default function DNAHelixMotion({
         p.y += p.vy;
       }
 
-      // ── Pass 2: paint, back half then front half (cheap depth ordering) ──
+      // Two-bucket depth ordering — back half then front half.
       const paintParticle = (p: P) => {
         const z = p.z;
-        const fade = smooth(0.0, 0.05, p.t); // soft top edge only
-        // Rungs get a brighter floor so the cross-lines read strongly.
+        const fade = smooth(0.0, 0.05, p.t);
         const alpha = (p.isRung ? 0.74 + z * 0.26 : 0.58 + z * 0.42) * fade;
         const ci = (z * (CN - 1)) | 0;
         let ai = (alpha * (AN - 1)) | 0;

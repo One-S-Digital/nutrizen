@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  animate,
   motion,
-  useMotionTemplate,
   useMotionValue,
   useReducedMotion,
   useScroll,
@@ -17,11 +15,11 @@ import {
 import {
   BotanicalFrond,
   BotanicalSprig,
-  ContourField,
   GrainOverlay,
 } from "@/components/ui/Texture";
 import DNAHelixMotion from "@/components/home/DNAHelixMotion";
-import { scrollEase, springLag, springTilt } from "@/lib/motion";
+import InfusionField from "@/components/home/InfusionField";
+import { scrollEase } from "@/lib/motion";
 
 const ANNOTATIONS = [
   {
@@ -183,65 +181,17 @@ export default function Hero() {
   const reduceMotion = !!useReducedMotion();
   const canHover = useCanHover();
   const sectionRef = useRef<HTMLElement>(null);
-
-  // Light-field cursor tracking (px within section) + normalized for tilt.
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const nx = useMotionValue(0.62);
-  const ny = useMotionValue(0.42);
-  const sx = useSpring(mx, springLag);
-  const sy = useSpring(my, springLag);
-  const snx = useSpring(nx, springTilt);
-  const sny = useSpring(ny, springTilt);
-
-  const maskImage = useMotionTemplate`radial-gradient(520px circle at ${sx}px ${sy}px, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.35) 46%, transparent 74%)`;
-  const glowX = useTransform(sx, (v) => v - 340);
-  const glowY = useTransform(sy, (v) => v - 340);
-
-  const tiltX = useTransform(sny, [0, 1], [5.5, -5.5]);
-  const tiltY = useTransform(snx, [0, 1], [-7, 7]);
-
-  // Botanical depth layers drift against the cursor.
-  const frondX = useTransform(snx, [0, 1], [16, -16]);
-  const frondY = useTransform(sny, [0, 1], [9, -9]);
-  const sprigX = useTransform(snx, [0, 1], [-22, 22]);
-  const sprigY = useTransform(sny, [0, 1], [-12, 12]);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    mx.set(rect.width * 0.66);
-    my.set(rect.height * 0.42);
-  }, [mx, my]);
-
-  useEffect(() => {
-    if (canHover || reduceMotion) return;
-    const el = sectionRef.current;
-    if (!el) return;
-    const { width: w, height: h } = el.getBoundingClientRect();
-    const controls = [
-      animate(mx, [w * 0.2, w * 0.85, w * 0.45, w * 0.75, w * 0.2], {
-        duration: 30,
-        repeat: Infinity,
-        ease: "easeInOut",
-      }),
-      animate(my, [h * 0.3, h * 0.55, h * 0.85, h * 0.4, h * 0.3], {
-        duration: 30,
-        repeat: Infinity,
-        ease: "easeInOut",
-      }),
-    ];
-    return () => controls.forEach((c) => c.stop());
-  }, [canHover, reduceMotion, mx, my]);
+  const cursorRef = useRef({ x: -9999, y: -9999 });
+  const getCursor = useCallback(() => cursorRef.current, []);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!sectionRef.current) return;
     const rect = sectionRef.current.getBoundingClientRect();
-    mx.set(e.clientX - rect.left);
-    my.set(e.clientY - rect.top);
-    nx.set((e.clientX - rect.left) / rect.width);
-    ny.set((e.clientY - rect.top) / rect.height);
+    cursorRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  };
+
+  const handleMouseLeave = () => {
+    cursorRef.current = { x: -9999, y: -9999 };
   };
 
   // Scroll: text lifts and fades, specimen drifts slower.
@@ -272,41 +222,27 @@ export default function Hero() {
     <section
       ref={sectionRef}
       onMouseMove={canHover ? handleMouseMove : undefined}
+      onMouseLeave={canHover ? handleMouseLeave : undefined}
       className="relative isolate min-h-[100svh] overflow-hidden bg-ink-deep"
     >
-      {/* ── The Infusion Field ── */}
+      {/* Background */}
       <div className="absolute inset-0 bg-[radial-gradient(130%_100%_at_72%_18%,#1E3326_0%,#0E1B14_50%,#070F0B_100%)]" aria-hidden />
-      <motion.div
-        style={reduceMotion ? undefined : { x: frondX, y: frondY }}
+      <div
         className="absolute -bottom-28 -left-20 w-[400px] text-[#18291F] blur-[2px] lg:w-[560px]"
         aria-hidden
       >
         <BotanicalFrond className="h-auto w-full rotate-[26deg]" />
-      </motion.div>
-      <motion.div
-        style={reduceMotion ? undefined : { x: sprigX, y: sprigY }}
+      </div>
+      <div
         className="absolute -top-24 right-[-70px] w-[330px] text-[#16261D] blur-[3px] lg:w-[440px]"
         aria-hidden
       >
         <BotanicalSprig className="h-auto w-full rotate-[148deg]" />
-      </motion.div>
-      <ContourField className="absolute inset-0 h-full w-full text-primary opacity-[0.05]" />
-      <motion.div
-        className="absolute inset-0"
-        style={{ maskImage, WebkitMaskImage: maskImage }}
-        aria-hidden
-      >
-        <ContourField className="absolute inset-0 h-full w-full text-glow opacity-40" />
-      </motion.div>
-      <motion.div
-        className="pointer-events-none absolute left-0 top-0 h-[680px] w-[680px] rounded-full"
-        style={{
-          x: glowX,
-          y: glowY,
-          background:
-            "radial-gradient(circle, rgba(217,232,196,0.1) 0%, rgba(217,232,196,0.035) 40%, transparent 65%)",
-        }}
-        aria-hidden
+      </div>
+      <InfusionField
+        getCursor={getCursor}
+        reduceMotion={reduceMotion}
+        className="absolute inset-0 h-full w-full"
       />
       <GrainOverlay className="opacity-[0.055]" />
 
@@ -460,18 +396,7 @@ export default function Hero() {
                     : { duration: 7.5, repeat: Infinity, ease: "easeInOut" }
                 }
               >
-                <motion.div
-                  style={
-                    reduceMotion || !canHover
-                      ? {}
-                      : {
-                          rotateX: tiltX,
-                          rotateY: tiltY,
-                          transformStyle: "preserve-3d",
-                        }
-                  }
-                  className="relative aspect-square w-full"
-                >
+                <div className="relative aspect-square w-full">
                   <Image
                     src="/metabol.png"
                     alt="NutriZen Metabol+ — improve metabolism, digestive health and cellular detox"
@@ -480,7 +405,7 @@ export default function Hero() {
                     sizes="(max-width: 640px) 300px, (max-width: 1024px) 360px, 520px"
                     className="select-none object-contain drop-shadow-[0_36px_44px_rgba(0,0,0,0.5)]"
                   />
-                </motion.div>
+                </div>
               </motion.div>
             </motion.div>
 
