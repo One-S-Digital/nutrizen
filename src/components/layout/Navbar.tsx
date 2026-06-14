@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,96 +9,24 @@ import { useUIStore } from "@/store/uiStore";
 import type { NavCollection, FooterNavLink } from "@/lib/shopify";
 
 // ── Category icon map ────────────────────────────────────────────────────────
-// Matches on lowercased title substrings; first match wins.
 type IconDef = { bg: string; icon: React.ReactNode };
-
 function getCategoryIcon(title: string): IconDef {
   const t = title.toLowerCase();
-
   if (t.includes("energy") || t.includes("vitality"))
-    return {
-      bg: "bg-amber-50",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-amber-500" aria-hidden>
-          <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
-        </svg>
-      ),
-    };
-
+    return { bg: "bg-amber-50", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-amber-500" aria-hidden><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg> };
   if (t.includes("stress") || t.includes("sleep") || t.includes("mood"))
-    return {
-      bg: "bg-indigo-50",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-indigo-500" aria-hidden>
-          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-        </svg>
-      ),
-    };
-
+    return { bg: "bg-indigo-50", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-indigo-500" aria-hidden><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg> };
   if (t.includes("immun") || t.includes("defense") || t.includes("defence"))
-    return {
-      bg: "bg-emerald-50",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-emerald-600" aria-hidden>
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-        </svg>
-      ),
-    };
-
+    return { bg: "bg-emerald-50", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-emerald-600" aria-hidden><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> };
   if (t.includes("detox") || t.includes("digest"))
-    return {
-      bg: "bg-teal-50",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-teal-500" aria-hidden>
-          <path d="M12 2a7 7 0 0 1 7 7c0 4.97-7 13-7 13S5 13.97 5 9a7 7 0 0 1 7-7z" />
-          <circle cx="12" cy="9" r="2.5" />
-        </svg>
-      ),
-    };
-
+    return { bg: "bg-teal-50", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-teal-500" aria-hidden><path d="M12 2a7 7 0 0 1 7 7c0 4.97-7 13-7 13S5 13.97 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg> };
   if (t.includes("metabol") || t.includes("blood sugar"))
-    return {
-      bg: "bg-rose-50",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-rose-500" aria-hidden>
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-        </svg>
-      ),
-    };
-
+    return { bg: "bg-rose-50", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-rose-500" aria-hidden><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> };
   if (t.includes("bone") || t.includes("muscle") || t.includes("recovery"))
-    return {
-      bg: "bg-orange-50",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-orange-500" aria-hidden>
-          <path d="M6.5 6.5a4.5 4.5 0 0 0 0 6.36l4.59 4.59a1 1 0 0 0 1.41 0l4.59-4.59a4.5 4.5 0 0 0-6.36-6.36L9 8.27" />
-          <path d="M9 8.27 6.5 6.5" />
-          <path d="M17.5 17.5a4.5 4.5 0 0 0 0-6.36l-1.09-1.09" />
-        </svg>
-      ),
-    };
-
+    return { bg: "bg-orange-50", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-orange-500" aria-hidden><path d="M6.5 6.5a4.5 4.5 0 0 0 0 6.36l4.59 4.59a1 1 0 0 0 1.41 0l4.59-4.59a4.5 4.5 0 0 0-6.36-6.36L9 8.27"/><path d="M9 8.27 6.5 6.5"/><path d="M17.5 17.5a4.5 4.5 0 0 0 0-6.36l-1.09-1.09"/></svg> };
   if (t.includes("cellular") || t.includes("longev"))
-    return {
-      bg: "bg-violet-50",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-violet-500" aria-hidden>
-          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-          <path d="M5 3 4 6l-3 1 3 1 1 3 1-3 3-1-3-1-1-3z" />
-        </svg>
-      ),
-    };
-
-  // Default fallback
-  return {
-    bg: "bg-primary/10",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-primary" aria-hidden>
-        <circle cx="12" cy="12" r="9" />
-        <path d="M12 8v4l3 3" />
-      </svg>
-    ),
-  };
+    return { bg: "bg-violet-50", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-violet-500" aria-hidden><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3 4 6l-3 1 3 1 1 3 1-3 3-1-3-1-1-3z"/></svg> };
+  return { bg: "bg-primary/10", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-primary" aria-hidden><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg> };
 }
 
 type NavbarProps = {
@@ -117,19 +44,20 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
   const pathname = usePathname();
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
+  // Detect if we're on the home page (hero is dark)
+  const isHomePage = pathname === "/";
+
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
   useEffect(() => {
     if (!mobileOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = prev; };
   }, [mobileOpen]);
-
   useEffect(() => {
     if (!mobileOpen) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMobileOpen(false); };
@@ -146,8 +74,6 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
     shopLeaveTimer.current = setTimeout(() => setShopOpen(false), 160);
   };
 
-  // Build dropdown items: prefer main-menu links (already /shop?collection= normalised),
-  // fall back to raw nav collections.
   const dropdownItems: { id: string; title: string; href: string; imageUrl?: string | null }[] =
     mainMenuLinks.length > 0
       ? mainMenuLinks.map((l) => {
@@ -169,9 +95,17 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
     { href: "/blogs/news", label: "Journal" },
   ];
 
+  // Color tokens based on page + scroll state
+  // On home (dark hero): text is white/light until scrolled
+  // On other pages or when scrolled: text is dark
+  const onDark = isHomePage && !isScrolled;
+  const navTextClass = onDark
+    ? "text-white/85 hover:text-white"
+    : "text-neutral-dark hover:text-primary";
+  const iconClass = onDark ? "text-white/80 hover:text-white" : "text-neutral-dark hover:text-primary";
+
   return (
     <>
-      {/* Outer header */}
       <header
         className={`fixed inset-x-0 z-50 pointer-events-none flex justify-center transition-[top] duration-300 ${bannerVisible ? "top-9" : "top-0"}`}
       >
@@ -180,7 +114,7 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
           animate={
             isScrolled
               ? { maxWidth: "58rem", marginTop: 12, borderRadius: 9999 }
-              : { maxWidth: 1280, marginTop: 0, borderRadius: 0 }
+              : { maxWidth: 1540, marginTop: 0, borderRadius: 0 }
           }
           transition={{ duration: 0.45, ease: [0.32, 0, 0.16, 1] }}
           style={{ marginLeft: "auto", marginRight: "auto" }}
@@ -189,7 +123,7 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
             animate={
               isScrolled
                 ? {
-                    backgroundColor: "rgba(247,249,246,0.92)",
+                    backgroundColor: "rgba(247,249,246,0.93)",
                     boxShadow: "0 8px 32px -4px rgba(47,58,51,0.14), 0 0 0 1px rgba(47,58,51,0.07)",
                     paddingLeft: 20,
                     paddingRight: 20,
@@ -197,12 +131,12 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                     paddingBottom: 10,
                   }
                 : {
-                    backgroundColor: "rgba(247,249,246,0)",
+                    backgroundColor: isHomePage ? "rgba(7,18,9,0)" : "rgba(247,249,246,0)",
                     boxShadow: "0 0 0 0 transparent",
-                    paddingLeft: 24,
-                    paddingRight: 24,
-                    paddingTop: 20,
-                    paddingBottom: 20,
+                    paddingLeft: 40,
+                    paddingRight: 40,
+                    paddingTop: 22,
+                    paddingBottom: 22,
                   }
             }
             transition={{ duration: 0.45, ease: [0.32, 0, 0.16, 1] }}
@@ -213,55 +147,39 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
             }}
           >
             <div className="grid grid-cols-3 items-center gap-4">
-              {/* LEFT: nav */}
+
+              {/* LEFT: nav links */}
               <div className="justify-self-start flex items-center gap-1 min-w-0">
                 {/* Mobile hamburger */}
                 <button
                   type="button"
-                  className="md:hidden p-2 -ml-1 rounded-lg text-neutral-dark hover:bg-neutral-light/60 hover:text-primary transition-colors"
+                  className={`md:hidden p-2 -ml-1 rounded-lg transition-colors ${iconClass}`}
                   aria-label="Open menu"
                   onClick={() => setMobileOpen(true)}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                    <line x1="4" x2="20" y1="12" y2="12" />
-                    <line x1="4" x2="20" y1="6" y2="6" />
-                    <line x1="4" x2="20" y1="18" y2="18" />
+                    <line x1="4" x2="20" y1="12" y2="12"/>
+                    <line x1="4" x2="20" y1="6" y2="6"/>
+                    <line x1="4" x2="20" y1="18" y2="18"/>
                   </svg>
                 </button>
 
                 {/* Desktop nav */}
-                <nav className="hidden md:flex items-center gap-6 font-medium text-neutral-dark text-sm">
+                <nav className="hidden md:flex items-center gap-7 font-medium text-sm">
                   {/* Shop with mega-menu */}
                   <div className="relative" onMouseEnter={openShop} onMouseLeave={closeShopDelayed}>
                     <Link
                       href="/shop"
-                      className="inline-flex items-center gap-1 hover:text-primary transition-colors duration-200 py-1 relative"
+                      className={`inline-flex items-center gap-1 transition-colors duration-200 py-1 relative ${navTextClass}`}
                     >
                       Shop
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="13"
-                        height="13"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className={`transition-transform duration-200 ${shopOpen ? "rotate-180" : ""}`}
-                        aria-hidden
-                      >
-                        <path d="m6 9 6 6 6-6" />
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-200 ${shopOpen ? "rotate-180" : ""}`} aria-hidden>
+                        <path d="m6 9 6 6 6-6"/>
                       </svg>
                       {pathname === "/shop" && (
-                        <motion.span
-                          layoutId="navUnderline"
-                          className="absolute -bottom-0.5 left-0 right-4 h-[2px] bg-primary rounded-full"
-                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                        />
+                        <motion.span layoutId="navUnderline" className="absolute -bottom-0.5 left-0 right-4 h-[2px] bg-primary rounded-full" transition={{ type: "spring", stiffness: 380, damping: 30 }} />
                       )}
                     </Link>
-
                     <AnimatePresence>
                       {shopOpen && (
                         <motion.div
@@ -274,15 +192,11 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                           onMouseLeave={closeShopDelayed}
                         >
                           <div className="w-[min(calc(100vw-3rem),42rem)] rounded-2xl border border-neutral-light/80 bg-white/95 backdrop-blur-xl shadow-xl p-6">
-                            <Link
-                              href="/shop"
-                              className="mb-4 block text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
-                              onClick={() => setShopOpen(false)}
-                            >
+                            <Link href="/shop" className="mb-4 block text-sm font-semibold text-primary hover:text-primary/80 transition-colors" onClick={() => setShopOpen(false)}>
                               Shop all products →
                             </Link>
                             {dropdownItems.length > 0 ? (
-                              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[min(60vh,22rem)] overflow-y-auto pr-1">
+                              <ul className="grid grid-cols-2 gap-2">
                                 {dropdownItems.map((item) => (
                                   <li key={item.id}>
                                     <Link
@@ -291,13 +205,7 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                                       onClick={() => setShopOpen(false)}
                                     >
                                       {item.imageUrl ? (
-                                        <Image
-                                          src={item.imageUrl}
-                                          alt=""
-                                          width={44}
-                                          height={44}
-                                          className="h-11 w-11 shrink-0 rounded-lg object-cover bg-neutral-light/40"
-                                        />
+                                        <Image src={item.imageUrl} alt="" width={44} height={44} className="h-11 w-11 shrink-0 rounded-lg object-cover bg-neutral-light/40" />
                                       ) : (() => {
                                         const { bg, icon } = getCategoryIcon(item.title);
                                         return (
@@ -312,9 +220,7 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                                 ))}
                               </ul>
                             ) : (
-                              <p className="text-sm text-neutral-dark">
-                                Categories will appear here once your Shopify store is connected.
-                              </p>
+                              <p className="text-sm text-neutral-dark">Categories will appear here once your Shopify store is connected.</p>
                             )}
                           </div>
                         </motion.div>
@@ -326,15 +232,11 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                     <Link
                       key={link.href}
                       href={link.href}
-                      className="hover:text-primary transition-colors duration-200 py-1 relative"
+                      className={`transition-colors duration-200 py-1 relative ${navTextClass}`}
                     >
                       {link.label}
                       {pathname === link.href && (
-                        <motion.span
-                          layoutId="navUnderline"
-                          className="absolute -bottom-0.5 left-0 right-0 h-[2px] bg-primary rounded-full"
-                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                        />
+                        <motion.span layoutId="navUnderline" className="absolute -bottom-0.5 left-0 right-0 h-[2px] bg-primary rounded-full" transition={{ type: "spring", stiffness: 380, damping: 30 }} />
                       )}
                     </Link>
                   ))}
@@ -348,40 +250,41 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                   alt="NutriZen"
                   width={240}
                   height={56}
-                  className={`w-auto object-contain object-center transition-all duration-500 ${isScrolled ? "h-8" : "h-9 sm:h-10 md:h-11"}`}
+                  className={`w-auto object-contain object-center transition-all duration-500 ${isScrolled ? "h-8" : "h-9 sm:h-10 md:h-11"} ${onDark ? "brightness-0 invert" : ""}`}
                   priority
                 />
               </Link>
 
               {/* RIGHT: actions */}
-              <div className="justify-self-end flex items-center gap-4">
-                <button aria-label="Search" className="hidden md:block text-neutral-dark hover:text-primary transition-colors duration-200">
+              <div className="justify-self-end flex items-center gap-5">
+                <button
+                  aria-label="Search"
+                  className={`hidden md:block transition-colors duration-200 ${iconClass}`}
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="m21 21-4.3-4.3" />
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.3-4.3"/>
                   </svg>
                 </button>
-
                 <a
                   href="/pages/account"
                   aria-label="My account"
-                  className="hidden md:block text-neutral-dark hover:text-primary transition-colors duration-200"
+                  className={`hidden md:block transition-colors duration-200 ${iconClass}`}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="8" r="4" />
-                    <path d="M20 21a8 8 0 0 0-16 0" />
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M20 21a8 8 0 0 0-16 0"/>
                   </svg>
                 </a>
-
                 <button
                   onClick={openCart}
                   aria-label={`Cart${cartItemCount > 0 ? `, ${cartItemCount} items` : ""}`}
-                  className="relative text-neutral-dark hover:text-primary transition-colors duration-200"
+                  className={`relative transition-colors duration-200 ${iconClass}`}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-                    <path d="M3 6h18" />
-                    <path d="M16 10a4 4 0 0 1-8 0" />
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+                    <line x1="3" x2="21" y1="6" y2="6"/>
+                    <path d="M16 10a4 4 0 0 1-8 0"/>
                   </svg>
                   <AnimatePresence>
                     {cartItemCount > 0 && (
@@ -421,47 +324,43 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.38, ease: [0.32, 0, 0.16, 1] }}
-              className="absolute left-0 top-0 bottom-0 w-[min(100%,20rem)] bg-background-main shadow-2xl flex flex-col pt-6 pb-8 px-5 overflow-y-auto"
+              className="absolute left-0 top-0 bottom-0 w-[min(100%,20rem)] bg-[#071209] shadow-2xl flex flex-col pt-6 pb-8 px-5 overflow-y-auto"
             >
               <div className="flex justify-between items-center mb-6">
                 <Link href="/" onClick={() => setMobileOpen(false)}>
-                  <Image src="/nutrizen-logo.png" alt="NutriZen" width={140} height={36} className="h-8 w-auto" />
+                  <Image src="/nutrizen-logo.png" alt="NutriZen" width={140} height={36} className="h-8 w-auto brightness-0 invert" />
                 </Link>
                 <button
                   type="button"
-                  className="p-2 rounded-lg text-neutral-dark hover:bg-neutral-light/60"
+                  className="p-2 rounded-lg text-white/70 hover:text-white"
                   onClick={() => setMobileOpen(false)}
                   aria-label="Close menu"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+                    <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
                   </svg>
                 </button>
               </div>
-
-              <nav className="flex flex-col gap-1 font-medium text-neutral-darkest">
-                <Link href="/shop" className="py-3 border-b border-neutral-light/80 text-primary font-semibold" onClick={() => setMobileOpen(false)}>
+              <nav className="flex flex-col gap-1 font-medium text-white/90">
+                <Link href="/shop" className="py-3 border-b border-white/10 text-[#8CAB77] font-semibold" onClick={() => setMobileOpen(false)}>
                   Shop all
                 </Link>
-
                 {dropdownItems.length > 0 && (
                   <>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-neutral-dark pt-4 pb-2">Categories</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-white/40 pt-4 pb-2">Categories</p>
                     {dropdownItems.map((item) => {
                       const { bg, icon } = getCategoryIcon(item.title);
                       return (
                         <Link
                           key={item.id}
                           href={item.href}
-                          className="flex items-center gap-3 py-2.5 border-b border-neutral-light/50 text-sm hover:text-primary transition-colors"
+                          className="flex items-center gap-3 py-2.5 border-b border-white/10 text-sm hover:text-[#8CAB77] transition-colors"
                           onClick={() => setMobileOpen(false)}
                         >
                           {item.imageUrl ? (
                             <Image src={item.imageUrl} alt="" width={32} height={32} className="h-8 w-8 shrink-0 rounded-md object-cover" />
                           ) : (
-                            <span className={`h-8 w-8 shrink-0 rounded-md ${bg} flex items-center justify-center`} aria-hidden>
-                              {icon}
-                            </span>
+                            <span className={`h-8 w-8 shrink-0 rounded-md ${bg} flex items-center justify-center`} aria-hidden>{icon}</span>
                           )}
                           {item.title}
                         </Link>
@@ -469,21 +368,19 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                     })}
                   </>
                 )}
-
                 {secondaryLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="py-3 border-b border-neutral-light/50 hover:text-primary transition-colors mt-2"
+                    className="py-3 border-b border-white/10 hover:text-[#8CAB77] transition-colors mt-2"
                     onClick={() => setMobileOpen(false)}
                   >
                     {link.label}
                   </Link>
                 ))}
-
                 <Link
                   href="/pages/account"
-                  className="py-3 border-b border-neutral-light/50 hover:text-primary transition-colors"
+                  className="py-3 border-b border-white/10 hover:text-[#8CAB77] transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
                   My account
