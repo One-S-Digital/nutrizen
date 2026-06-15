@@ -259,7 +259,7 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                   alt="NutriZen"
                   width={240}
                   height={56}
-                  className={`w-auto object-contain object-center transition-all duration-500 ${isScrolled ? "h-8" : "h-9 sm:h-10 md:h-11"} ${onDark ? "brightness-0 invert" : ""}`}
+                  className={`w-auto object-contain object-center transition-all duration-500 ${isScrolled ? "h-8" : "h-9 sm:h-10 md:h-11"}`}
                   priority
                 />
               </Link>
