@@ -149,7 +149,7 @@ export default function Hero() {
       ref={sectionRef}
       onMouseMove={canHover ? handleMouseMove : undefined}
       onMouseLeave={canHover ? handleMouseLeave : undefined}
-      className="relative isolate h-[100svh] max-h-[100svh] overflow-hidden bg-[#071209] -mt-[152px] pt-0"
+      className="relative isolate min-h-[100svh] overflow-x-hidden bg-[#071209] -mt-[152px] pt-0 lg:h-[100svh] lg:max-h-[100svh] lg:overflow-hidden"
     >
       {/* ── Layer 1: Background image ── */}
       <div className="absolute inset-0 z-0" aria-hidden>
@@ -193,7 +193,7 @@ export default function Hero() {
       />
 
       {/* ── Layer 6: Main content grid ── */}
-      <div className="relative z-10 mx-auto grid h-full w-full max-w-[1540px] grid-cols-1 items-stretch gap-x-0 px-6 pb-[70px] pt-[165px] md:pt-[170px] lg:grid-cols-[1fr_1fr] lg:px-10 lg:pb-0 lg:pt-[192px] xl:px-16">
+      <div className="relative z-10 mx-auto grid h-full w-full max-w-[1540px] grid-cols-1 items-stretch gap-x-0 px-6 pb-28 pt-[165px] md:pt-[170px] lg:grid-cols-[1fr_1fr] lg:px-10 lg:pb-0 lg:pt-[192px] xl:px-16">
 
         {/* ── Editorial / text column ── */}
         <motion.div
@@ -211,9 +211,9 @@ export default function Hero() {
             variants={childVariants}
             className="font-serif text-[2.5rem] leading-[1.03] tracking-[-0.02em] text-[#F6F3EA] min-[420px]:text-[2.9rem] sm:text-[3.7rem] lg:text-[4.5rem] xl:text-[5.4rem]"
           >
-            Supplements with
+            Supplements that
             <br />
-            <em className="italic text-[#8CAB77]">nothing to hide</em>
+            <em className="italic text-[#8CAB77]">actually make sense</em>
             <span className="text-[#E7A46C] not-italic">.</span>
           </motion.h1>
 
