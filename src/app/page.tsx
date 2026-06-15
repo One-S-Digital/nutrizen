@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import Hero from "@/components/home/Hero";
 import ProductMarquee from "@/components/home/ProductMarquee";
 import DynamicProductShowcase from "@/components/home/DynamicProductShowcase";
-import ProblemSolution from "@/components/home/ProblemSolution";
 import CategoryShowcase from "@/components/home/CategoryShowcase";
 import IngredientBreakdown from "@/components/home/IngredientBreakdown";
 import SocialProof from "@/components/home/SocialProof";
@@ -104,9 +103,8 @@ export default async function Home() {
           </div>
         </section>
       )}
-      <ProblemSolution />
-      <DynamicProductShowcase />
       <IngredientBreakdown />
+      <DynamicProductShowcase />
       <SocialProof />
     </div>
   );
