@@ -44,8 +44,9 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
   const pathname = usePathname();
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Detect if we're on the home page (hero is dark)
+  // Detect if we're on a page with a dark hero (home + Our Story)
   const isHomePage = pathname === "/";
+  const isDarkHero = isHomePage || pathname === "/pages/about";
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 40);
@@ -98,7 +99,7 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
   // Color tokens based on page + scroll state
   // On home (dark hero): text is white/light until scrolled
   // On other pages or when scrolled: text is dark
-  const onDark = isHomePage && !isScrolled;
+  const onDark = isDarkHero && !isScrolled;
   const navTextClass = onDark
     ? "text-white/85 hover:text-white"
     : "text-neutral-dark hover:text-primary";
@@ -122,7 +123,7 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
         >
           <motion.div
             initial={{
-              backgroundColor: isHomePage ? "rgba(7,18,9,0)" : "rgba(247,249,246,0)",
+              backgroundColor: isDarkHero ? "rgba(7,18,9,0)" : "rgba(247,249,246,0)",
               boxShadow: "0 0 0 0 transparent",
               paddingLeft: 40,
               paddingRight: 40,
@@ -140,7 +141,7 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
                     paddingBottom: 10,
                   }
                 : {
-                    backgroundColor: isHomePage ? "rgba(7,18,9,0)" : "rgba(247,249,246,0)",
+                    backgroundColor: isDarkHero ? "rgba(7,18,9,0)" : "rgba(247,249,246,0)",
                     boxShadow: "0 0 0 0 transparent",
                     paddingLeft: 40,
                     paddingRight: 40,
