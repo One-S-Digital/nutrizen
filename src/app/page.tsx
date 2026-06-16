@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import Hero from "@/components/home/Hero";
 import ProductMarquee from "@/components/home/ProductMarquee";
 import DynamicProductShowcase from "@/components/home/DynamicProductShowcase";
-import ProblemSolution from "@/components/home/ProblemSolution";
 import CategoryShowcase from "@/components/home/CategoryShowcase";
 import IngredientBreakdown from "@/components/home/IngredientBreakdown";
 import SocialProof from "@/components/home/SocialProof";
@@ -81,8 +80,6 @@ export default async function Home() {
       <JsonLd data={homePageSchema} />
       <Hero />
       <ProductMarquee products={marqueeProducts} />
-      <DynamicProductShowcase />
-      <ProblemSolution />
       {collections.length > 0 ? (
         <CategoryShowcase categories={collections} />
       ) : (
@@ -107,6 +104,7 @@ export default async function Home() {
         </section>
       )}
       <IngredientBreakdown />
+      <DynamicProductShowcase />
       <SocialProof />
     </div>
   );

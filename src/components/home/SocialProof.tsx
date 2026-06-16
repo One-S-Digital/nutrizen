@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import Link from "next/link";
 import { Truck, ShieldCheck, MessageCircle } from "lucide-react";
@@ -12,22 +11,22 @@ import { scrollEase, scrollViewport } from "@/lib/motion";
 const TRUST_BADGES = [
   {
     Icon: Truck,
-    iconColor: "#E57373",
-    iconBg: "bg-red-50",
+    iconColor: "#10201A",
+    iconBg: "bg-ink/[0.05]",
     title: "Nationwide Delivery",
     desc: "Fast, flat-rate shipping across South Africa",
   },
   {
     Icon: ShieldCheck,
-    iconColor: "#F59E0B",
-    iconBg: "bg-amber-50",
+    iconColor: "#10201A",
+    iconBg: "bg-ink/[0.05]",
     title: "30-Day Refund",
     desc: "Not satisfied? We'll sort it out within 30 days",
   },
   {
     Icon: MessageCircle,
-    iconColor: "#25D366",
-    iconBg: "bg-green-50",
+    iconColor: "#10201A",
+    iconBg: "bg-ink/[0.05]",
     title: "Daily WhatsApp Support",
     desc: "Real human support available every day",
   },
@@ -46,7 +45,7 @@ const reviews = [
     text: "I've tried every adaptogen complex on the market, but NutriZen's Focus formula is the only one that absolutely clears my mental fog without a crash.",
     rating: 5,
     tag: "Energy & Focus",
-    color: "#6995B1",
+    color: "#5B5E80",
   },
   {
     name: "Michael T.",
@@ -54,7 +53,7 @@ const reviews = [
     text: "The VitaCore B-Complex completely changed my morning routine. I feel naturally energised and actually ready to tackle the day.",
     rating: 5,
     tag: "Daily Vitality",
-    color: "#8CAB77",
+    color: "#A8762E",
   },
   {
     name: "Emma W.",
@@ -62,7 +61,7 @@ const reviews = [
     text: "Incredible quality. You can tell they actually care about the science behind these supplements. My stress levels have visibly dropped.",
     rating: 5,
     tag: "Stress & Recovery",
-    color: "#D87D4A",
+    color: "#8A5A40",
   },
 ];
 
@@ -141,8 +140,8 @@ export default function SocialProof() {
             viewport={scrollViewport}
             transition={{ duration: 0.8, ease: scrollEase }}
           >
-            <h2 className="text-2xl md:text-3xl font-bold text-neutral-darkest">
-              Why <span className="text-primary">15,000+</span> Customers Choose NutriZen
+            <h2 className="font-serif text-3xl md:text-4xl text-ink tracking-[-0.01em]">
+              Why <em className="italic text-goal-immunity">15&nbsp;000+</em> customers choose NutriZen
             </h2>
           </motion.div>
 
@@ -186,8 +185,8 @@ export default function SocialProof() {
           >
             {TRUST_STATS.map(({ value, label }) => (
               <div key={label} className="text-center">
-                <p className="text-xl md:text-2xl font-bold text-neutral-darkest mb-0.5">{value}</p>
-                <p className="text-xs text-neutral-dark">{label}</p>
+                <p className="font-serif text-2xl md:text-3xl text-ink mb-1">{value}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-neutral-dark">{label}</p>
               </div>
             ))}
           </motion.div>
@@ -212,11 +211,13 @@ export default function SocialProof() {
             viewport={scrollViewport}
             transition={{ duration: 0.85, ease: scrollEase }}
           >
-            <span className="inline-block text-secondary font-bold tracking-[0.18em] uppercase text-xs mb-4 bg-secondary/8 px-4 py-1.5 rounded-full">
-              Real Results
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-neutral-darkest mb-4">
-              For People Who Are Done Compromising
+            <p className="mb-5 flex items-center justify-center gap-3 font-mono text-[11px] uppercase tracking-[0.3em] text-goal-recovery">
+              <span className="h-px w-9 bg-goal-recovery/50" aria-hidden />
+              04 · Field notes
+              <span className="h-px w-9 bg-goal-recovery/50" aria-hidden />
+            </p>
+            <h2 className="font-serif text-3xl md:text-[2.6rem] leading-[1.08] tracking-[-0.01em] text-ink mb-4">
+              Notes from people who <em className="italic">stopped compromising</em>
             </h2>
             <p className="text-base text-neutral-dark leading-relaxed">
               If you&apos;ve ever questioned whether your supplements actually work — you&apos;re not alone.
@@ -236,8 +237,10 @@ export default function SocialProof() {
                 key={i}
                 variants={reviewVariants}
                 whileHover={rm ? {} : { y: -6, transition: { duration: 0.28, ease: scrollEase } }}
-                className="bg-background-main rounded-3xl border border-neutral-light/50 p-8 relative overflow-hidden cursor-default"
-                style={{ boxShadow: "0 4px 20px -4px rgba(47,58,51,0.08)" }}
+                className={`bg-white rounded-3xl border border-neutral-light/50 p-8 relative overflow-hidden cursor-default ${
+                  i % 2 === 0 ? "md:rotate-[-0.6deg]" : "md:rotate-[0.7deg]"
+                }`}
+                style={{ boxShadow: "0 14px 36px -14px rgba(16,32,26,0.16)" }}
               >
                 {/* Colour accent top bar */}
                 <div
@@ -249,15 +252,15 @@ export default function SocialProof() {
                 <div className="flex items-start justify-between mb-5">
                   <StarRating rating={review.rating} />
                   <span
-                    className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
-                    style={{ backgroundColor: `${review.color}18`, color: review.color }}
+                    className="font-mono text-[9px] uppercase tracking-[0.18em] px-2.5 py-1 rounded-full"
+                    style={{ backgroundColor: `${review.color}16`, color: review.color }}
                   >
                     {review.tag}
                   </span>
                 </div>
 
-                <h4 className="font-bold text-neutral-darkest text-base mb-3">{review.title}</h4>
-                <p className="text-neutral-dark leading-relaxed text-sm mb-6 italic">
+                <h4 className="font-serif text-lg text-ink mb-3">{review.title}</h4>
+                <p className="font-serif italic text-neutral-dark leading-relaxed text-[15px] mb-6">
                   &ldquo;{review.text}&rdquo;
                 </p>
 
@@ -303,8 +306,8 @@ export default function SocialProof() {
                 <span className="inline-block text-xs font-bold uppercase tracking-[0.18em] text-secondary mb-4">
                   Why Choose NutriZen
                 </span>
-                <h2 className="text-3xl md:text-4xl font-bold text-neutral-darkest mb-10 leading-tight">
-                  Supplements Built for People Who Actually Care What Goes in Their Body
+                <h2 className="font-serif text-3xl md:text-4xl text-ink mb-10 leading-[1.12] tracking-[-0.01em]">
+                  Built for people who actually care what goes in their body
                 </h2>
               </motion.div>
 
@@ -335,17 +338,17 @@ export default function SocialProof() {
               whileInView={{ opacity: 1, x: 0, scale: 1 }}
               viewport={scrollViewport}
               transition={{ duration: 0.85, ease: scrollEase }}
-              className="rounded-3xl bg-[#425244] p-10 md:p-14 text-white relative overflow-hidden"
+              className="rounded-3xl bg-ink p-10 md:p-14 text-white relative overflow-hidden"
             >
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full" aria-hidden />
               <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-white/5 rounded-full" aria-hidden />
 
               <div className="relative z-10">
-                <p className="text-white/60 font-semibold text-xs uppercase tracking-widest mb-4">
+                <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-glow/70 mb-4">
                   Feel the difference
                 </p>
-                <h3 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-                  Your Health. Clear, Simple, Effective.
+                <h3 className="font-serif text-3xl md:text-[2.4rem] mb-4 leading-[1.1] tracking-[-0.01em]">
+                  Your health. <em className="italic text-glow">Clear, simple, effective.</em>
                 </h3>
                 <p className="text-white/75 text-base leading-relaxed mb-8">
                   Supplements designed to actually work — with every ingredient listed, every dose intentional.

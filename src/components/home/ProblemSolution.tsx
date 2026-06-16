@@ -1,301 +1,229 @@
 "use client";
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { BadgeCheck, Droplets, FlaskConical } from "lucide-react";
 import Link from "next/link";
+import { ContourField, GrainOverlay } from "@/components/ui/Texture";
 import { scrollEase, scrollViewport } from "@/lib/motion";
-
-// ─── Background science decorations ──────────────────────────────────────────
-
-function AtomSVG() {
-  return (
-    <svg width="240" height="240" viewBox="0 0 240 240" fill="none" aria-hidden>
-      <defs>
-        <filter id="aglow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="5" result="b" />
-          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-      </defs>
-      <g filter="url(#aglow)">
-        <circle cx="120" cy="120" r="12" fill="#8CAB77" opacity="0.9" />
-        <circle cx="120" cy="120" r="7" fill="#d4f0a8" opacity="0.95" />
-        <ellipse cx="120" cy="120" rx="105" ry="32" stroke="#8CAB77" strokeWidth="1.2" opacity="0.75" />
-        <ellipse cx="120" cy="120" rx="105" ry="32" stroke="#8CAB77" strokeWidth="1.2" opacity="0.55" transform="rotate(60 120 120)" />
-        <ellipse cx="120" cy="120" rx="105" ry="32" stroke="#8CAB77" strokeWidth="1.2" opacity="0.55" transform="rotate(120 120 120)" />
-        {/* Electrons */}
-        <circle cx="225" cy="120" r="5.5" fill="#6995B1" opacity="0.95" />
-        <circle cx="67" cy="211" r="5.5" fill="#6995B1" opacity="0.90" />
-        <circle cx="67" cy="29" r="5.5" fill="#8CAB77" opacity="0.90" />
-      </g>
-    </svg>
-  );
-}
-
-function MoleculeFormulaSVG() {
-  const r = 36; const cx = 85; const cy = 95;
-  const hex = Array.from({ length: 6 }, (_, i) => {
-    const a = (i * 60 - 90) * Math.PI / 180;
-    return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
-  });
-  return (
-    <svg width="200" height="220" viewBox="0 0 200 220" fill="none" aria-hidden>
-      <defs>
-        <filter id="mglow" x="-40%" y="-20%" width="180%" height="140%">
-          <feGaussianBlur stdDeviation="2.5" result="b" />
-          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-      </defs>
-      <g filter="url(#mglow)" stroke="#8CAB77" strokeWidth="1.4">
-        {hex.map((v, i) => {
-          const n = hex[(i + 1) % 6];
-          return <line key={i} x1={v.x} y1={v.y} x2={n.x} y2={n.y} opacity="0.75" />;
-        })}
-        {[0, 2, 4].map(i => {
-          const v = hex[i]; const n = hex[(i + 1) % 6];
-          const dx = n.x - v.x; const dy = n.y - v.y;
-          const len = Math.sqrt(dx * dx + dy * dy);
-          const nx = (-dy / len) * 5; const ny = (dx / len) * 5;
-          return <line key={i} x1={v.x + nx} y1={v.y + ny} x2={n.x + nx} y2={n.y + ny} opacity="0.40" />;
-        })}
-        <line x1={hex[0].x} y1={hex[0].y} x2={hex[0].x} y2={hex[0].y - 28} opacity="0.65" />
-        <text x={hex[0].x - 10} y={hex[0].y - 34} fill="#a8d080" fontSize="13" fontFamily="monospace" stroke="none" opacity="0.85">HO</text>
-        <line x1={hex[1].x} y1={hex[1].y} x2={hex[1].x + 28} y2={hex[1].y} opacity="0.65" />
-        <text x={hex[1].x + 30} y={hex[1].y + 5} fill="#a8d080" fontSize="13" fontFamily="monospace" stroke="none" opacity="0.85">NH₂</text>
-        <line x1={hex[2].x} y1={hex[2].y} x2={hex[2].x + 24} y2={hex[2].y + 18} opacity="0.65" />
-        <text x={hex[2].x + 26} y={hex[2].y + 22} fill="#a8d080" fontSize="13" fontFamily="monospace" stroke="none" opacity="0.85">NO₂</text>
-        {hex.map((v, i) => <circle key={i} cx={v.x} cy={v.y} r="2.8" fill="#8CAB77" stroke="none" opacity="0.75" />)}
-      </g>
-    </svg>
-  );
-}
-
-function FlaskSVG() {
-  return (
-    <svg width="130" height="170" viewBox="0 0 130 170" fill="none" aria-hidden>
-      <defs>
-        <filter id="fglow" x="-50%" y="-20%" width="200%" height="140%">
-          <feGaussianBlur stdDeviation="3.5" result="b" />
-          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-      </defs>
-      <g filter="url(#fglow)" stroke="#8CAB77" strokeWidth="1.5">
-        <line x1="48" y1="8" x2="48" y2="62" opacity="0.75" />
-        <line x1="82" y1="8" x2="82" y2="62" opacity="0.75" />
-        <line x1="42" y1="8" x2="88" y2="8" opacity="0.75" />
-        <line x1="48" y1="62" x2="8" y2="150" opacity="0.75" />
-        <line x1="82" y1="62" x2="122" y2="150" opacity="0.75" />
-        <line x1="8" y1="150" x2="122" y2="150" opacity="0.75" />
-        <path d="M14 118 Q65 108 116 118" stroke="#6995B1" strokeWidth="1.2" fill="none" opacity="0.5" />
-        <circle cx="30" cy="132" r="3.5" fill="#8CAB77" stroke="none" opacity="0.65" />
-        <circle cx="65" cy="138" r="2.5" fill="#8CAB77" stroke="none" opacity="0.55" />
-        <circle cx="95" cy="130" r="3" fill="#8CAB77" stroke="none" opacity="0.60" />
-        <line x1="12" y1="108" x2="24" y2="108" opacity="0.40" />
-        <line x1="10" y1="126" x2="22" y2="126" opacity="0.40" />
-        <line x1="9" y1="140" x2="21" y2="140" opacity="0.40" />
-      </g>
-    </svg>
-  );
-}
-
-function DataBarsSVG() {
-  const bars = [0.4, 0.75, 0.55, 0.9, 0.65, 0.5, 0.8];
-  return (
-    <svg width="80" height="120" viewBox="0 0 80 120" fill="none" aria-hidden>
-      <defs>
-        <filter id="bglow">
-          <feGaussianBlur stdDeviation="2" result="b" />
-          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-      </defs>
-      <g filter="url(#bglow)">
-        {bars.map((h, i) => (
-          <rect
-            key={i}
-            x={i * 11 + 2} y={120 - h * 100}
-            width={8} height={h * 100}
-            fill="#8CAB77" rx={2}
-            opacity={0.5 + h * 0.25}
-          />
-        ))}
-        <line x1="0" y1="120" x2="80" y2="120" stroke="#8CAB77" strokeWidth="0.8" opacity="0.5" />
-      </g>
-    </svg>
-  );
-}
-
-// Small scattered particle dots
-function ParticleDots() {
-  const dots = [
-    [12, 18], [45, 8], [180, 22], [320, 12], [460, 28], [580, 8], [720, 18],
-    [90, 48], [230, 38], [380, 52], [510, 42], [650, 35],
-  ] as [number, number][];
-  const lines: [number, number, number, number][] = [
-    [12, 18, 45, 8], [180, 22, 230, 38], [380, 52, 460, 28], [580, 8, 650, 35],
-  ];
-  return (
-    <svg width="760" height="60" viewBox="0 0 760 60" fill="none" aria-hidden>
-      {lines.map(([x1, y1, x2, y2], i) => (
-        <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeWidth="0.5" opacity="0.2" />
-      ))}
-      {dots.map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r={i % 3 === 0 ? 2 : 1.5} fill="white" opacity={i % 2 === 0 ? 0.35 : 0.2} />
-      ))}
-    </svg>
-  );
-}
-
-// ─── Section data ─────────────────────────────────────────────────────────────
 
 const PILLARS = [
   {
-    title: "Transparent Formulas",
-    text: "No hidden ingredients. No unnecessary additives. You know exactly what you're putting into your body.",
-    iconBg: "bg-[#8CAB77]/20 text-[#8CAB77]",
-    hoverGlow: "rgba(140,171,119,0.10)",
-    icon: <FlaskConical className="h-7 w-7" strokeWidth={1.75} aria-hidden />,
+    index: "01",
+    title: "Transparent formulas",
+    text: "Every active ingredient named, every dose stated. No proprietary blends, no asterisks doing heavy lifting.",
   },
   {
-    title: "Clinically Effective Doses",
-    text: "Formulated with nutrition science — not marketing hype. Precision dosages that drive actual results.",
-    iconBg: "bg-[#6995B1]/20 text-[#6995B1]",
-    hoverGlow: "rgba(105,149,177,0.10)",
-    icon: <BadgeCheck className="h-7 w-7" strokeWidth={1.75} aria-hidden />,
+    index: "02",
+    title: "Clinically effective doses",
+    text: "Formulated to the amounts used in research — not the amounts that look good on a label.",
   },
   {
-    title: "Clean & Bioavailable",
-    text: "Your body absorbs what it actually needs. Real targeted nutrients directly where your cells need them.",
-    iconBg: "bg-[#8CAB77]/20 text-[#8CAB77]",
-    hoverGlow: "rgba(140,171,119,0.10)",
-    icon: <Droplets className="h-7 w-7" strokeWidth={1.75} aria-hidden />,
+    index: "03",
+    title: "Forms your body absorbs",
+    text: "Chelated minerals and bioavailable forms, because a nutrient you can't absorb is money you can't keep.",
   },
 ];
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// Illustrative comparison — swap in real label data when content is finalized.
+const INDUSTRY_ROWS = [
+  { name: "Proprietary Energy Blend†", amount: "850 mg", hidden: false },
+  { name: "— caffeine matrix", amount: "?? mg", hidden: true },
+  { name: "— taurine, guarana extract", amount: "?? mg", hidden: true },
+  { name: "— niacin (form unstated)", amount: "?? mg", hidden: true },
+];
+
+const NUTRIZEN_ROWS = [
+  { name: "Every active ingredient", value: "named in full" },
+  { name: "Every dose", value: "stated in mg" },
+  { name: "Every nutrient form", value: "disclosed" },
+  { name: "Fillers & colourants", value: "none — ever" },
+];
 
 export default function ProblemSolution() {
   const rm = !!useReducedMotion();
 
   const cardContainerVariants: Variants = {
     hidden: {},
-    visible: { transition: { staggerChildren: rm ? 0 : 0.13, delayChildren: rm ? 0 : 0.06 } },
+    visible: { transition: { staggerChildren: rm ? 0 : 0.16, delayChildren: rm ? 0 : 0.08 } },
   };
   const cardVariants: Variants = {
-    hidden: rm ? { opacity: 1, y: 0 } : { opacity: 0, y: 32 },
+    hidden: rm ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: scrollEase } },
+  };
+  const pillarVariants: Variants = {
+    hidden: rm ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: scrollEase } },
   };
 
   return (
-    <section className="relative overflow-hidden bg-[#1A2C1E]">
+    <section className="relative overflow-hidden bg-ink">
+      <div
+        className="absolute inset-0 bg-[radial-gradient(110%_80%_at_50%_0%,#1A2C1E_0%,#10201A_55%,#0A1510_100%)]"
+        aria-hidden
+      />
+      <ContourField className="absolute inset-0 h-full w-full text-primary opacity-[0.05]" />
+      <GrainOverlay className="opacity-[0.05]" />
 
-      {/* ── Background ── */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-
-        {/* Atmospheric glow orbs */}
-        <div className="absolute -top-60 -left-20 h-[700px] w-[700px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(140,171,119,0.18),transparent_65%)]" />
-        <div className="absolute top-1/3 left-1/3 h-[900px] w-[900px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(140,171,119,0.06),transparent_60%)]" />
-        <div className="absolute bottom-0 right-0 h-[600px] w-[600px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(105,149,177,0.10),transparent_65%)]" />
-
-        {/* Particle dots — top strip */}
-        <div className="absolute top-8 left-0 right-0 flex justify-center opacity-60">
-          <ParticleDots />
-        </div>
-        {/* Particle dots — middle */}
-        <div className="absolute top-1/2 left-0 right-0 flex justify-center opacity-40 -translate-y-1/2">
-          <ParticleDots />
-        </div>
-
-        {/* Atom — top right */}
-        <div className="absolute top-10 right-10 md:right-24 opacity-[0.18]">
-          <AtomSVG />
-        </div>
-
-        {/* Molecular formula — bottom left (inset from helix) */}
-        <div className="absolute bottom-24 left-20 md:left-32 opacity-[0.16]">
-          <MoleculeFormulaSVG />
-        </div>
-
-        {/* Flask — bottom right */}
-        <div className="absolute bottom-10 right-6 md:right-20 opacity-[0.15]">
-          <FlaskSVG />
-        </div>
-
-        {/* Data bars — right middle */}
-        <div className="absolute top-1/2 right-12 md:right-28 -translate-y-1/2 opacity-[0.18]">
-          <DataBarsSVG />
-        </div>
-      </div>
-
-      {/* ── Content ── */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
-
-        {/* THE PROBLEM */}
+      <div className="relative z-10 mx-auto max-w-7xl px-6">
+        {/* Header */}
         <motion.div
-          className="pt-28 pb-16 text-center max-w-3xl mx-auto"
+          className="mx-auto max-w-3xl pt-24 text-center md:pt-32"
           initial={rm ? false : { opacity: 0, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={scrollViewport}
           transition={{ duration: 0.85, ease: scrollEase }}
         >
-          <span className="inline-block px-4 py-1.5 rounded-full bg-white/8 text-white/50 text-xs font-bold uppercase tracking-[0.18em] mb-6 border border-white/10">
-            The Problem
-          </span>
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
-            Tired of guessing what&rsquo;s really
-            <br className="hidden md:block" /> in your supplements?
+          <p className="mb-6 flex items-center justify-center gap-3 font-mono text-[11px] uppercase tracking-[0.3em] text-primary">
+            <span className="h-px w-9 bg-primary/50" aria-hidden />
+            03 · The evidence
+            <span className="h-px w-9 bg-primary/50" aria-hidden />
+          </p>
+          <h2 className="font-serif text-4xl leading-[1.06] tracking-[-0.01em] text-paper sm:text-5xl md:text-[3.4rem]">
+            Tired of guessing what&rsquo;s
+            <br className="hidden md:block" /> really in your supplements?
           </h2>
-          <p className="text-lg text-white/60 leading-relaxed">
-            Most supplements are packed with fillers, underdosed ingredients, or{" "}
-            <span className="font-semibold text-white/85">&ldquo;proprietary blends&rdquo;</span> that hide the truth.
+          <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-white/55 md:text-lg">
+            Most labels are written to hide. Ours are written to be read.
+            Don&rsquo;t take the claim — compare the labels.
           </p>
         </motion.div>
 
-        {/* DIVIDER */}
+        {/* Label comparison */}
         <motion.div
-          className="flex items-center gap-5 max-w-2xl mx-auto pb-16"
-          initial={rm ? false : { opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={scrollViewport}
-          transition={{ duration: 1, ease: scrollEase }}
-        >
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/15 to-white/15" />
-          <span className="flex-shrink-0 px-5 py-2 rounded-full bg-primary/15 text-primary text-xs font-bold uppercase tracking-widest whitespace-nowrap border border-primary/25">
-            The NutriZen Difference
-          </span>
-          <div className="flex-1 h-px bg-gradient-to-l from-transparent via-white/15 to-white/15" />
-        </motion.div>
-
-        {/* SOLUTION CARDS */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-5 pb-20"
+          className="mx-auto mt-16 grid max-w-4xl grid-cols-1 gap-8 md:mt-20 md:grid-cols-2 md:gap-10"
           initial="hidden"
           whileInView="visible"
           viewport={scrollViewport}
           variants={cardContainerVariants}
         >
-          {PILLARS.map((item) => (
-            <motion.div
-              key={item.title}
-              variants={cardVariants}
-              className="group relative rounded-3xl p-8 border border-white/10 bg-white/[0.045] overflow-hidden transition-all duration-300 hover:border-white/18 hover:bg-white/[0.07]"
-              style={{ boxShadow: "0 4px 28px -4px rgba(0,0,0,0.35)" }}
+          {/* The industry label */}
+          <motion.div
+            variants={cardVariants}
+            whileHover={rm ? undefined : { rotate: 0, scale: 1.015 }}
+            transition={{ duration: 0.4, ease: scrollEase }}
+            className="relative rotate-[-1.3deg] rounded-2xl bg-[#F3EFE2] p-7 text-ink shadow-[0_28px_60px_-20px_rgba(0,0,0,0.55)] md:p-8"
+          >
+            <span
+              className="absolute right-5 top-5 rotate-[-7deg] rounded-sm border-2 border-[#A14F42]/75 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.28em] text-[#A14F42]"
+              aria-hidden
             >
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl"
-                style={{ background: `radial-gradient(ellipse at 50% -10%, ${item.hoverGlow} 0%, transparent 65%)` }}
-                aria-hidden
-              />
-              <div className={`relative z-10 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${item.iconBg}`}>
-                {item.icon}
-              </div>
-              <h3 className="relative z-10 text-xl font-bold text-white mb-3">{item.title}</h3>
-              <p className="relative z-10 text-white/55 leading-relaxed text-sm">{item.text}</p>
+              Undisclosed
+            </span>
+            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink/45">
+              What they show you
+            </p>
+            <h3 className="mt-3 border-b-[3px] border-ink pb-2 font-serif text-2xl text-ink">
+              Supplement Facts
+            </h3>
+            <ul className="mt-1">
+              {INDUSTRY_ROWS.map((row) => (
+                <li
+                  key={row.name}
+                  className={`flex items-baseline justify-between gap-4 border-b border-ink/15 py-2.5 text-sm ${
+                    row.hidden ? "pl-3 text-ink/50 italic" : "font-medium"
+                  }`}
+                >
+                  <span>{row.name}</span>
+                  <span
+                    className={`whitespace-nowrap font-mono text-xs ${
+                      row.hidden ? "select-none blur-[3px]" : ""
+                    }`}
+                    aria-hidden={row.hidden}
+                  >
+                    {row.amount}
+                  </span>
+                </li>
+              ))}
+              <li className="border-b border-ink/15 py-2.5 text-xs italic leading-relaxed text-ink/55">
+                Other ingredients: maltodextrin, titanium dioxide, talc,
+                shellac, artificial colourants…
+              </li>
+            </ul>
+            <p className="mt-4 font-mono text-[10px] leading-relaxed tracking-[0.06em] text-[#A14F42]">
+              † individual amounts not disclosed. Hover all you like — they
+              won&rsquo;t tell you.
+            </p>
+          </motion.div>
+
+          {/* The NutriZen label */}
+          <motion.div
+            variants={cardVariants}
+            whileHover={rm ? undefined : { rotate: 0, scale: 1.015 }}
+            transition={{ duration: 0.4, ease: scrollEase }}
+            className="relative rotate-[1deg] rounded-2xl bg-paper-white p-7 text-ink shadow-[0_28px_60px_-20px_rgba(0,0,0,0.55)] md:p-8"
+          >
+            <span
+              className="absolute right-5 top-5 rotate-[6deg] rounded-sm border-2 border-primary px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.28em] text-[#5F7F4D]"
+              aria-hidden
+            >
+              Disclosed
+            </span>
+            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink/45">
+              What we show you
+            </p>
+            <h3 className="mt-3 border-b-[3px] border-ink pb-2 font-serif text-2xl text-ink">
+              Supplement Facts
+            </h3>
+            <ul className="mt-1">
+              {NUTRIZEN_ROWS.map((row) => (
+                <li
+                  key={row.name}
+                  className="group flex items-baseline justify-between gap-4 border-b border-ink/15 py-2.5 text-sm transition-colors duration-200 hover:bg-primary/5"
+                >
+                  <span className="font-medium">{row.name}</span>
+                  <span className="flex items-center gap-1.5 whitespace-nowrap font-mono text-xs text-[#5F7F4D]">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    {row.value}
+                  </span>
+                </li>
+              ))}
+              <li className="py-2.5 text-xs italic leading-relaxed text-ink/55">
+                Other ingredients: none worth hiding.
+              </li>
+            </ul>
+            <p className="mt-4 font-mono text-[10px] leading-relaxed tracking-[0.06em] text-[#5F7F4D]">
+              ✓ the full facts panel is on every product page
+            </p>
+          </motion.div>
+        </motion.div>
+
+        {/* Pillars */}
+        <motion.div
+          className="mx-auto mt-20 grid max-w-5xl grid-cols-1 gap-10 border-t border-white/10 pt-14 md:mt-24 md:grid-cols-3"
+          initial="hidden"
+          whileInView="visible"
+          viewport={scrollViewport}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: rm ? 0 : 0.12 } },
+          }}
+        >
+          {PILLARS.map((pillar) => (
+            <motion.div key={pillar.index} variants={pillarVariants}>
+              <p className="font-mono text-[11px] tracking-[0.25em] text-primary/80">
+                {pillar.index}
+              </p>
+              <h3 className="mt-3 font-serif text-xl text-paper">{pillar.title}</h3>
+              <p className="mt-2.5 text-sm leading-relaxed text-white/50">{pillar.text}</p>
             </motion.div>
           ))}
         </motion.div>
 
         {/* CTA */}
         <motion.div
-          className="text-center pb-28"
+          className="pb-24 pt-16 text-center md:pb-32"
           initial={rm ? false : { opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={scrollViewport}
@@ -303,12 +231,24 @@ export default function ProblemSolution() {
         >
           <Link
             href="/pages/science"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full border border-white/20 text-white/75 hover:text-white hover:border-white/35 hover:bg-white/[0.06] text-sm font-semibold transition-all duration-200"
+            className="group inline-flex items-center gap-3 rounded-full border border-white/15 px-8 py-3.5 text-sm font-medium text-white/75 transition-all duration-300 hover:border-white/35 hover:bg-white/[0.05] hover:text-white"
           >
-            See what&rsquo;s inside every formula
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+            Read the science behind every formula
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="transition-transform duration-300 group-hover:translate-x-1"
+              aria-hidden
+            >
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
             </svg>
           </Link>
         </motion.div>
