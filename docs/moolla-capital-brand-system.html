@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moolla Capital — Brand System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Design Tokens ─────────────────────────────────────────── */
+    :root {
+      /* Primitives */
+      --navy-900:   #0D1B3E;
+      --navy-800:   #122248;
+      --navy-700:   #1A3060;
+      --navy-600:   #234285;
+      --navy-500:   #2C55AB;
+      --navy-100:   #D4DCF0;
+      --navy-50:    #EEF1F9;
+
+      --gold-900:   #7A5E1A;
+      --gold-700:   #A67C28;
+      --gold-500:   #C9A84C;
+      --gold-300:   #E4CC8A;
+      --gold-100:   #F7EFD2;
+      --gold-50:    #FBF7EC;
+
+      --green-900:  #0D3D29;
+      --green-700:  #145439;
+      --green-500:  #1A6B4A;
+      --green-300:  #4DA87C;
+      --green-100:  #C8E9D9;
+      --green-50:   #EBF6F0;
+
+      --red-700:    #8B2A20;
+      --red-500:    #B03A2E;
+      --red-100:    #F5D0CC;
+
+      --neutral-950: #1A1512;
+      --neutral-900: #2C2825;
+      --neutral-800: #3D3834;
+      --neutral-600: #6B6560;
+      --neutral-400: #9A948F;
+      --neutral-200: #C8C3BE;
+      --neutral-100: #E8E4DC;
+      --neutral-50:  #F8F7F4;
+      --white:       #FFFFFF;
+
+      /* Semantic */
+      --color-bg-primary:       var(--white);
+      --color-bg-secondary:     var(--neutral-50);
+      --color-bg-tertiary:      var(--neutral-100);
+      --color-bg-inverse:       var(--navy-900);
+      --color-bg-brand:         var(--navy-900);
+      --color-bg-accent:        var(--gold-500);
+
+      --color-text-primary:     var(--neutral-900);
+      --color-text-secondary:   var(--neutral-600);
+      --color-text-tertiary:    var(--neutral-400);
+      --color-text-inverse:     var(--white);
+      --color-text-brand:       var(--navy-900);
+      --color-text-accent:      var(--gold-700);
+      --color-text-link:        var(--navy-600);
+
+      --color-border-default:   var(--neutral-200);
+      --color-border-strong:    var(--neutral-600);
+      --color-border-brand:     var(--navy-900);
+      --color-border-accent:    var(--gold-500);
+
+      --color-status-success:   var(--green-500);
+      --color-status-warning:   var(--gold-500);
+      --color-status-error:     var(--red-500);
+      --color-status-info:      var(--navy-600);
+
+      /* Typography */
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body:    'Inter', system-ui, sans-serif;
+
+      --text-xs:   12px;
+      --text-sm:   14px;
+      --text-base: 16px;
+      --text-lg:   18px;
+      --text-xl:   20px;
+      --text-2xl:  24px;
+      --text-3xl:  32px;
+      --text-4xl:  40px;
+      --text-5xl:  48px;
+      --text-6xl:  64px;
+
+      /* Spacing */
+      --space-1:  4px;
+      --space-2:  8px;
+      --space-3:  12px;
+      --space-4:  16px;
+      --space-6:  24px;
+      --space-8:  32px;
+      --space-12: 48px;
+      --space-16: 64px;
+      --space-24: 96px;
+
+      /* Radius */
+      --radius-sm:   4px;
+      --radius-md:   8px;
+      --radius-lg:   12px;
+      --radius-xl:   16px;
+      --radius-2xl:  24px;
+      --radius-full: 9999px;
+
+      /* Shadows */
+      --shadow-sm:  0 1px 2px rgba(13,27,62,0.06);
+      --shadow-md:  0 4px 12px rgba(13,27,62,0.10);
+      --shadow-lg:  0 8px 24px rgba(13,27,62,0.14);
+      --shadow-xl:  0 16px 48px rgba(13,27,62,0.18);
+    }
+
+    /* ─── Reset & Base ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--color-text-primary);
+      background: var(--color-bg-secondary);
+      line-height: 1.6;
+    }
+
+    /* ─── Layout ────────────────────────────────────────────────── */
+    .page-wrap { display: flex; min-height: 100vh; }
+
+    /* Sidebar nav */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 240px;
+      height: 100vh;
+      background: var(--navy-900);
+      color: var(--white);
+      overflow-y: auto;
+      padding: var(--space-8) var(--space-6);
+      z-index: 100;
+    }
+    .sidebar-logo {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--gold-500);
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-1);
+    }
+    .sidebar-sub {
+      font-size: var(--text-xs);
+      color: var(--navy-100);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-8);
+    }
+    .sidebar-section {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--navy-100);
+      margin: var(--space-6) 0 var(--space-2);
+    }
+    .sidebar a {
+      display: block;
+      font-size: var(--text-sm);
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-sm);
+      margin-bottom: 2px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sidebar a:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+    }
+    .sidebar a.active {
+      background: rgba(201,168,76,0.15);
+      color: var(--gold-300);
+    }
+
+    /* Main content */
+    .main {
+      margin-left: 240px;
+      flex: 1;
+      padding: var(--space-12) var(--space-12);
+      max-width: 1080px;
+    }
+
+    /* ─── Sections ──────────────────────────────────────────────── */
+    .section {
+      margin-bottom: var(--space-24);
+    }
+    .section-tag {
+      display: inline-block;
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold-700);
+      margin-bottom: var(--space-2);
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: var(--text-4xl);
+      font-weight: 700;
+      color: var(--navy-900);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-3);
+    }
+    .section-desc {
+      font-size: var(--text-lg);
+      color: var(--neutral-600);
+      max-width: 640px;
+      margin-bottom: var(--space-8);
+    }
+    .divider {
+      height: 1px;
+      background: var(--color-border-default);
+      margin: var(--space-8) 0;
+    }
+
+    /* ─── Hero ──────────────────────────────────────────────────── */
+    .hero {
+      background: var(--navy-900);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-16);
+      margin-bottom: var(--space-24);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold-500);
+      margin-bottom: var(--space-4);
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: var(--text-6xl);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: var(--space-4);
+    }
+    .hero-title span { color: var(--gold-500); }
+    .hero-tagline {
+      font-size: var(--text-xl);
+      color: var(--navy-100);
+      font-style: italic;
+      font-family: var(--font-display);
+      margin-bottom: var(--space-8);
+    }
+    .hero-meta {
+      display: flex;
+      gap: var(--space-8);
+    }
+    .hero-stat {
+      display: flex;
+      flex-direction: column;
+    }
+    .hero-stat-value {
+      font-family: var(--font-display);
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      color: var(--gold-500);
+    }
+    .hero-stat-label {
+      font-size: var(--text-sm);
+      color: var(--navy-100);
+    }
+    .hero-version {
+      position: absolute;
+      bottom: var(--space-6);
+      right: var(--space-8);
+      font-size: var(--text-xs);
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── Color Palette ─────────────────────────────────────────── */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+    }
+    .color-swatch {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border-default);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .color-swatch:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .swatch-block {
+      height: 80px;
+    }
+    .swatch-info {
+      background: var(--white);
+      padding: var(--space-2) var(--space-3);
+    }
+    .swatch-name {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--neutral-900);
+      margin-bottom: 2px;
+    }
+    .swatch-hex {
+      font-size: var(--text-xs);
+      color: var(--neutral-600);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .color-row-label {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--neutral-600);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-3);
+      margin-top: var(--space-6);
+    }
+    .color-scale {
+      display: flex;
+      gap: 4px;
+      margin-bottom: var(--space-6);
+    }
+    .scale-swatch {
+      flex: 1;
+      height: 56px;
+      border-radius: var(--radius-sm);
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .scale-swatch:hover { transform: scaleY(1.05); }
+    .scale-swatch::after {
+      content: attr(data-label);
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: var(--neutral-600);
+      white-space: nowrap;
+    }
+    .scale-wrap { margin-bottom: var(--space-8); }
+
+    /* Semantic tokens table */
+    .token-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-6);
+    }
+    .token-table th {
+      text-align: left;
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--neutral-600);
+      padding: var(--space-2) var(--space-4);
+      border-bottom: 2px solid var(--color-border-default);
+    }
+    .token-table td {
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--color-border-default);
+      vertical-align: middle;
+    }
+    .token-table tr:last-child td { border-bottom: none; }
+    .token-table .swatch-dot {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border-radius: var(--radius-sm);
+      vertical-align: middle;
+      margin-right: var(--space-2);
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .token-table code {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 11px;
+      background: var(--neutral-50);
+      border: 1px solid var(--neutral-100);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      color: var(--navy-700);
+    }
+    .token-table tr { background: var(--white); }
+    .token-table tr:hover { background: var(--neutral-50); }
+
+    /* ─── Typography ────────────────────────────────────────────── */
+    .type-specimen {
+      background: var(--white);
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      margin-bottom: var(--space-4);
+      box-shadow: var(--shadow-sm);
+    }
+    .type-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--neutral-100);
+    }
+    .type-meta-name {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--neutral-600);
+    }
+    .type-meta-detail {
+      font-size: var(--text-xs);
+      color: var(--neutral-400);
+    }
+    .type-meta-chip {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      background: var(--gold-50);
+      color: var(--gold-700);
+      border: 1px solid var(--gold-300);
+    }
+    .type-scale-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+
+    /* ─── Spacing ───────────────────────────────────────────────── */
+    .spacing-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--neutral-100);
+    }
+    .spacing-row:last-child { border-bottom: none; }
+    .spacing-bar-wrap {
+      width: 200px;
+    }
+    .spacing-bar {
+      background: var(--navy-900);
+      height: 20px;
+      border-radius: var(--radius-sm);
+      opacity: 0.85;
+    }
+    .spacing-label {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: var(--text-xs);
+      color: var(--neutral-600);
+      width: 140px;
+    }
+    .spacing-value {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--neutral-900);
+    }
+
+    /* ─── Components ────────────────────────────────────────────── */
+    .component-section {
+      background: var(--white);
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-xl);
+      margin-bottom: var(--space-6);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .component-header {
+      padding: var(--space-4) var(--space-6);
+      border-bottom: 1px solid var(--neutral-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .component-name {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--neutral-900);
+    }
+    .component-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      background: var(--navy-50);
+      color: var(--navy-700);
+    }
+    .component-body {
+      padding: var(--space-8) var(--space-6);
+    }
+    .component-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      align-items: center;
+      margin-bottom: var(--space-4);
+    }
+    .component-row:last-child { margin-bottom: 0; }
+    .component-row-label {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--neutral-400);
+      width: 80px;
+      flex-shrink: 0;
+    }
+    .component-dark {
+      background: var(--navy-900);
+      padding: var(--space-6);
+      border-radius: var(--radius-lg);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: var(--text-sm);
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn-sm { padding: 6px 14px; font-size: var(--text-xs); }
+    .btn-md { padding: 10px 20px; }
+    .btn-lg { padding: 14px 28px; font-size: var(--text-base); }
+
+    .btn-primary {
+      background: var(--navy-900);
+      color: var(--white);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-primary:hover { background: var(--navy-700); box-shadow: var(--shadow-md); }
+    .btn-primary:active { background: var(--navy-800); transform: translateY(1px); }
+
+    .btn-accent {
+      background: var(--gold-500);
+      color: var(--navy-900);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-accent:hover { background: var(--gold-700); color: var(--white); box-shadow: var(--shadow-md); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--navy-900);
+      border: 2px solid var(--navy-900);
+    }
+    .btn-secondary:hover { background: var(--navy-900); color: var(--white); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--navy-700);
+    }
+    .btn-ghost:hover { background: var(--navy-50); }
+
+    .btn-danger {
+      background: var(--red-500);
+      color: var(--white);
+    }
+    .btn-danger:hover { background: var(--red-700); }
+
+    .btn:disabled, .btn.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px; height: 40px;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      font-size: var(--text-lg);
+      transition: all 0.15s;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+    }
+    .badge-navy    { background: var(--navy-50);   color: var(--navy-800);  border: 1px solid var(--navy-100); }
+    .badge-gold    { background: var(--gold-50);   color: var(--gold-900);  border: 1px solid var(--gold-300); }
+    .badge-green   { background: var(--green-50);  color: var(--green-700); border: 1px solid var(--green-100); }
+    .badge-red     { background: var(--red-100);   color: var(--red-700);   border: 1px solid var(--red-100); }
+    .badge-neutral { background: var(--neutral-100); color: var(--neutral-800); border: 1px solid var(--neutral-200); }
+    .badge::before {
+      content: '';
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* Inputs */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .form-label {
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--neutral-800);
+    }
+    .form-hint {
+      font-size: var(--text-xs);
+      color: var(--neutral-600);
+    }
+    .input {
+      width: 100%;
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      color: var(--neutral-900);
+      background: var(--white);
+      border: 1.5px solid var(--neutral-200);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+    .input::placeholder { color: var(--neutral-400); }
+    .input:focus {
+      border-color: var(--navy-500);
+      box-shadow: 0 0 0 3px rgba(44,85,171,0.12);
+    }
+    .input.error {
+      border-color: var(--red-500);
+    }
+    .input.error:focus {
+      box-shadow: 0 0 0 3px rgba(176,58,46,0.12);
+    }
+    .form-error {
+      font-size: var(--text-xs);
+      color: var(--red-500);
+      font-weight: 500;
+    }
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+    .card-icon-bar {
+      height: 5px;
+    }
+    .card-body { padding: var(--space-6); }
+    .card-icon {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-xl);
+      margin-bottom: var(--space-4);
+    }
+    .card-title {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 600;
+      color: var(--navy-900);
+      margin-bottom: var(--space-2);
+    }
+    .card-desc {
+      font-size: var(--text-sm);
+      color: var(--neutral-600);
+      line-height: 1.5;
+      margin-bottom: var(--space-4);
+    }
+    .card-link {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--navy-600);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .card-link:hover { color: var(--gold-700); }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+    }
+
+    /* Stat card */
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-card-label {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--neutral-600);
+      margin-bottom: var(--space-2);
+    }
+    .stat-card-value {
+      font-family: var(--font-display);
+      font-size: var(--text-4xl);
+      font-weight: 700;
+      color: var(--navy-900);
+      line-height: 1;
+      margin-bottom: var(--space-2);
+    }
+    .stat-card-value span { color: var(--gold-500); }
+    .stat-card-change {
+      font-size: var(--text-sm);
+      color: var(--green-500);
+      font-weight: 500;
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+    }
+
+    /* Navigation */
+    .nav-example {
+      background: var(--white);
+      border: 1px solid var(--neutral-200);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-8);
+      height: 68px;
+      border-bottom: 1px solid var(--neutral-100);
+      background: var(--white);
+    }
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--navy-900);
+      text-decoration: none;
+    }
+    .nav-brand span { color: var(--gold-500); }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    .nav-link {
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--neutral-600);
+      text-decoration: none;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav-link:hover { color: var(--navy-900); background: var(--neutral-50); }
+    .nav-link.active { color: var(--navy-900); font-weight: 600; }
+    .nav-actions { display: flex; gap: var(--space-3); align-items: center; }
+
+    /* Dark nav */
+    .nav-bar-dark {
+      background: var(--navy-900);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .nav-bar-dark .nav-brand { color: var(--white); }
+    .nav-bar-dark .nav-link  { color: rgba(255,255,255,0.65); }
+    .nav-bar-dark .nav-link:hover { color: var(--white); background: rgba(255,255,255,0.06); }
+    .nav-bar-dark .nav-link.active { color: var(--white); }
+
+    /* Alert */
+    .alert {
+      display: flex;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-4);
+      border-radius: var(--radius-lg);
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-3);
+    }
+    .alert-icon { font-size: var(--text-xl); flex-shrink: 0; }
+    .alert-title { font-weight: 600; margin-bottom: 2px; }
+    .alert-info    { background: var(--navy-50);   border-left: 4px solid var(--navy-500); }
+    .alert-success { background: var(--green-50);  border-left: 4px solid var(--green-500); }
+    .alert-warning { background: var(--gold-50);   border-left: 4px solid var(--gold-500); }
+    .alert-error   { background: var(--red-100);   border-left: 4px solid var(--red-500); }
+    .alert-info .alert-title    { color: var(--navy-800); }
+    .alert-success .alert-title { color: var(--green-700); }
+    .alert-warning .alert-title { color: var(--gold-900); }
+    .alert-error .alert-title   { color: var(--red-700); }
+
+    /* Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+    .data-table thead {
+      background: var(--navy-900);
+    }
+    .data-table thead th {
+      text-align: left;
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--navy-100);
+      padding: var(--space-3) var(--space-4);
+    }
+    .data-table tbody tr {
+      border-bottom: 1px solid var(--neutral-100);
+      transition: background 0.1s;
+    }
+    .data-table tbody tr:hover { background: var(--neutral-50); }
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table tbody td {
+      padding: var(--space-4);
+      color: var(--neutral-800);
+    }
+    .data-table tbody td:first-child { font-weight: 500; color: var(--neutral-900); }
+    .table-wrap {
+      background: var(--white);
+      border: 1px solid var(--neutral-200);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Divider */
+    .divider-examples { display: flex; flex-direction: column; gap: var(--space-4); }
+    .divider-hr { height: 1px; background: var(--neutral-200); }
+    .divider-hr-gold { height: 2px; background: linear-gradient(to right, var(--gold-500), var(--gold-100), transparent); }
+    .divider-hr-dark { height: 1px; background: var(--navy-900); }
+    .divider-vertical {
+      width: 1px; height: 40px;
+      background: var(--neutral-200);
+      display: inline-block;
+    }
+
+    /* ─── Brand Voice ───────────────────────────────────────────── */
+    .voice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-4);
+    }
+    .voice-card {
+      background: var(--white);
+      border: 1px solid var(--neutral-200);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+    }
+    .voice-card-icon { font-size: var(--text-3xl); margin-bottom: var(--space-3); }
+    .voice-card-title {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 600;
+      color: var(--navy-900);
+      margin-bottom: var(--space-2);
+    }
+    .voice-card-desc {
+      font-size: var(--text-sm);
+      color: var(--neutral-600);
+      line-height: 1.6;
+      margin-bottom: var(--space-4);
+    }
+    .voice-example {
+      background: var(--neutral-50);
+      border: 1px solid var(--neutral-100);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+    }
+    .voice-example-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--neutral-400);
+      margin-bottom: var(--space-1);
+    }
+    .voice-example-text {
+      font-size: var(--text-sm);
+      color: var(--neutral-800);
+      font-style: italic;
+    }
+
+    /* Do / Don't */
+    .do-dont-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+    .do-dont-card {
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      border: 1px solid transparent;
+    }
+    .do-card {
+      background: var(--green-50);
+      border-color: var(--green-100);
+    }
+    .dont-card {
+      background: var(--red-100);
+      border-color: var(--red-100);
+    }
+    .do-dont-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-sm);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-4);
+    }
+    .do-card .do-dont-header { color: var(--green-700); }
+    .dont-card .do-dont-header { color: var(--red-700); }
+    .do-dont-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .do-dont-list li {
+      font-size: var(--text-sm);
+      color: var(--neutral-800);
+      display: flex;
+      gap: var(--space-2);
+    }
+    .do-dont-list li::before { flex-shrink: 0; margin-top: 1px; }
+    .do-card .do-dont-list li::before { content: '✓'; color: var(--green-500); font-weight: 700; }
+    .dont-card .do-dont-list li::before { content: '✗'; color: var(--red-500); font-weight: 700; }
+
+    /* ─── Logo / Identity ───────────────────────────────────────── */
+    .logo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+    }
+    .logo-example {
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-4);
+      min-height: 160px;
+      border: 1px solid var(--neutral-200);
+    }
+    .logo-text {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--text-2xl);
+      letter-spacing: -0.02em;
+      text-align: center;
+    }
+    .logo-sub {
+      font-size: var(--text-xs);
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .logo-light-bg { background: var(--white); }
+    .logo-dark-bg  { background: var(--navy-900); }
+    .logo-sand-bg  { background: var(--neutral-50); }
+
+    /* Value chips */
+    .values-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+    }
+    .value-chip {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      background: var(--white);
+      border: 1.5px solid var(--navy-100);
+      border-radius: var(--radius-full);
+      padding: var(--space-2) var(--space-4);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--navy-800);
+    }
+    .value-chip-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gold-500);
+    }
+
+    /* ─── Copy tooltip ──────────────────────────────────────────── */
+    .copied-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--navy-900);
+      color: var(--white);
+      font-size: var(--text-sm);
+      padding: var(--space-3) var(--space-6);
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .copied-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── Responsive ────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: var(--space-8) var(--space-6); }
+      .card-grid, .stat-grid, .logo-grid { grid-template-columns: 1fr 1fr; }
+      .type-scale-grid, .do-dont-grid, .voice-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .hero-title { font-size: var(--text-4xl); }
+      .card-grid, .stat-grid, .logo-grid { grid-template-columns: 1fr; }
+      .color-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ─── Print / Export ────────────────────────────────────────── */
+    @media print {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .component-section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Sidebar ──────────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">Moolla Capital</div>
+  <div class="sidebar-sub">Brand System v1.0</div>
+
+  <div class="sidebar-section">Identity</div>
+  <a href="#identity">Brand Identity</a>
+  <a href="#logo">Logo Usage</a>
+  <a href="#values">Values & Voice</a>
+
+  <div class="sidebar-section">Foundations</div>
+  <a href="#colors">Color Palette</a>
+  <a href="#typography">Typography</a>
+  <a href="#spacing">Spacing & Grid</a>
+  <a href="#shadows">Shadows</a>
+
+  <div class="sidebar-section">Components</div>
+  <a href="#buttons">Buttons</a>
+  <a href="#badges">Badges</a>
+  <a href="#inputs">Form Inputs</a>
+  <a href="#cards">Cards</a>
+  <a href="#navigation">Navigation</a>
+  <a href="#alerts">Alerts</a>
+  <a href="#tables">Data Tables</a>
+  <a href="#dividers">Dividers</a>
+</aside>
+
+<!-- ── Main ─────────────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow">Brand System · v1.0 · June 2026</div>
+    <h1 class="hero-title">Moolla <span>Capital</span></h1>
+    <p class="hero-tagline">"Build Wealth Beyond Borders"</p>
+    <div class="hero-meta">
+      <div class="hero-stat">
+        <span class="hero-stat-value">30<span style="color:var(--gold-300);font-size:var(--text-xl)">+</span></span>
+        <span class="hero-stat-label">Years of excellence</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">500<span style="color:var(--gold-300);font-size:var(--text-xl)">+</span></span>
+        <span class="hero-stat-label">Clients served</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">100<span style="color:var(--gold-300);font-size:var(--text-xl)">%</span></span>
+        <span class="hero-stat-label">Compliance commitment</span>
+      </div>
+    </div>
+    <div class="hero-version">Crafted by OneS Digital · onesdigitalagency@gmail.com</div>
+  </div>
+
+  <!-- ── Brand Identity ─────────────────────────────────────── -->
+  <section id="identity" class="section">
+    <span class="section-tag">Brand Identity</span>
+    <h2 class="section-title">Who We Are</h2>
+    <p class="section-desc">Moolla Capital is a South African-founded financial services firm delivering structured, compliant, and growth-driven solutions since 1990 — locally rooted, globally capable.</p>
+
+    <div class="logo-grid" id="logo">
+      <div class="logo-example logo-light-bg">
+        <div class="logo-text" style="color: var(--navy-900);">Moolla Capital</div>
+        <div class="logo-sub" style="color: var(--gold-700);">Strategic Financial Solutions</div>
+      </div>
+      <div class="logo-example logo-dark-bg">
+        <div class="logo-text" style="color: var(--white);">Moolla <span style="color:var(--gold-500);">Capital</span></div>
+        <div class="logo-sub" style="color: var(--navy-100);">Since 1990</div>
+      </div>
+      <div class="logo-example logo-sand-bg">
+        <div class="logo-text" style="color: var(--navy-900); font-size: var(--text-3xl);">MC</div>
+        <div class="logo-sub" style="color: var(--neutral-600);">Monogram mark</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <span class="section-tag">Brand Values</span>
+    <div id="values">
+      <div class="values-row">
+        <div class="value-chip"><div class="value-chip-dot"></div> Integrity</div>
+        <div class="value-chip"><div class="value-chip-dot"></div> Confidentiality</div>
+        <div class="value-chip"><div class="value-chip-dot"></div> Precision</div>
+        <div class="value-chip"><div class="value-chip-dot"></div> Accountability</div>
+        <div class="value-chip"><div class="value-chip-dot"></div> Strategic Thinking</div>
+      </div>
+    </div>
+
+    <div class="divider" style="margin-top: var(--space-8);"></div>
+
+    <span class="section-tag">Brand Voice</span>
+    <div class="voice-grid" style="margin-top: var(--space-4);">
+      <div class="voice-card">
+        <div class="voice-card-icon">⚖️</div>
+        <div class="voice-card-title">Authoritative</div>
+        <div class="voice-card-desc">We speak with decades of expertise behind every word. Confident without arrogance — grounded in evidence and track record.</div>
+        <div class="voice-example">
+          <div class="voice-example-label">Example</div>
+          <div class="voice-example-text">"Our integrated approach ensures regulatory compliance while accelerating your wealth objectives."</div>
+        </div>
+      </div>
+      <div class="voice-card">
+        <div class="voice-card-icon">🤝</div>
+        <div class="voice-card-title">Trustworthy</div>
+        <div class="voice-card-desc">We are transparent, accountable, and human. Jargon is used only when necessary — always explained clearly.</div>
+        <div class="voice-example">
+          <div class="voice-example-label">Example</div>
+          <div class="voice-example-text">"You deal with one trusted firm for all your financial needs — from auditing to offshore investment."</div>
+        </div>
+      </div>
+      <div class="voice-card">
+        <div class="voice-card-icon">🌍</div>
+        <div class="voice-card-title">Globally Minded</div>
+        <div class="voice-card-desc">We think beyond borders. Language reflects international sophistication without losing our South African identity.</div>
+        <div class="voice-example">
+          <div class="voice-example-label">Example</div>
+          <div class="voice-example-text">"Build wealth beyond borders — we navigate international structures so you don't have to."</div>
+        </div>
+      </div>
+      <div class="voice-card">
+        <div class="voice-card-icon">🎯</div>
+        <div class="voice-card-title">Precise</div>
+        <div class="voice-card-desc">Every word earns its place. We are direct, specific, and concise — never vague, never over-promising.</div>
+        <div class="voice-example">
+          <div class="voice-example-label">Example</div>
+          <div class="voice-example-text">"Our offshore structures are fully SARS-compliant and optimised for long-term capital preservation."</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="do-dont-grid">
+      <div class="do-dont-card do-card">
+        <div class="do-dont-header">✓ Do</div>
+        <ul class="do-dont-list">
+          <li>Use confident, clear language that projects expertise</li>
+          <li>Lead with client outcomes, not service features</li>
+          <li>Reference 30+ years of heritage when relevant</li>
+          <li>Pair serif headlines with clean body copy</li>
+          <li>Use gold as an accent — not a primary fill</li>
+        </ul>
+      </div>
+      <div class="do-dont-card dont-card">
+        <div class="do-dont-header">✗ Don't</div>
+        <ul class="do-dont-list">
+          <li>Use casual slang or exclamation marks in copy</li>
+          <li>Fill backgrounds with gold — it loses its premium signal</li>
+          <li>Use more than two typefaces in a single layout</li>
+          <li>Use red as anything other than an error/alert state</li>
+          <li>Make promises around specific returns or guarantees</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Color Palette ──────────────────────────────────────── -->
+  <section id="colors" class="section">
+    <span class="section-tag">Foundations</span>
+    <h2 class="section-title">Color Palette</h2>
+    <p class="section-desc">The palette is anchored in deep navy (authority), warm gold (prosperity), and emerald green (growth). Neutrals keep layouts breathable.</p>
+
+    <!-- Primary palette cards -->
+    <div class="color-grid">
+      <div class="color-swatch" onclick="copyHex('#0D1B3E', this)">
+        <div class="swatch-block" style="background:#0D1B3E;"></div>
+        <div class="swatch-info"><div class="swatch-name">Navy 900 · Primary</div><div class="swatch-hex">#0D1B3E</div></div>
+      </div>
+      <div class="color-swatch" onclick="copyHex('#C9A84C', this)">
+        <div class="swatch-block" style="background:#C9A84C;"></div>
+        <div class="swatch-info"><div class="swatch-name">Gold 500 · Accent</div><div class="swatch-hex">#C9A84C</div></div>
+      </div>
+      <div class="color-swatch" onclick="copyHex('#1A6B4A', this)">
+        <div class="swatch-block" style="background:#1A6B4A;"></div>
+        <div class="swatch-info"><div class="swatch-name">Green 500 · Growth</div><div class="swatch-hex">#1A6B4A</div></div>
+      </div>
+      <div class="color-swatch" onclick="copyHex('#F8F7F4', this)">
+        <div class="swatch-block" style="background:#F8F7F4; border-bottom:1px solid #E8E4DC;"></div>
+        <div class="swatch-info"><div class="swatch-name">Neutral 50 · Background</div><div class="swatch-hex">#F8F7F4</div></div>
+      </div>
+      <div class="color-swatch" onclick="copyHex('#2C2825', this)">
+        <div class="swatch-block" style="background:#2C2825;"></div>
+        <div class="swatch-info"><div class="swatch-name">Neutral 900 · Text</div><div class="swatch-hex">#2C2825</div></div>
+      </div>
+      <div class="color-swatch" onclick="copyHex('#B03A2E', this)">
+        <div class="swatch-block" style="background:#B03A2E;"></div>
+        <div class="swatch-info"><div class="swatch-name">Red 500 · Error</div><div class="swatch-hex">#B03A2E</div></div>
+      </div>
+    </div>
+
+    <!-- Navy scale -->
+    <div class="scale-wrap">
+      <div class="color-row-label">Navy Scale</div>
+      <div class="color-scale" style="padding-bottom: 28px;">
+        <div class="scale-swatch" style="background:#EEF1F9;" data-label="50" onclick="copyHex('#EEF1F9',this)"></div>
+        <div class="scale-swatch" style="background:#D4DCF0;" data-label="100" onclick="copyHex('#D4DCF0',this)"></div>
+        <div class="scale-swatch" style="background:#2C55AB;" data-label="500" onclick="copyHex('#2C55AB',this)"></div>
+        <div class="scale-swatch" style="background:#234285;" data-label="600" onclick="copyHex('#234285',this)"></div>
+        <div class="scale-swatch" style="background:#1A3060;" data-label="700" onclick="copyHex('#1A3060',this)"></div>
+        <div class="scale-swatch" style="background:#122248;" data-label="800" onclick="copyHex('#122248',this)"></div>
+        <div class="scale-swatch" style="background:#0D1B3E;" data-label="900" onclick="copyHex('#0D1B3E',this)"></div>
+      </div>
+    </div>
+
+    <!-- Gold scale -->
+    <div class="scale-wrap">
+      <div class="color-row-label">Gold Scale</div>
+      <div class="color-scale" style="padding-bottom: 28px;">
+        <div class="scale-swatch" style="background:#FBF7EC;" data-label="50" onclick="copyHex('#FBF7EC',this)"></div>
+        <div class="scale-swatch" style="background:#F7EFD2;" data-label="100" onclick="copyHex('#F7EFD2',this)"></div>
+        <div class="scale-swatch" style="background:#E4CC8A;" data-label="300" onclick="copyHex('#E4CC8A',this)"></div>
+        <div class="scale-swatch" style="background:#C9A84C;" data-label="500" onclick="copyHex('#C9A84C',this)"></div>
+        <div class="scale-swatch" style="background:#A67C28;" data-label="700" onclick="copyHex('#A67C28',this)"></div>
+        <div class="scale-swatch" style="background:#7A5E1A;" data-label="900" onclick="copyHex('#7A5E1A',this)"></div>
+      </div>
+    </div>
+
+    <!-- Semantic tokens -->
+    <div class="color-row-label" style="margin-top: var(--space-8);">Semantic Tokens</div>
+    <div class="table-wrap">
+      <table class="token-table">
+        <thead>
+          <tr>
+            <th>Token</th>
+            <th>CSS Variable</th>
+            <th>Value</th>
+            <th>Usage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="swatch-dot" style="background:#FFFFFF;"></span>bg/primary</td><td><code>--color-bg-primary</code></td><td><code>#FFFFFF</code></td><td>Page backgrounds, cards</td></tr>
+          <tr><td><span class="swatch-dot" style="background:#F8F7F4;border:1px solid #E8E4DC;"></span>bg/secondary</td><td><code>--color-bg-secondary</code></td><td><code>#F8F7F4</code></td><td>App shell, sidebars</td></tr>
+          <tr><td><span class="swatch-dot" style="background:#0D1B3E;"></span>bg/inverse</td><td><code>--color-bg-inverse</code></td><td><code>#0D1B3E</code></td><td>Dark sections, footers</td></tr>
+          <tr><td><span class="swatch-dot" style="background:#C9A84C;"></span>bg/accent</td><td><code>--color-bg-accent</code></td><td><code>#C9A84C</code></td><td>CTAs, highlights</td></tr>
+          <tr><td><span class="swatch-dot" style="background:#2C2825;"></span>text/primary</td><td><code>--color-text-primary</code></td><td><code>#2C2825</code></td><td>Body copy, headings</td></tr>
+          <tr><td><span class="swatch-dot" style="background:#6B6560;"></span>text/secondary</td><td><code>--color-text-secondary</code></td><td><code>#6B6560</code></td><td>Subheadings, captions</td></tr>
+          <tr><td><span class="swatch-dot" style="background:#FFFFFF;border:1px solid #E8E4DC;"></span>text/inverse</td><td><code>--color-text-inverse</code></td><td><code>#FFFFFF</code></td><td>Text on dark backgrounds</td></tr>
+          <tr><td><span class="swatch-dot" style="background:#C8C3BE;"></span>border/default</td><td><code>--color-border-default</code></td><td><code>#C8C3BE</code></td><td>Cards, inputs, dividers</td></tr>
+          <tr><td><span class="swatch-dot" style="background:#1A6B4A;"></span>status/success</td><td><code>--color-status-success</code></td><td><code>#1A6B4A</code></td><td>Positive states</td></tr>
+          <tr><td><span class="swatch-dot" style="background:#C9A84C;"></span>status/warning</td><td><code>--color-status-warning</code></td><td><code>#C9A84C</code></td><td>Caution states</td></tr>
+          <tr><td><span class="swatch-dot" style="background:#B03A2E;"></span>status/error</td><td><code>--color-status-error</code></td><td><code>#B03A2E</code></td><td>Error, destructive</td></tr>
+          <tr><td><span class="swatch-dot" style="background:#2C55AB;"></span>status/info</td><td><code>--color-status-info</code></td><td><code>#2C55AB</code></td><td>Informational states</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Typography ─────────────────────────────────────────── -->
+  <section id="typography" class="section">
+    <span class="section-tag">Foundations</span>
+    <h2 class="section-title">Typography</h2>
+    <p class="section-desc">Two fonts. Playfair Display carries the brand's heritage and authority. Inter ensures clarity and legibility across digital interfaces.</p>
+
+    <!-- Display scale -->
+    <div class="type-specimen">
+      <div class="type-meta">
+        <div class="type-meta-name">Playfair Display</div>
+        <div class="type-meta-chip">Display & Headings</div>
+        <div class="type-meta-detail">Serif · Google Fonts</div>
+      </div>
+      <div style="font-family:var(--font-display); color: var(--navy-900); margin-bottom: var(--space-6);">
+        <div style="font-size:64px; font-weight:700; line-height:1.05; letter-spacing:-0.03em; margin-bottom:var(--space-2);">Build Wealth Beyond Borders</div>
+        <div style="font-size:40px; font-weight:600; line-height:1.1; letter-spacing:-0.02em; margin-bottom:var(--space-2);">Strategic Financial Solutions</div>
+        <div style="font-size:32px; font-weight:500; line-height:1.15; margin-bottom:var(--space-2);">Offshore Investment & Wealth Management</div>
+        <div style="font-size:24px; font-weight:400; line-height:1.25; margin-bottom:var(--space-2);">Integrity · Confidentiality · Precision</div>
+        <div style="font-size:20px; font-weight:400; font-style:italic; line-height:1.3; color:var(--neutral-600);">Delivering structured, compliant, and growth-driven financial services</div>
+      </div>
+    </div>
+
+    <!-- Body scale -->
+    <div class="type-specimen">
+      <div class="type-meta">
+        <div class="type-meta-name">Inter</div>
+        <div class="type-meta-chip">Body & UI</div>
+        <div class="type-meta-detail">Sans-serif · Google Fonts</div>
+      </div>
+      <div style="font-family:var(--font-body); color: var(--neutral-900);">
+        <div style="font-size:18px; font-weight:400; line-height:1.6; margin-bottom:var(--space-4); max-width:600px;">Moolla Capital's integrated approach means clients deal with one trusted firm for all their financial needs — from auditing and tax advisory to wealth management and offshore investment structures.</div>
+        <div style="font-size:16px; font-weight:400; line-height:1.6; color:var(--neutral-600); margin-bottom:var(--space-4); max-width:600px;">Our team of qualified professionals delivers precision-led financial services across South Africa and internationally, with 100% commitment to compliance and client confidentiality.</div>
+        <div style="font-size:14px; font-weight:400; line-height:1.5; color:var(--neutral-400);">Moolla Capital (Pty) Ltd · Registered in South Africa · All services subject to applicable regulatory requirements.</div>
+      </div>
+    </div>
+
+    <!-- Type scale table -->
+    <div class="type-scale-grid">
+      <div>
+        <div class="color-row-label">Display Scale (Playfair)</div>
+        <div class="table-wrap">
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Size</th><th>Weight</th><th>Use</th></tr></thead>
+            <tbody>
+              <tr><td><code>display/2xl</code></td><td>64px</td><td>700</td><td>Hero headlines</td></tr>
+              <tr><td><code>display/xl</code></td><td>48px</td><td>700</td><td>Section heroes</td></tr>
+              <tr><td><code>display/lg</code></td><td>40px</td><td>600</td><td>Page titles</td></tr>
+              <tr><td><code>display/md</code></td><td>32px</td><td>600</td><td>Section titles</td></tr>
+              <tr><td><code>display/sm</code></td><td>24px</td><td>500</td><td>Card titles</td></tr>
+              <tr><td><code>display/xs</code></td><td>20px</td><td>400</td><td>Sub-headings</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="color-row-label">Body Scale (Inter)</div>
+        <div class="table-wrap">
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Size</th><th>Weight</th><th>Use</th></tr></thead>
+            <tbody>
+              <tr><td><code>body/xl</code></td><td>18px</td><td>400</td><td>Lead paragraphs</td></tr>
+              <tr><td><code>body/lg</code></td><td>16px</td><td>400</td><td>Body copy</td></tr>
+              <tr><td><code>body/md</code></td><td>14px</td><td>400</td><td>Secondary text</td></tr>
+              <tr><td><code>body/sm</code></td><td>12px</td><td>400</td><td>Captions, metadata</td></tr>
+              <tr><td><code>label/lg</code></td><td>16px</td><td>600</td><td>Form labels, CTAs</td></tr>
+              <tr><td><code>label/sm</code></td><td>12px</td><td>600</td><td>Tags, eyebrows</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Spacing ─────────────────────────────────────────────── -->
+  <section id="spacing" class="section">
+    <span class="section-tag">Foundations</span>
+    <h2 class="section-title">Spacing & Grid</h2>
+    <p class="section-desc">8pt base grid. All spacing tokens are multiples of 4px — snapping to 8px wherever possible.</p>
+
+    <div class="component-section">
+      <div class="component-body">
+        <div class="spacing-row"><div class="spacing-label"><code>--space-1 · 4px</code></div><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:4px;"></div></div><div class="spacing-value">4px</div></div>
+        <div class="spacing-row"><div class="spacing-label"><code>--space-2 · 8px</code></div><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:8px;"></div></div><div class="spacing-value">8px</div></div>
+        <div class="spacing-row"><div class="spacing-label"><code>--space-3 · 12px</code></div><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:12px;"></div></div><div class="spacing-value">12px</div></div>
+        <div class="spacing-row"><div class="spacing-label"><code>--space-4 · 16px</code></div><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:16px;"></div></div><div class="spacing-value">16px</div></div>
+        <div class="spacing-row"><div class="spacing-label"><code>--space-6 · 24px</code></div><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:24px;"></div></div><div class="spacing-value">24px</div></div>
+        <div class="spacing-row"><div class="spacing-label"><code>--space-8 · 32px</code></div><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:32px;"></div></div><div class="spacing-value">32px</div></div>
+        <div class="spacing-row"><div class="spacing-label"><code>--space-12 · 48px</code></div><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:48px;"></div></div><div class="spacing-value">48px</div></div>
+        <div class="spacing-row"><div class="spacing-label"><code>--space-16 · 64px</code></div><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:64px;"></div></div><div class="spacing-value">64px</div></div>
+        <div class="spacing-row"><div class="spacing-label"><code>--space-24 · 96px</code></div><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:96px;"></div></div><div class="spacing-value">96px</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Shadows ─────────────────────────────────────────────── -->
+  <section id="shadows" class="section">
+    <span class="section-tag">Foundations</span>
+    <h2 class="section-title">Elevation & Shadows</h2>
+    <p class="section-desc">Navy-tinted shadows (not pure black) maintain warmth while signalling depth.</p>
+    <div style="display:grid; grid-template-columns: repeat(4,1fr); gap: var(--space-4);">
+      <div style="background:var(--white); border-radius:var(--radius-xl); padding:var(--space-6); box-shadow:var(--shadow-sm); text-align:center;">
+        <div style="font-size:var(--text-sm); font-weight:600; color:var(--neutral-900); margin-bottom:4px;">SM</div>
+        <div style="font-size:var(--text-xs); color:var(--neutral-600);">Resting cards</div>
+      </div>
+      <div style="background:var(--white); border-radius:var(--radius-xl); padding:var(--space-6); box-shadow:var(--shadow-md); text-align:center;">
+        <div style="font-size:var(--text-sm); font-weight:600; color:var(--neutral-900); margin-bottom:4px;">MD</div>
+        <div style="font-size:var(--text-xs); color:var(--neutral-600);">Hovered cards</div>
+      </div>
+      <div style="background:var(--white); border-radius:var(--radius-xl); padding:var(--space-6); box-shadow:var(--shadow-lg); text-align:center;">
+        <div style="font-size:var(--text-sm); font-weight:600; color:var(--neutral-900); margin-bottom:4px;">LG</div>
+        <div style="font-size:var(--text-xs); color:var(--neutral-600);">Dropdowns, popovers</div>
+      </div>
+      <div style="background:var(--white); border-radius:var(--radius-xl); padding:var(--space-6); box-shadow:var(--shadow-xl); text-align:center;">
+        <div style="font-size:var(--text-sm); font-weight:600; color:var(--neutral-900); margin-bottom:4px;">XL</div>
+        <div style="font-size:var(--text-xs); color:var(--neutral-600);">Modals, drawers</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Buttons ─────────────────────────────────────────────── -->
+  <section id="buttons" class="section">
+    <span class="section-tag">Components</span>
+    <h2 class="section-title">Buttons</h2>
+    <p class="section-desc">Five variants × three sizes. Primary and Accent carry the main CTAs. Use Ghost sparingly for tertiary actions.</p>
+
+    <div class="component-section">
+      <div class="component-header">
+        <span class="component-name">Button Variants</span>
+        <span class="component-tag">5 variants · 3 sizes</span>
+      </div>
+      <div class="component-body">
+        <div class="component-row">
+          <span class="component-row-label">Primary</span>
+          <button class="btn btn-primary btn-sm">Small</button>
+          <button class="btn btn-primary btn-md">Request Consultation</button>
+          <button class="btn btn-primary btn-lg">Get Started</button>
+          <button class="btn btn-primary btn-md disabled">Disabled</button>
+        </div>
+        <div class="component-row">
+          <span class="component-row-label">Accent</span>
+          <button class="btn btn-accent btn-sm">Small</button>
+          <button class="btn btn-accent btn-md">Request a Quote</button>
+          <button class="btn btn-accent btn-lg">Explore Offshore</button>
+        </div>
+        <div class="component-row">
+          <span class="component-row-label">Secondary</span>
+          <button class="btn btn-secondary btn-sm">Small</button>
+          <button class="btn btn-secondary btn-md">Learn More</button>
+          <button class="btn btn-secondary btn-lg">View Services</button>
+        </div>
+        <div class="component-row">
+          <span class="component-row-label">Ghost</span>
+          <button class="btn btn-ghost btn-sm">Small</button>
+          <button class="btn btn-ghost btn-md">Cancel</button>
+          <button class="btn btn-ghost btn-lg">Back</button>
+        </div>
+        <div class="component-row">
+          <span class="component-row-label">Danger</span>
+          <button class="btn btn-danger btn-sm">Delete</button>
+          <button class="btn btn-danger btn-md">Remove Account</button>
+        </div>
+        <div class="component-row" style="padding: var(--space-4); border-radius: var(--radius-xl); background: var(--navy-900);">
+          <span class="component-row-label" style="color:var(--navy-100);">On Dark</span>
+          <button class="btn btn-accent btn-md">Request Quote</button>
+          <button class="btn btn-md" style="background:rgba(255,255,255,0.1); color:var(--white); border: 1.5px solid rgba(255,255,255,0.2);">Learn More</button>
+          <button class="btn btn-ghost btn-md" style="color:rgba(255,255,255,0.7);">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Badges ─────────────────────────────────────────────── -->
+  <section id="badges" class="section">
+    <span class="section-tag">Components</span>
+    <h2 class="section-title">Badges & Tags</h2>
+    <p class="section-desc">Used for service categories, compliance status, and account types.</p>
+    <div class="component-section">
+      <div class="component-body">
+        <div class="component-row">
+          <span class="component-row-label">Status</span>
+          <span class="badge badge-green">Compliant</span>
+          <span class="badge badge-gold">Pending Review</span>
+          <span class="badge badge-red">Action Required</span>
+          <span class="badge badge-navy">Active</span>
+          <span class="badge badge-neutral">Inactive</span>
+        </div>
+        <div class="component-row">
+          <span class="component-row-label">Services</span>
+          <span class="badge badge-navy">Audit & Assurance</span>
+          <span class="badge badge-navy">Tax Advisory</span>
+          <span class="badge badge-gold">Offshore Investment</span>
+          <span class="badge badge-green">Wealth Management</span>
+          <span class="badge badge-neutral">Trust Services</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Inputs ─────────────────────────────────────────────── -->
+  <section id="inputs" class="section">
+    <span class="section-tag">Components</span>
+    <h2 class="section-title">Form Inputs</h2>
+    <p class="section-desc">Clean, accessible inputs with clear focus states. Error states use red; never remove the visible label.</p>
+    <div class="component-section">
+      <div class="component-body">
+        <div class="input-grid" style="margin-bottom: var(--space-6);">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input class="input" type="text" placeholder="e.g. Ahmed Moolla" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input class="input" type="email" placeholder="name@company.co.za" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number <span style="color:var(--neutral-400); font-weight:400;">(optional)</span></label>
+            <input class="input" type="tel" placeholder="+27 __ ___ ____" />
+            <span class="form-hint">We will only use this for consultation scheduling.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Company Registration</label>
+            <input class="input error" type="text" placeholder="e.g. 2005/012345/07" value="invalid" />
+            <span class="form-error">Please enter a valid South African company registration number.</span>
+          </div>
+        </div>
+        <div class="form-group" style="max-width: 480px;">
+          <label class="form-label">Service Required</label>
+          <select class="input">
+            <option value="" disabled selected>Select a service</option>
+            <option>Audit & Assurance</option>
+            <option>Tax Advisory</option>
+            <option>Wealth Management</option>
+            <option>Offshore Investment</option>
+            <option>Trust Services</option>
+            <option>Company Registration</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Cards ──────────────────────────────────────────────── -->
+  <section id="cards" class="section">
+    <span class="section-tag">Components</span>
+    <h2 class="section-title">Cards</h2>
+    <p class="section-desc">Service cards use a coloured top bar for category distinction. Stat cards feature the display typeface prominently.</p>
+
+    <div class="color-row-label">Service Cards</div>
+    <div class="card-grid" style="margin-bottom: var(--space-8);">
+      <div class="card">
+        <div class="card-icon-bar" style="background: var(--navy-900);"></div>
+        <div class="card-body">
+          <div class="card-icon" style="background: var(--navy-50); color: var(--navy-800);">📋</div>
+          <div class="card-title">Audits & Assurance</div>
+          <div class="card-desc">Independent, IRBA-compliant auditing and assurance services for businesses of all sizes.</div>
+          <a href="#" class="card-link">Learn more →</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon-bar" style="background: var(--gold-500);"></div>
+        <div class="card-body">
+          <div class="card-icon" style="background: var(--gold-50); color: var(--gold-700);">🌍</div>
+          <div class="card-title">Offshore Investment</div>
+          <div class="card-desc">SARS-compliant offshore structures optimised for long-term capital preservation and growth.</div>
+          <a href="#" class="card-link">Learn more →</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon-bar" style="background: var(--green-500);"></div>
+        <div class="card-body">
+          <div class="card-icon" style="background: var(--green-50); color: var(--green-700);">📈</div>
+          <div class="card-title">Wealth Management</div>
+          <div class="card-desc">Personalised wealth strategies across asset classes, structured for your long-term financial objectives.</div>
+          <a href="#" class="card-link">Learn more →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="color-row-label">Stat Cards</div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-card-label">Years in Operation</div>
+        <div class="stat-card-value">30<span>+</span></div>
+        <div class="stat-card-change">↑ Est. 1990</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Clients Served</div>
+        <div class="stat-card-value">500<span>+</span></div>
+        <div class="stat-card-change">↑ Across SA & internationally</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Compliance Rate</div>
+        <div class="stat-card-value">100<span>%</span></div>
+        <div class="stat-card-change">✓ Zero regulatory breaches</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Navigation ─────────────────────────────────────────── -->
+  <section id="navigation" class="section">
+    <span class="section-tag">Components</span>
+    <h2 class="section-title">Navigation</h2>
+    <p class="section-desc">Two nav variants: light (internal pages) and dark (homepage, landing pages).</p>
+
+    <div class="nav-example" style="margin-bottom: var(--space-4);">
+      <div class="nav-bar">
+        <a class="nav-brand" href="#">Moolla <span>Capital</span></a>
+        <nav class="nav-links">
+          <a class="nav-link active" href="#">Home</a>
+          <a class="nav-link" href="#">About</a>
+          <a class="nav-link" href="#">Services</a>
+          <a class="nav-link" href="#">Offshore</a>
+          <a class="nav-link" href="#">Contact</a>
+        </nav>
+        <div class="nav-actions">
+          <button class="btn btn-primary btn-sm">Request Quote</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-example">
+      <div class="nav-bar nav-bar-dark">
+        <a class="nav-brand" href="#">Moolla Capital</a>
+        <nav class="nav-links">
+          <a class="nav-link active" href="#">Home</a>
+          <a class="nav-link" href="#">About</a>
+          <a class="nav-link" href="#">Services</a>
+          <a class="nav-link" href="#">Offshore</a>
+          <a class="nav-link" href="#">Contact</a>
+        </nav>
+        <div class="nav-actions">
+          <button class="btn btn-accent btn-sm">Request Quote</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Alerts ─────────────────────────────────────────────── -->
+  <section id="alerts" class="section">
+    <span class="section-tag">Components</span>
+    <h2 class="section-title">Alerts & Notifications</h2>
+    <p class="section-desc">Left-border alerts for contextual feedback. Always include a short title alongside the description.</p>
+    <div class="alert alert-info">
+      <div class="alert-icon">ℹ️</div>
+      <div><div class="alert-title">Annual Tax Returns Due</div>Your provisional tax return is due within 30 days. Our advisory team can assist with preparation and submission.</div>
+    </div>
+    <div class="alert alert-success">
+      <div class="alert-icon">✅</div>
+      <div><div class="alert-title">Offshore Structure Approved</div>Your Mauritius holding company registration has been successfully completed and is now fully operational.</div>
+    </div>
+    <div class="alert alert-warning">
+      <div class="alert-icon">⚠️</div>
+      <div><div class="alert-title">Document Expiry Notice</div>Your trust deed expires in 60 days. Please contact us to arrange a review and renewal before the compliance deadline.</div>
+    </div>
+    <div class="alert alert-error">
+      <div class="alert-icon">🚨</div>
+      <div><div class="alert-title">SARS Audit Notification</div>Your account has been flagged for review. Immediate action is required — contact your Moolla Capital advisor today.</div>
+    </div>
+  </section>
+
+  <!-- ── Tables ─────────────────────────────────────────────── -->
+  <section id="tables" class="section">
+    <span class="section-tag">Components</span>
+    <h2 class="section-title">Data Tables</h2>
+    <p class="section-desc">Navy table headers reinforce brand authority. Rows alternate on hover for scannability.</p>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Service</th>
+            <th>Status</th>
+            <th>Assigned To</th>
+            <th>Due Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Pinnacle Holdings (Pty) Ltd</td>
+            <td>Annual Audit</td>
+            <td><span class="badge badge-green">Compliant</span></td>
+            <td>A. Moolla</td>
+            <td>30 Jun 2026</td>
+          </tr>
+          <tr>
+            <td>Sunset Family Trust</td>
+            <td>Trust Administration</td>
+            <td><span class="badge badge-gold">Pending Review</span></td>
+            <td>S. Khan</td>
+            <td>15 Jul 2026</td>
+          </tr>
+          <tr>
+            <td>Bridgepoint Investments</td>
+            <td>Offshore Structure</td>
+            <td><span class="badge badge-navy">Active</span></td>
+            <td>R. Patel</td>
+            <td>01 Aug 2026</td>
+          </tr>
+          <tr>
+            <td>Greenfield Developers cc</td>
+            <td>Tax Advisory</td>
+            <td><span class="badge badge-red">Action Required</span></td>
+            <td>A. Moolla</td>
+            <td>Overdue</td>
+          </tr>
+          <tr>
+            <td>Legacy Wealth Family Office</td>
+            <td>Wealth Management</td>
+            <td><span class="badge badge-green">Compliant</span></td>
+            <td>S. Khan</td>
+            <td>31 Aug 2026</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Dividers ────────────────────────────────────────────── -->
+  <section id="dividers" class="section">
+    <span class="section-tag">Components</span>
+    <h2 class="section-title">Dividers</h2>
+    <p class="section-desc">Three variants for different contexts — subtle, gold-accented, and strong.</p>
+    <div class="component-section">
+      <div class="component-body">
+        <div style="margin-bottom: var(--space-4);">
+          <div style="font-size: var(--text-xs); font-weight:600; color: var(--neutral-400); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--space-3);">Default</div>
+          <div class="divider-hr"></div>
+        </div>
+        <div style="margin-bottom: var(--space-4);">
+          <div style="font-size: var(--text-xs); font-weight:600; color: var(--neutral-400); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--space-3);">Gold Accent</div>
+          <div class="divider-hr-gold"></div>
+        </div>
+        <div style="margin-bottom: var(--space-4);">
+          <div style="font-size: var(--text-xs); font-weight:600; color: var(--neutral-400); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--space-3);">Strong</div>
+          <div class="divider-hr-dark"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Copy toast -->
+<div class="copied-toast" id="copiedToast">Copied to clipboard</div>
+
+<script>
+  // Copy hex on swatch click
+  function copyHex(hex, el) {
+    navigator.clipboard.writeText(hex).catch(() => {});
+    const toast = document.getElementById('copiedToast');
+    toast.textContent = hex + ' copied';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  // Active sidebar link tracking
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.sidebar a');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const link = document.querySelector(`.sidebar a[href="#${e.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
