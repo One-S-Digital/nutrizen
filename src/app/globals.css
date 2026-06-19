@@ -26,7 +26,216 @@
   }
 }
 
+/* Slow, motion-safe rotation for the product orbit. Keeps the centering
+   translate so the orbit stays pinned while it spins. */
+@keyframes orbitSpin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .product-orbit {
+    animation: orbitSpin 75s linear infinite;
+  }
+}
+
 @layer components {
+  /* ============================================================
+     HERO RESPONSIVE SYSTEM  (global — shared by all hero sections)
+     ------------------------------------------------------------
+     Breakpoint model:
+       • mobile (base)  → copy LEFT-aligned, CTAs stacked
+       • tablet (md)    → copy CENTERED, CTAs in a centered row
+       • desktop (lg)   → two-column split, copy LEFT-aligned
+     Apply these classes to any page's hero to keep the responsive
+     behaviour identical site-wide. Decorative layers (background,
+     leaves, DNA, product art) stay local to each hero component.
+     ============================================================ */
+
+  /* Section shell — pulls up under the fixed navbar, locks height on desktop */
+  .hero-shell {
+    @apply relative isolate min-h-[100svh] overflow-x-hidden -mt-[152px] pt-0
+           lg:h-[100svh] lg:max-h-[100svh] lg:overflow-hidden;
+    background-color: #071209;
+  }
+
+  /* Content grid — single column until lg, then two equal columns */
+  .hero-grid {
+    @apply relative z-10 mx-auto grid h-full w-full max-w-[1540px] grid-cols-1
+           items-stretch gap-x-0 px-6 pb-32 pt-[150px] md:pt-[160px]
+           lg:grid-cols-[1fr_1fr] lg:px-10 lg:pb-0 lg:pt-[192px] xl:px-16;
+  }
+
+  /* Copy column — alignment flips per breakpoint */
+  .hero-copy {
+    @apply relative z-20 flex flex-col items-start text-left
+           md:mx-auto md:max-w-2xl md:items-center md:text-center
+           lg:mx-0 lg:max-w-2xl lg:items-start lg:text-left;
+  }
+
+  .hero-eyebrow {
+    @apply mb-6 font-mono text-[11px] uppercase tracking-[0.42em] text-[#E7A46C];
+  }
+
+  .hero-title {
+    @apply font-serif leading-[1.03] tracking-[-0.02em] text-[#F6F3EA]
+           text-[2.5rem] min-[420px]:text-[2.9rem] sm:text-[3.7rem]
+           lg:text-[4.5rem] xl:text-[5.4rem];
+  }
+
+  .hero-lede {
+    @apply mt-6 max-w-[46ch] text-base leading-relaxed text-[#F6F3EA]/70 md:text-[1.05rem];
+  }
+
+  /* CTA group — stacked & left on mobile, centered row on tablet, left row on desktop */
+  .hero-actions {
+    @apply mt-9 flex flex-col items-start gap-4
+           md:flex-row md:items-center md:justify-center
+           lg:justify-start;
+  }
+
+  .hero-btn {
+    @apply inline-flex items-center justify-center gap-3 rounded-full px-8 py-[14px]
+           text-[15px] font-semibold transition-all duration-300 hover:-translate-y-0.5;
+  }
+  .hero-btn-primary {
+    @apply bg-[#D9E8C4] text-[#10201A] shadow-[0_16px_40px_-12px_rgba(217,232,196,0.65)] hover:bg-[#F6F3EA];
+  }
+  .hero-btn-ghost {
+    @apply border border-[#D89455]/55 bg-[#10201A]/30 text-[#F6F3EA]/90 backdrop-blur-sm
+           hover:border-[#D9E8C4]/60 hover:bg-white/[0.05] hover:text-white;
+  }
+
+  /* Trust / stats bar — floating rounded card on mobile+tablet, flush full-width bar on desktop */
+  .hero-statbar {
+    @apply absolute inset-x-0 bottom-0 z-30
+           lg:border-t lg:border-white/[0.10] lg:bg-[#071209]/90 lg:backdrop-blur-xl;
+  }
+  .hero-statbar-inner {
+    @apply mx-auto max-w-[1540px] px-3 pb-3 sm:px-4 lg:px-10 lg:pb-0 xl:px-16;
+  }
+  .hero-statlist {
+    @apply grid grid-cols-1 overflow-hidden rounded-2xl border border-white/[0.10]
+           bg-[#071209]/85 backdrop-blur-xl divide-y divide-white/[0.10]
+           md:grid-cols-4 md:divide-x md:divide-y-0
+           lg:rounded-none lg:border-0 lg:bg-transparent lg:backdrop-blur-none;
+  }
+  .hero-stat {
+    @apply flex flex-row items-center justify-center gap-4 px-5 py-3.5 text-left
+           md:flex-col md:gap-1.5 md:px-2 md:py-4 md:text-center
+           lg:flex-row lg:gap-4 lg:px-8 lg:py-5 lg:text-left;
+  }
+  .hero-stat-icon {
+    @apply flex-shrink-0 text-[#E7A46C];
+  }
+  .hero-stat-title {
+    @apply block font-mono text-[10px] font-semibold uppercase leading-tight tracking-[0.2em] text-[#F6F3EA]
+           sm:text-[11px] sm:tracking-[0.28em];
+  }
+  .hero-stat-sub {
+    @apply mt-0.5 block font-mono text-[9px] uppercase leading-tight tracking-[0.18em] text-[#F6F3EA]/60
+           sm:text-[10px] sm:tracking-[0.22em];
+  }
+
+  /* Annotation callouts — connector + icon + label, anchored to the right of the bottle */
+  .hero-annotation {
+    @apply absolute z-30 flex items-center gap-2 lg:gap-3;
+  }
+  .hero-annotation-line {
+    @apply relative h-px w-4 flex-shrink-0 sm:w-6 xl:w-9;
+  }
+  .hero-annotation-icon {
+    @apply grid h-8 w-8 flex-shrink-0 place-items-center rounded-full border border-[#D89455]/40
+           bg-[#071209]/70 text-[#E7A46C] shadow-[0_0_0_5px_rgba(216,148,85,0.08),0_0_20px_rgba(216,148,85,0.18)]
+           backdrop-blur-sm lg:h-10 lg:w-10;
+  }
+  .hero-annotation-title {
+    @apply font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#F6F3EA]
+           [text-shadow:0_1px_3px_rgba(0,0,0,0.95)] sm:text-[11px] sm:tracking-[0.26em];
+  }
+  .hero-annotation-sub {
+    @apply mt-1 text-[11px] leading-snug tracking-[0.01em] text-[#F6F3EA]/65
+           [text-shadow:0_1px_2px_rgba(0,0,0,0.9)] sm:mt-1.5 sm:text-[13px];
+  }
+
+  /* Feature chips — bordered rounded tiles used below the hero lede */
+  .hero-chip {
+    @apply inline-flex items-center gap-2.5 rounded-xl border border-white/[0.12] bg-white/[0.05]
+           px-4 py-2.5 text-sm font-medium text-[#F6F3EA]/85 backdrop-blur-sm
+           transition-colors duration-300 hover:border-[#D9E8C4]/40 hover:bg-white/[0.08];
+  }
+  .hero-chip-icon {
+    @apply flex-shrink-0 text-[#8CAB77];
+  }
+
+  /* ============================================================
+     PRODUCT ORBIT  (reusable scientific halo behind a hero product)
+     ------------------------------------------------------------
+     Pure CSS/SVG. Sits BEHIND the product (z-1) but above the
+     background (z-0); product art rides on top (z-3+). Decorative
+     only — pointer-events:none so it never eats clicks. Scales with
+     the viewport via clamp() and rotates very slowly (motion-safe).
+     ============================================================ */
+  .product-orbit {
+    position: absolute;
+    left: 50%;
+    top: 44%;
+    width: clamp(300px, 38vw, 660px);
+    aspect-ratio: 1 / 1;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  /* bright sage-green radial glow seated behind the bottle */
+  .product-orbit::before {
+    content: "";
+    position: absolute;
+    inset: 6%;
+    border-radius: 9999px;
+    background: radial-gradient(
+      circle,
+      rgba(150, 210, 110, 0.55) 0%,
+      rgba(150, 205, 115, 0.34) 38%,
+      rgba(216, 148, 85, 0.14) 60%,
+      transparent 76%
+    );
+    filter: blur(26px);
+    transform: scale(1.5);
+  }
+  .orbit {
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    border: 1px solid rgba(196, 226, 168, 0.40);
+    box-shadow: 0 0 30px rgba(190, 220, 165, 0.14), inset 0 0 24px rgba(190, 220, 165, 0.05);
+  }
+  .orbit-1 { inset: 1%; }
+  .orbit-2 { inset: 13%; border-color: rgba(224, 240, 196, 0.32); }
+  .orbit-3 { inset: 26%; border-style: dashed; border-color: rgba(196, 226, 168, 0.44); }
+  .orbit-4 { inset: 40%; border-color: rgba(231, 164, 108, 0.28); }
+  .orbit-node {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: 9999px;
+    background: rgba(216, 236, 182, 1);
+    box-shadow: 0 0 18px rgba(196, 226, 168, 0.9), 0 0 5px rgba(255, 255, 255, 0.7);
+  }
+  .orbit-node.is-gold {
+    background: rgba(235, 170, 112, 1);
+    box-shadow: 0 0 18px rgba(216, 148, 85, 0.85), 0 0 5px rgba(255, 235, 210, 0.65);
+  }
+  .node-1 { top: 5%; left: 47%; }
+  .node-2 { top: 33%; right: 3%; }
+  .node-3 { bottom: 15%; left: 11%; }
+  .node-4 { bottom: 5%; right: 31%; }
+
+  /* dotted connector that runs from an annotation icon toward the bottle */
+  .annotation-connector {
+    flex-shrink: 0;
+    height: 0;
+    border-top: 1px dashed rgba(190, 220, 165, 0.45);
+  }
+
   .pdp-description p {
     @apply mb-4 last:mb-0;
   }

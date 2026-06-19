@@ -80,12 +80,9 @@ function HeroIcon({ name, className = "" }: { name: string; className?: string }
 
 function AnnotationLine({ title, sub, icon, top, delay, reduceMotion }: (typeof ANNOTATIONS)[number] & { reduceMotion: boolean }) {
   return (
-    <div
-      className="absolute z-30 hidden lg:flex items-center gap-3"
-      style={{ top, left: "58%", right: "0%" }}
-    >
+    <div className="hero-annotation" style={{ top, left: "58%", right: "0%" }}>
       {/* short connector line from bottle edge to icon */}
-      <div className="relative h-px w-6 flex-shrink-0 xl:w-9">
+      <div className="hero-annotation-line">
         <motion.span
           initial={reduceMotion ? false : { scaleX: 0 }}
           animate={{ scaleX: 1 }}
@@ -98,9 +95,9 @@ function AnnotationLine({ title, sub, icon, top, delay, reduceMotion }: (typeof 
         initial={reduceMotion ? false : { scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5, delay: delay + 0.5, ease: scrollEase }}
-        className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full border border-[#D89455]/40 bg-[#071209]/70 text-[#E7A46C] shadow-[0_0_0_5px_rgba(216,148,85,0.08),0_0_20px_rgba(216,148,85,0.18)] backdrop-blur-sm"
+        className="hero-annotation-icon"
       >
-        <HeroIcon name={icon} className="h-[18px] w-[18px]" />
+        <HeroIcon name={icon} className="h-4 w-4 lg:h-[18px] lg:w-[18px]" />
       </motion.span>
       {/* text */}
       <motion.div
@@ -109,8 +106,8 @@ function AnnotationLine({ title, sub, icon, top, delay, reduceMotion }: (typeof 
         transition={{ duration: 0.7, delay: delay + 0.25, ease: scrollEase }}
         className="min-w-0 text-left"
       >
-        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.26em] text-[#F6F3EA] [text-shadow:0_1px_3px_rgba(0,0,0,0.95)]">{title}</p>
-        <p className="mt-1.5 text-[13px] leading-snug tracking-[0.01em] text-[#F6F3EA]/65 [text-shadow:0_1px_2px_rgba(0,0,0,0.9)]">{sub}</p>
+        <p className="hero-annotation-title">{title}</p>
+        <p className="hero-annotation-sub">{sub}</p>
       </motion.div>
     </div>
   );
@@ -149,7 +146,7 @@ export default function Hero() {
       ref={sectionRef}
       onMouseMove={canHover ? handleMouseMove : undefined}
       onMouseLeave={canHover ? handleMouseLeave : undefined}
-      className="relative isolate min-h-[100svh] overflow-x-hidden bg-[#071209] -mt-[152px] pt-0 lg:h-[100svh] lg:max-h-[100svh] lg:overflow-hidden"
+      className="hero-shell"
     >
       {/* ── Layer 1: Background image ── */}
       <div className="absolute inset-0 z-0" aria-hidden>
@@ -193,7 +190,7 @@ export default function Hero() {
       />
 
       {/* ── Layer 6: Main content grid ── */}
-      <div className="relative z-10 mx-auto grid h-full w-full max-w-[1540px] grid-cols-1 items-stretch gap-x-0 px-6 pb-28 pt-[165px] md:pt-[170px] lg:grid-cols-[1fr_1fr] lg:px-10 lg:pb-0 lg:pt-[192px] xl:px-16">
+      <div className="hero-grid">
 
         {/* ── Editorial / text column ── */}
         <motion.div
@@ -201,34 +198,28 @@ export default function Hero() {
           initial={reduceMotion ? false : "hidden"}
           animate="visible"
           style={reduceMotion ? {} : { y: textY, opacity: textOpacity }}
-          className="relative z-20 flex flex-col justify-start max-w-2xl"
+          className="hero-copy"
         >
-          <motion.p variants={childVariants} className="mb-6 font-mono text-[11px] uppercase tracking-[0.42em] text-[#E7A46C]">
+          <motion.p variants={childVariants} className="hero-eyebrow">
             NutriZen · Precision Wellness
           </motion.p>
 
-          <motion.h1
-            variants={childVariants}
-            className="font-serif text-[2.5rem] leading-[1.03] tracking-[-0.02em] text-[#F6F3EA] min-[420px]:text-[2.9rem] sm:text-[3.7rem] lg:text-[4.5rem] xl:text-[5.4rem]"
-          >
-            Supplements that
+          <motion.h1 variants={childVariants} className="hero-title">
+            Clean Supplements<span className="text-[#E7A46C] not-italic">.</span>
             <br />
-            <em className="italic text-[#8CAB77]">actually make sense</em>
+            <em className="italic text-[#8CAB77]">Real Results</em>
             <span className="text-[#E7A46C] not-italic">.</span>
           </motion.h1>
 
-          <motion.p variants={childVariants} className="mt-6 max-w-[46ch] text-base leading-relaxed text-[#F6F3EA]/70 md:text-[1.05rem]">
+          <motion.p variants={childVariants} className="hero-lede">
             No fillers. No proprietary blends. Clinically dosed nutrients in the
             forms your body actually absorbs — formulated in the open, delivered
             across South Africa.
           </motion.p>
 
-          <motion.div variants={childVariants} className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <motion.div variants={childVariants} className="hero-actions">
             <Magnetic>
-              <Link
-                href="/shop"
-                className="group inline-flex w-full items-center justify-center gap-3 rounded-full bg-[#D9E8C4] px-8 py-[14px] text-[15px] font-semibold text-[#10201A] shadow-[0_16px_40px_-12px_rgba(217,232,196,0.65)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#F6F3EA] sm:w-auto"
-              >
+              <Link href="/shop" className="group hero-btn hero-btn-primary">
                 Shop bestsellers
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
                   <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
@@ -236,10 +227,7 @@ export default function Hero() {
               </Link>
             </Magnetic>
             <Magnetic>
-              <a
-                href="#goals"
-                className="group inline-flex w-full items-center justify-center gap-3 rounded-full border border-[#D89455]/55 bg-[#10201A]/30 px-8 py-[14px] text-[15px] font-semibold text-[#F6F3EA]/90 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#D9E8C4]/60 hover:bg-white/[0.05] hover:text-white sm:w-auto"
-              >
+              <a href="#goals" className="group hero-btn hero-btn-ghost">
                 Find your formula
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
                   <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
@@ -252,7 +240,7 @@ export default function Hero() {
         {/* ── Specimen column ── */}
         <motion.div
           style={reduceMotion ? {} : { y: specimenY }}
-          className="relative z-10 mx-auto mt-10 flex w-full flex-col items-end justify-end pb-[60px] lg:mt-0 lg:h-full lg:pb-0"
+          className="relative z-10 mx-auto mt-10 flex w-full flex-col items-center justify-end pb-[60px] lg:mt-0 lg:h-full lg:items-end lg:pb-0"
         >
           {/* Right leaf — z-[15] inside specimen: above stone (z-10) and below annotations (z-30) */}
           <div
@@ -299,7 +287,7 @@ export default function Hero() {
             ))}
 
             {/* Product + stone: bottle in normal flow, stone overlaps bottom via negative margin */}
-            <div className="flex flex-col items-center w-full -translate-x-[10%] translate-y-[8svh]">
+            <div className="flex flex-col items-center w-full -translate-x-[10%] translate-y-[2svh] md:translate-y-[8svh]">
               {/* Product bottle */}
               <motion.div
                 initial={reduceMotion ? false : { opacity: 0, y: 40, scale: 0.9 }}
@@ -318,10 +306,8 @@ export default function Hero() {
                     height={1024}
                     priority
                     sizes="(max-width: 640px) 200px, (max-width: 1024px) 280px, 420px"
-                    className="select-none"
+                    className="select-none w-auto h-[min(40svh,420px)] md:h-[min(48svh,540px)] lg:h-[min(54svh,620px)]"
                     style={{
-                      height: "min(54svh, 620px)",
-                      width: "auto",
                       maxWidth: "none",
                       display: "block",
                       filter:
@@ -359,24 +345,18 @@ export default function Hero() {
         initial={reduceMotion ? false : { opacity: 0, y: 28 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9, delay: 1.15, ease: scrollEase }}
-        className="absolute bottom-0 left-0 right-0 z-30 border-t border-white/[0.10] bg-[#071209]/90 backdrop-blur-xl"
+        className="hero-statbar"
       >
-        <div className="mx-auto max-w-[1540px] px-4 lg:px-10 xl:px-16">
-          <ul className="grid grid-cols-2 divide-x divide-y divide-white/[0.10] sm:grid-cols-4 sm:divide-y-0">
+        <div className="hero-statbar-inner">
+          <ul className="hero-statlist">
             {TRUST_ITEMS.map((item) => (
-              <li key={item.title} className="flex items-center gap-4 px-5 py-5 sm:justify-center sm:px-8">
-                <span className="flex-shrink-0 text-[#E7A46C]">
-                  <HeroIcon name={item.icon} className="h-7 w-7" />
+              <li key={item.title} className="hero-stat">
+                <span className="hero-stat-icon">
+                  <HeroIcon name={item.icon} className="h-6 w-6 lg:h-7 lg:w-7" />
                 </span>
                 <span>
-                  <span className="block font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-[#F6F3EA]">
-                    {item.title}
-                  </span>
-                  {item.sub && (
-                    <span className="mt-0.5 block font-mono text-[10px] uppercase tracking-[0.22em] text-[#F6F3EA]/60">
-                      {item.sub}
-                    </span>
-                  )}
+                  <span className="hero-stat-title">{item.title}</span>
+                  {item.sub && <span className="hero-stat-sub">{item.sub}</span>}
                 </span>
               </li>
             ))}

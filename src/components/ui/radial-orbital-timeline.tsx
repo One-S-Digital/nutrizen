@@ -7,6 +7,7 @@ import {
   type CSSProperties,
   type ElementType,
   type MouseEvent,
+  type ReactNode,
 } from "react";
 import { ArrowRight, Link2, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +34,8 @@ export interface RadialOrbitalTimelineProps {
   className?: string;
   /** Disables auto-rotation when the user prefers reduced motion */
   prefersReducedMotion?: boolean;
+  /** Custom element rendered at the orbit center (embed only). Falls back to the gradient donut. */
+  centerSlot?: ReactNode;
 }
 
 export default function RadialOrbitalTimeline({
@@ -40,11 +43,18 @@ export default function RadialOrbitalTimeline({
   embed = false,
   className,
   prefersReducedMotion = false,
+  centerSlot,
 }: RadialOrbitalTimelineProps) {
   const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>({});
   const [viewMode] = useState<"orbital">("orbital");
-  const [rotationAngle, setRotationAngle] = useState<number>(0);
+  // Initial frame seats the first node (Magnesium) at the bottom in embed mode
+  // (canonical pentagon layout); the orbit then rotates slowly from there.
+  const initialAngle = embed ? 90 : 0;
+  const [rotationAngle, setRotationAngle] = useState<number>(initialAngle);
   const [autoRotate, setAutoRotate] = useState<boolean>(() => !prefersReducedMotion);
+  // Defer rotation-driven positions until after mount so SSR and the first
+  // client render agree (prevents a hydration mismatch from the animated angle).
+  const [hasMounted, setHasMounted] = useState(false);
   const [pulseEffect, setPulseEffect] = useState<Record<number, boolean>>({});
   const [centerOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [activeNodeId, setActiveNodeId] = useState<number | null>(null);
@@ -53,6 +63,10 @@ export default function RadialOrbitalTimeline({
   const nodeRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   const orbitRadius = embed ? 118 : 200;
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   useEffect(() => {
     if (prefersReducedMotion) setAutoRotate(false);
@@ -118,6 +132,8 @@ export default function RadialOrbitalTimeline({
   }, [autoRotate, viewMode]);
 
   const centerViewOnNode = (nodeId: number) => {
+    // Keep the embed diagram static — tapping expands the card without spinning.
+    if (embed) return;
     if (viewMode !== "orbital" || !nodeRefs.current[nodeId]) return;
 
     const nodeIndex = timelineData.findIndex((item) => item.id === nodeId);
@@ -128,15 +144,19 @@ export default function RadialOrbitalTimeline({
   };
 
   const calculateNodePosition = (index: number, total: number) => {
-    const angle = ((index / total) * 360 + rotationAngle) % 360;
+    const angle = ((index / total) * 360 + (hasMounted ? rotationAngle : initialAngle)) % 360;
     const radius = orbitRadius;
     const radian = (angle * Math.PI) / 180;
 
     const x = radius * Math.cos(radian) + centerOffset.x;
     const y = radius * Math.sin(radian) + centerOffset.y;
 
-    const zIndex = Math.round(100 + 50 * Math.cos(radian));
-    const opacity = Math.max(0.4, Math.min(1, 0.4 + 0.6 * ((1 + Math.sin(radian)) / 2)));
+    // Embed mode keeps every node fully opaque and flat; the full-screen mode
+    // uses depth-based fading.
+    const zIndex = embed ? 100 : Math.round(100 + 50 * Math.cos(radian));
+    const opacity = embed
+      ? 1
+      : Math.max(0.4, Math.min(1, 0.4 + 0.6 * ((1 + Math.sin(radian)) / 2)));
 
     return { x, y, angle, zIndex, opacity };
   };
@@ -184,7 +204,7 @@ export default function RadialOrbitalTimeline({
         "flex w-full flex-col items-center justify-center",
         embed ? "overflow-visible" : "overflow-hidden",
         embed
-          ? "min-h-[360px] rounded-xl bg-background-main md:min-h-[400px]"
+          ? "min-h-[360px] rounded-xl bg-transparent md:min-h-[400px]"
           : "h-screen bg-black",
         className,
       )}
@@ -205,39 +225,43 @@ export default function RadialOrbitalTimeline({
             transform: `translate(${centerOffset.x}px, ${centerOffset.y}px)`,
           }}
         >
-          <div
-            className={cn(
-              "absolute z-10 flex animate-pulse items-center justify-center rounded-full bg-gradient-to-br from-primary via-secondary to-primary",
-              embed ? "h-12 w-12" : "h-16 w-16",
-            )}
-          >
+          {embed && centerSlot ? (
+            <div className="absolute z-10 flex items-center justify-center">{centerSlot}</div>
+          ) : (
             <div
               className={cn(
-                "absolute h-20 w-20 rounded-full opacity-70 animate-ping",
-                embed ? "border border-primary/25" : "border border-white/20",
+                "absolute z-10 flex items-center justify-center rounded-full",
+                embed
+                  ? "h-12 w-12 bg-gradient-to-br from-[#8CAB77] via-[#6995B1] to-[#A8762E] shadow-[0_8px_22px_-8px_rgba(105,149,177,0.6)]"
+                  : "h-16 w-16 animate-pulse bg-gradient-to-br from-primary via-secondary to-primary",
               )}
-            />
-            <div
-              className={cn(
-                "absolute h-24 w-24 rounded-full opacity-50 animate-ping",
-                embed ? "border border-secondary/20" : "border border-white/10",
+            >
+              {!embed && (
+                <>
+                  <div className="absolute h-20 w-20 rounded-full border border-white/20 opacity-70 animate-ping" />
+                  <div
+                    className="absolute h-24 w-24 rounded-full border border-white/10 opacity-50 animate-ping"
+                    style={{ animationDelay: "0.5s" }}
+                  />
+                </>
               )}
-              style={{ animationDelay: "0.5s" }}
-            />
-            <div
-              className={cn(
-                "rounded-full backdrop-blur-md",
-                embed ? "h-6 w-6 bg-white shadow-sm ring-2 ring-primary/20" : "h-8 w-8 bg-white/80",
-              )}
-            />
-          </div>
+              <div
+                className={cn(
+                  "rounded-full",
+                  embed ? "h-[26px] w-[26px] bg-white" : "h-8 w-8 bg-white/80 backdrop-blur-md",
+                )}
+              />
+            </div>
+          )}
 
-          <div
-            className={cn(
-              "absolute rounded-full border",
-              embed ? "h-56 w-56 border-primary/15" : "h-96 w-96 border-white/10",
-            )}
-          />
+          {embed ? (
+            <>
+              <div className="absolute h-[236px] w-[236px] rounded-full border border-neutral-darkest/[0.08]" />
+              <div className="absolute h-[132px] w-[132px] rounded-full border border-neutral-darkest/[0.08]" />
+            </>
+          ) : (
+            <div className="absolute h-96 w-96 rounded-full border border-white/10" />
+          )}
 
           {timelineData.map((item, index) => {
             const position = calculateNodePosition(index, timelineData.length);
@@ -286,7 +310,7 @@ export default function RadialOrbitalTimeline({
                         ? "scale-150 border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/25"
                         : isRelated
                           ? "animate-pulse border-primary/50 bg-primary/15 text-primary"
-                          : "border-neutral-light bg-white text-primary shadow-sm"
+                          : "border-neutral-light bg-white text-primary shadow-[0_6px_16px_-6px_rgba(47,58,51,0.28)]"
                       : isExpanded
                         ? "scale-150 border-white bg-white text-black shadow-lg shadow-white/30"
                         : isRelated

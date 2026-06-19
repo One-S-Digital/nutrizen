@@ -42,7 +42,7 @@ export default function ComparisonSection({
   };
 
   return (
-    <section className="bg-background-main py-20 md:py-28">
+    <section className="relative overflow-hidden bg-background-main py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6">
         <motion.div
           className="mx-auto max-w-3xl text-center"
@@ -51,22 +51,36 @@ export default function ComparisonSection({
           viewport={scrollViewport}
           transition={{ duration: reduceMotion ? 0 : 0.75, ease: scrollEase }}
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-secondary">{eyebrow}</p>
-          <h2 className="mt-3 text-3xl font-bold text-neutral-darkest md:text-4xl">{title}</h2>
-          {subtitle ? (
-            <p className="mt-4 text-lg text-neutral-dark">{subtitle}</p>
-          ) : null}
+          <p className="mb-5 flex items-center justify-center gap-3 font-mono text-[11px] uppercase tracking-[0.3em] text-secondary">
+            <span className="h-px w-7 bg-secondary/40" aria-hidden />
+            {eyebrow}
+            <span className="h-px w-7 bg-secondary/40" aria-hidden />
+          </p>
+          <h2 className="font-serif text-3xl leading-[1.08] tracking-[-0.01em] text-ink sm:text-4xl md:text-[2.9rem]">
+            {title}
+          </h2>
+          {subtitle ? <p className="mt-5 text-lg leading-relaxed text-ink/65">{subtitle}</p> : null}
         </motion.div>
 
-        <div className="mt-14 grid gap-6 lg:grid-cols-2">
+        <div className="relative mt-14 grid gap-6 lg:grid-cols-2 lg:gap-12">
+          {/* VS badge — sits between the two columns on desktop */}
+          <div
+            className="pointer-events-none absolute left-1/2 top-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 lg:block"
+            aria-hidden
+          >
+            <span className="grid h-14 w-14 place-items-center rounded-full bg-primary font-mono text-sm font-semibold tracking-[0.1em] text-white shadow-[0_12px_30px_-10px_rgba(140,171,119,0.8)] ring-[6px] ring-background-main">
+              VS
+            </span>
+          </div>
+
           <motion.div
             initial={reduceMotion ? false : { opacity: 0, x: -28 }}
             whileInView={reduceMotion ? undefined : { opacity: 1, x: 0 }}
             viewport={scrollViewport}
             transition={{ duration: reduceMotion ? 0 : 0.75, ease: scrollEase }}
-            className="rounded-[2rem] border border-neutral-light/80 bg-neutral-light/40 p-8 md:p-10"
+            className="rounded-[2rem] border border-neutral-light bg-neutral-light/30 p-8 md:p-10"
           >
-            <h3 className="text-lg font-semibold text-neutral-dark/90">{leftTitle}</h3>
+            <h3 className="font-serif text-xl text-ink/55">{leftTitle}</h3>
             <motion.ul
               className="mt-6 space-y-4"
               initial="hidden"
@@ -75,20 +89,16 @@ export default function ComparisonSection({
               variants={listParent}
             >
               {leftItems.map((line) => (
-                <motion.li
-                  key={line}
-                  variants={row}
-                  className="flex items-start gap-3 text-neutral-dark"
-                >
+                <motion.li key={line} variants={row} className="flex items-start gap-3 text-ink/55">
                   <span
-                    className="mt-1 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-neutral/30 text-neutral-darkest/70"
+                    className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-neutral/25 text-ink/45"
                     aria-hidden
                   >
                     <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="3">
                       <path d="M18 6 6 18M6 6l12 12" />
                     </svg>
                   </span>
-                  <span>{line}</span>
+                  <span className="line-through decoration-ink/15">{line}</span>
                 </motion.li>
               ))}
             </motion.ul>
@@ -99,10 +109,10 @@ export default function ComparisonSection({
             whileInView={reduceMotion ? undefined : { opacity: 1, x: 0 }}
             viewport={scrollViewport}
             transition={{ duration: reduceMotion ? 0 : 0.75, ease: scrollEase }}
-            className="relative overflow-hidden rounded-[2rem] border border-primary/25 bg-gradient-to-br from-primary/12 via-background-white to-secondary/10 p-8 shadow-[0_20px_60px_-24px_rgba(140,171,119,0.45)] md:p-10"
+            className="relative overflow-hidden rounded-[2rem] border border-primary/25 bg-gradient-to-br from-primary/12 via-background-white to-secondary/10 p-8 shadow-[0_30px_80px_-32px_rgba(140,171,119,0.5)] md:p-10"
           >
             <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
-            <h3 className="relative text-lg font-semibold text-neutral-darkest">{rightTitle}</h3>
+            <h3 className="relative font-serif text-xl text-ink">{rightTitle}</h3>
             <motion.ul
               className="relative mt-6 space-y-4"
               initial="hidden"
@@ -111,13 +121,9 @@ export default function ComparisonSection({
               variants={listParent}
             >
               {rightItems.map((line) => (
-                <motion.li
-                  key={line}
-                  variants={rowRight}
-                  className="flex items-start gap-3 text-neutral-darkest"
-                >
+                <motion.li key={line} variants={rowRight} className="flex items-start gap-3 text-ink">
                   <span
-                    className="mt-1 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary/25 text-primary"
+                    className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary text-white"
                     aria-hidden
                   >
                     <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="3">

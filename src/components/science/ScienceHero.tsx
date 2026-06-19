@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   motion,
   useReducedMotion,
@@ -9,204 +10,369 @@ import {
   useTransform,
   type Variants,
 } from "framer-motion";
+import InfusionField from "@/components/home/InfusionField";
+import { scrollEase } from "@/lib/motion";
 
-const PILLARS = [
-  { icon: "🔬", label: "Bioavailability" },
-  { icon: "⚖️", label: "Clinical dosing" },
-  { icon: "🔗", label: "Nutrient synergy" },
-  { icon: "📋", label: "Transparent labels" },
+/* Pointer-capability check so the cursor effects only run on hover-capable devices */
+function useCanHover() {
+  const [canHover, setCanHover] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const update = () => setCanHover(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+  return canHover;
+}
+
+/* ── Feature chips (2×2 under the lede) ── */
+const CHIPS = [
+  { label: "Bioavailability", icon: "leaf" },
+  { label: "Clinical dosing", icon: "scale" },
+  { label: "Nutrient synergy", icon: "molecule" },
+  { label: "Transparent labels", icon: "clipboard" },
+] as const;
+
+/* ── Annotation callouts arranged around the bottle (lg+ only) ── */
+const ANNOTATIONS: Array<{
+  title: string;
+  sub: string;
+  icon: string;
+  side: "left" | "right";
+  top: string;
+  delay: number;
+}> = [
+  { title: "Bioavailability", sub: "Forms chosen for absorption", icon: "leaf", side: "left", top: "15%", delay: 1.0 },
+  { title: "Nutrient Synergy", sub: "Ingredients that work together", icon: "molecule", side: "left", top: "calc(60% - 130px)", delay: 1.3 },
+  { title: "Clinical Dosing", sub: "Doses aligned with evidence", icon: "scale", side: "right", top: "21%", delay: 1.15 },
+  { title: "Transparent Labels", sub: "No fillers. No fluff. Just clarity.", icon: "clipboard", side: "right", top: "calc(65% - 130px)", delay: 1.45 },
 ];
 
-export default function ScienceHero() {
-  const reduceMotion = useReducedMotion();
-  const heroRef = useRef<HTMLElement>(null);
+/* ── Bottom stat strip ── */
+const STATS = [
+  { value: "Forms", label: "chosen for absorption", icon: "leaf" },
+  { value: "Doses", label: "aligned with evidence", icon: "shield" },
+  { value: "Labels", label: "fully transparent", icon: "award" },
+] as const;
 
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-  const rightY = useTransform(scrollYProgress, [0, 1], reduceMotion ? [0, 0] : [0, -50]);
+function Icon({ name, className = "" }: { name: string; className?: string }) {
+  const common = {
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 24,
+    height: 24,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.7,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    className,
+    "aria-hidden": true,
+  };
+  if (name === "scale")
+    return (
+      <svg {...common}>
+        <path d="M12 3v3" /><path d="M5 7h14" /><path d="M9 20h6" /><path d="M12 6v14" />
+        <path d="M5 7 2.5 13a3 3 0 0 0 5 0L5 7Z" /><path d="M19 7l-2.5 6a3 3 0 0 0 5 0L19 7Z" />
+      </svg>
+    );
+  if (name === "molecule")
+    return (
+      <svg {...common}>
+        <circle cx="6" cy="7" r="2" /><circle cx="18" cy="7" r="2" /><circle cx="12" cy="17" r="2" />
+        <path d="M7.6 8.4 10.6 15.2" /><path d="M16.4 8.4 13.4 15.2" /><path d="M8 7h8" />
+      </svg>
+    );
+  if (name === "clipboard")
+    return (
+      <svg {...common}>
+        <rect x="5" y="5" width="14" height="16" rx="2" /><path d="M9 5V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" />
+        <path d="M9 11h6" /><path d="M9 15h4" />
+      </svg>
+    );
+  if (name === "shield")
+    return (
+      <svg {...common}>
+        <path d="M12 3 5.5 5.4v5.2c0 4.2 2.7 7.7 6.5 9.4 3.8-1.7 6.5-5.2 6.5-9.4V5.4L12 3Z" />
+        <path d="m9 12 2 2 4-4" />
+      </svg>
+    );
+  if (name === "award")
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="9" r="5" /><path d="M8.5 13 7 21l5-2.6L17 21l-1.5-8" />
+      </svg>
+    );
+  // leaf
+  return (
+    <svg {...common}>
+      <path d="M19 5c-7.5.7-12.5 4.7-14 12 5.8.9 10.8-1.9 14-12Z" />
+      <path d="M8 16c2.6-3.8 5.4-6 8.7-7.4" />
+    </svg>
+  );
+}
+
+function Annotation({
+  title,
+  sub,
+  icon,
+  side,
+  top,
+  delay,
+  reduceMotion,
+}: (typeof ANNOTATIONS)[number] & { reduceMotion: boolean }) {
+  const isLeft = side === "left";
+
+  const connector = (
+    <div className="annotation-connector w-8 sm:w-10 xl:w-14">
+      <motion.span
+        initial={reduceMotion ? false : { scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 0.7, delay, ease: scrollEase }}
+        className={`block h-px w-full bg-gradient-to-r from-[#8CAB77]/70 to-[#8CAB77]/20 ${
+          isLeft ? "origin-right" : "origin-left"
+        }`}
+      />
+    </div>
+  );
+
+  const iconBadge = (
+    <motion.span
+      initial={reduceMotion ? false : { scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.5, delay: delay + 0.45, ease: scrollEase }}
+      className="hero-annotation-icon"
+    >
+      <Icon name={icon} className="h-4 w-4 lg:h-[18px] lg:w-[18px]" />
+    </motion.span>
+  );
+
+  const text = (
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, delay: delay + 0.25, ease: scrollEase }}
+      className={`min-w-0 ${isLeft ? "text-right" : "text-left"}`}
+    >
+      <p className="hero-annotation-title">{title}</p>
+      <p className="hero-annotation-sub">{sub}</p>
+    </motion.div>
+  );
+
+  return (
+    <div
+      className="hero-annotation hidden lg:flex"
+      style={isLeft ? { top, right: "58%" } : { top, left: "58%" }}
+    >
+      {isLeft ? (
+        <>
+          {text}
+          {iconBadge}
+          {connector}
+        </>
+      ) : (
+        <>
+          {connector}
+          {iconBadge}
+          {text}
+        </>
+      )}
+    </div>
+  );
+}
+
+export default function ScienceHero() {
+  const reduceMotion = !!useReducedMotion();
+  const canHover = useCanHover();
+  const heroRef = useRef<HTMLElement>(null);
+  const cursorRef = useRef({ x: -9999, y: -9999 });
+  const getCursor = useCallback(() => cursorRef.current, []);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!heroRef.current) return;
+    const rect = heroRef.current.getBoundingClientRect();
+    cursorRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  };
+  const handleMouseLeave = () => {
+    cursorRef.current = { x: -9999, y: -9999 };
+  };
+
+  const { scrollY } = useScroll();
+  const textY = useTransform(scrollY, [0, 500], reduceMotion ? [0, 0] : [0, -56]);
+  const textOpacity = useTransform(scrollY, [0, 420], reduceMotion ? [1, 1] : [1, 0]);
+  const specimenY = useTransform(scrollY, [0, 600], reduceMotion ? [0, 0] : [0, 50]);
 
   const containerVariants: Variants = {
     hidden: {},
-    visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+    visible: {
+      transition: { staggerChildren: reduceMotion ? 0 : 0.1, delayChildren: reduceMotion ? 0 : 0.15 },
+    },
   };
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 22 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] } },
+  const childVariants: Variants = {
+    hidden: reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.85, ease: scrollEase } },
   };
 
   return (
     <section
       ref={heroRef}
-      className="relative overflow-hidden bg-[#2F3A33] text-white"
-      style={{ minHeight: "58vh" }}
+      onMouseMove={canHover ? handleMouseMove : undefined}
+      onMouseLeave={canHover ? handleMouseLeave : undefined}
+      className="hero-shell"
     >
-      {/* Background layers */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_60%_at_20%_50%,rgba(105,149,177,0.18),transparent)] pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_85%_30%,rgba(140,171,119,0.12),transparent)] pointer-events-none" />
+      {/* ── Layer 0: Background image ── */}
+      <div className="absolute inset-0 z-0" aria-hidden>
+        <Image
+          src="/science%20heo%20bg.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+          quality={90}
+        />
+        {/* Left darkening for copy legibility */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#071209]/92 via-[#071209]/45 to-transparent" />
+        {/* Top + bottom vignette */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#071209]/55 via-transparent to-[#071209]/92" />
+      </div>
 
-      {/* Decorative rings */}
-      <motion.div
-        className="absolute top-8 right-[10%] w-64 h-64 rounded-full border border-white/6 pointer-events-none"
-        animate={reduceMotion ? {} : { rotate: 360 }}
-        transition={{ duration: 65, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div
-        className="absolute -bottom-14 left-[15%] w-48 h-48 rounded-full border border-white/4 pointer-events-none"
-        animate={reduceMotion ? {} : { rotate: -360 }}
-        transition={{ duration: 48, repeat: Infinity, ease: "linear" }}
-      />
-      {/* Floating particles */}
-      <motion.div
-        className="absolute top-1/4 right-[40%] w-2.5 h-2.5 rounded-full bg-secondary/60 pointer-events-none"
-        animate={reduceMotion ? {} : { y: [0, -14, 0], opacity: [0.6, 1, 0.6] }}
-        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-1/3 right-[25%] w-2 h-2 rounded-full bg-primary/50 pointer-events-none"
-        animate={reduceMotion ? {} : { y: [0, 10, 0], opacity: [0.4, 0.8, 0.4] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
+      {/* ── Layer 1: Floating particle field that reacts to the cursor ── */}
+      <InfusionField
+        getCursor={getCursor}
+        reduceMotion={reduceMotion}
+        className="absolute inset-0 z-[1] h-full w-full"
       />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-20 grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
-        {/* LEFT: copy */}
+      {/* ── Layer 2: Main content grid ── */}
+      <div className="hero-grid lg:pt-[164px]">
+        {/* Copy column */}
         <motion.div
           variants={containerVariants}
           initial={reduceMotion ? false : "hidden"}
           animate="visible"
+          style={reduceMotion ? {} : { y: textY, opacity: textOpacity }}
+          className="hero-copy"
         >
-          <motion.span
-            variants={itemVariants}
-            className="inline-block text-secondary font-bold text-xs uppercase tracking-[0.22em] mb-5"
-          >
+          <motion.p variants={childVariants} className="hero-eyebrow">
             The Science
-          </motion.span>
-
-          <motion.h1
-            variants={itemVariants}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.06] mb-5 tracking-tight"
-          >
-            Formulation you can feel —{" "}
-            <span className="text-primary">explained without the noise</span>
-          </motion.h1>
-
-          <motion.p
-            variants={itemVariants}
-            className="text-white/65 text-lg mb-8 max-w-lg leading-relaxed"
-          >
-            NutriZen formulas are built around bioavailability, intentional dosing, and
-            complementary nutrients. A calm look at what &ldquo;science-backed&rdquo; means in
-            practice — not a lab report, but a clearer standard.
           </motion.p>
 
-          {/* Science pillars */}
-          <motion.div variants={itemVariants} className="grid grid-cols-2 gap-3 mb-10 max-w-sm">
-            {PILLARS.map(({ icon, label }) => (
-              <div
-                key={label}
-                className="flex items-center gap-2.5 rounded-xl border border-white/12 bg-white/8 px-3.5 py-2.5 text-sm font-medium text-white/80"
-              >
-                <span>{icon}</span>
+          <motion.h1
+            variants={childVariants}
+            className="hero-title sm:text-[3.1rem] lg:text-[3.4rem] xl:text-[3.95rem]"
+          >
+            Formulation you can feel —{" "}
+            <em className="italic text-[#8CAB77]">explained without the noise</em>
+          </motion.h1>
+
+          <motion.p variants={childVariants} className="hero-lede">
+            NutriZen formulas are built around bioavailability, intentional dosing,
+            and complementary nutrients. A calm look at what &ldquo;science-backed&rdquo;
+            means in practice — not a lab report, but a clearer standard.
+          </motion.p>
+
+          {/* Feature chips */}
+          <motion.div
+            variants={childVariants}
+            className="mt-6 grid w-full max-w-md grid-cols-1 gap-2.5 min-[420px]:grid-cols-2 lg:mt-5"
+          >
+            {CHIPS.map(({ label, icon }) => (
+              <span key={label} className="hero-chip">
+                <Icon name={icon} className="hero-chip-icon h-[18px] w-[18px]" />
                 {label}
-              </div>
+              </span>
             ))}
           </motion.div>
 
-          <motion.div variants={itemVariants} className="flex flex-wrap gap-3">
-            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-              <Link
-                href="/shop"
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 text-sm font-bold text-white shadow-[0_8px_24px_-4px_rgba(140,171,119,0.45)] hover:bg-primary/90 transition-colors"
-              >
-                Shop formulas
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
-                </svg>
-              </Link>
-            </motion.div>
-            <Link
-              href="/pages/about"
-              className="inline-flex items-center rounded-full border border-white/20 px-7 py-3.5 text-sm font-semibold text-white/80 hover:bg-white/10 hover:text-white transition-all"
-            >
-              Our Story →
+          <motion.div variants={childVariants} className="hero-actions mt-6 lg:mt-5">
+            <Link href="/shop" className="group hero-btn hero-btn-primary">
+              Shop formulas
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
+                <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+              </svg>
+            </Link>
+            <Link href="/pages/about" className="group hero-btn hero-btn-ghost">
+              Our Story
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
+                <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+              </svg>
             </Link>
           </motion.div>
         </motion.div>
 
-        {/* RIGHT: orbiting molecule-style visual */}
+        {/* Specimen column */}
         <motion.div
-          style={{ y: rightY }}
-          className="hidden lg:flex items-center justify-center"
+          style={reduceMotion ? {} : { y: specimenY }}
+          className="relative z-10 mx-auto mt-10 flex w-full flex-col items-center justify-end pb-[80px] lg:mt-0 lg:h-full lg:justify-center lg:pb-0"
         >
-          <div className="relative w-72 h-72">
-            {/* Outer orbit ring */}
-            <motion.div
-              className="absolute inset-0 rounded-full border border-white/10"
-              animate={reduceMotion ? {} : { rotate: 360 }}
-              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-            >
-              {/* Orbiting product dot */}
-              <motion.div className="absolute -top-1 left-1/2 -translate-x-1/2">
-                <img src="/cellunex.png" alt="" className="w-14 h-14 object-contain drop-shadow-lg" />
-              </motion.div>
-            </motion.div>
-
-            {/* Inner orbit ring */}
-            <motion.div
-              className="absolute inset-8 rounded-full border border-white/8"
-              animate={reduceMotion ? {} : { rotate: -360 }}
-              transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-            >
-              <motion.div className="absolute -top-1 left-1/2 -translate-x-1/2">
-                <img src="/iron.png" alt="" className="w-10 h-10 object-contain drop-shadow-md opacity-80" />
-              </motion.div>
-            </motion.div>
-
-            {/* Center glow + main product */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-32 h-32 rounded-full bg-primary/25 blur-2xl absolute" />
-              <motion.div
-                animate={reduceMotion ? {} : { y: [0, -8, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="relative z-10"
-              >
-                <img
-                  src="/vitacore.png"
-                  alt="NutriZen Vitacore"
-                  className="w-28 h-28 object-contain filter drop-shadow-[0_12px_28px_rgba(0,0,0,0.45)]"
-                />
-              </motion.div>
+          <div className="science-visual relative w-full max-w-[340px] sm:max-w-[440px] lg:max-w-[600px]">
+            {/* Orbit halo — behind the product (z-1) */}
+            <div className="product-orbit" aria-hidden>
+              <span className="orbit orbit-1" />
+              <span className="orbit orbit-2" />
+              <span className="orbit orbit-3" />
+              <span className="orbit orbit-4" />
+              <span className="orbit-node node-1" />
+              <span className="orbit-node node-2 is-gold" />
+              <span className="orbit-node node-3" />
+              <span className="orbit-node node-4 is-gold" />
             </div>
 
-            {/* Label chip */}
+            {/* Annotation callouts (lg+) */}
+            {ANNOTATIONS.map((a) => (
+              <Annotation key={a.title} {...a} reduceMotion={reduceMotion} />
+            ))}
+
+            {/* Product composite — bottle + stone base + glow baked in (z-3) */}
             <motion.div
-              initial={reduceMotion ? false : { opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.8, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white/10 backdrop-blur-sm border border-white/15 rounded-full px-4 py-1.5 text-xs font-semibold text-white/80"
+              initial={reduceMotion ? false : { opacity: 0, y: 36, scale: 0.92 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 1.2, delay: 0.2, ease: scrollEase }}
+              className="relative z-[3]"
             >
-              Bioavailability-first formulation
+              <Image
+                src="/science%20hero%20image.png"
+                alt="NutriZen Metabol+ supplement on a natural stone base"
+                width={1254}
+                height={1254}
+                priority
+                sizes="(max-width: 640px) 320px, (max-width: 1024px) 440px, 600px"
+                className="h-auto w-full select-none"
+                style={{ filter: "drop-shadow(0 40px 70px rgba(0,0,0,0.85))" }}
+              />
             </motion.div>
           </div>
         </motion.div>
       </div>
 
-      {/* Bottom stat strip */}
-      <div className="relative z-10 border-t border-white/8">
-        <div className="max-w-2xl mx-auto px-6 py-6 grid grid-cols-3 gap-4 text-center">
-          {[
-            { value: "Forms", label: "chosen for absorption" },
-            { value: "Doses", label: "aligned with evidence" },
-            { value: "Labels", label: "fully transparent" },
-          ].map(({ value, label }) => (
-            <div key={label}>
-              <p className="text-base font-bold text-secondary">{value}</p>
-              <p className="text-xs text-white/50 mt-0.5">{label}</p>
-            </div>
-          ))}
+      {/* ── Stat strip — pinned to bottom ── */}
+      <motion.div
+        initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, delay: 1.1, ease: scrollEase }}
+        className="hero-statbar"
+      >
+        <div className="hero-statbar-inner">
+          <ul className="grid grid-cols-1 overflow-hidden rounded-2xl border border-white/10 bg-[#071209]/85 backdrop-blur-xl divide-y divide-white/10 md:grid-cols-3 md:divide-x md:divide-y-0 lg:rounded-none lg:border-0 lg:bg-transparent lg:backdrop-blur-none">
+            {STATS.map(({ value, label, icon }) => (
+              <li
+                key={value}
+                className="flex flex-row items-center justify-center gap-4 px-5 py-4 lg:px-8 lg:py-5"
+              >
+                <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-full border border-[#8CAB77]/35 text-[#8CAB77] lg:h-12 lg:w-12">
+                  <Icon name={icon} className="h-5 w-5" />
+                </span>
+                <span className="text-left">
+                  <span className="block font-serif text-lg font-semibold text-[#F6F3EA]">{value}</span>
+                  <span className="mt-0.5 block text-xs text-[#F6F3EA]/55">{label}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

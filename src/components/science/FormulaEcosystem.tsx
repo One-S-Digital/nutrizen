@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import RadialOrbitalTimeline from "@/components/ui/radial-orbital-timeline";
+import CenterCapsule from "@/components/ui/CenterCapsule";
 import { formulaEcosystemTimelineData } from "@/data/formula-ecosystem-timeline";
 import { scrollEase, scrollViewport } from "@/lib/motion";
 
@@ -18,18 +19,19 @@ export default function FormulaEcosystem() {
             viewport={scrollViewport}
             transition={{ duration: reduceMotion ? 0 : 0.85, ease: scrollEase }}
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            <p className="mb-5 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.3em] text-primary">
+              <span className="h-px w-9 bg-primary/50" aria-hidden />
               Formula ecosystem
             </p>
-            <h2 className="mt-3 text-3xl font-bold text-neutral-darkest md:text-4xl">
-              Nutrients don’t work in isolation
+            <h2 className="font-serif text-3xl leading-[1.08] tracking-[-0.01em] text-ink sm:text-4xl md:text-[2.9rem]">
+              Nutrients don’t work in <em className="italic text-primary">isolation</em>
             </h2>
-            <p className="mt-5 text-lg leading-relaxed text-neutral-dark">
+            <p className="mt-6 text-lg leading-relaxed text-ink/70">
               A NutriZen formula is a small ecosystem: minerals in thoughtful forms, cofactors that
               support utilization, and complementary compounds that align with real physiology - not
               a random stack.
             </p>
-            <p className="mt-4 text-lg leading-relaxed text-neutral-dark">
+            <p className="mt-4 text-lg leading-relaxed text-ink/70">
               The goal is simple: help your body spend less energy compensating - and more energy
               thriving.
             </p>
@@ -42,16 +44,20 @@ export default function FormulaEcosystem() {
             viewport={scrollViewport}
             transition={{ duration: reduceMotion ? 0 : 0.85, ease: scrollEase }}
           >
-            <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-primary/15 via-transparent to-secondary/20 blur-2xl" />
-            <div className="relative overflow-visible rounded-[2rem] border border-white/70 bg-white/70 p-4 shadow-sm backdrop-blur-md md:p-6">
+            <div
+              className="pointer-events-none absolute -inset-6 rounded-[2.4rem] bg-[radial-gradient(60%_60%_at_50%_45%,rgba(140,171,119,0.16),transparent_70%)] blur-2xl"
+              aria-hidden
+            />
+            <div className="relative overflow-visible rounded-[2rem] border border-neutral-light bg-[#FAFBF8] p-6 shadow-[0_40px_90px_-50px_rgba(47,58,51,0.45)] md:p-8">
               <div className="relative z-10 w-full overflow-visible">
                 <RadialOrbitalTimeline
                   embed
                   prefersReducedMotion={!!reduceMotion}
                   timelineData={formulaEcosystemTimelineData}
+                  centerSlot={<CenterCapsule reduceMotion={!!reduceMotion} />}
                 />
               </div>
-              <p className="relative z-0 mt-4 text-center text-sm text-neutral-dark">
+              <p className="relative z-0 mt-2 text-center text-sm text-neutral-dark">
                 Tap a node to explore how ingredients connect - uptake, balance, and everyday
                 usefulness.
               </p>

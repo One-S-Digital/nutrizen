@@ -193,10 +193,9 @@ export default function AboutHero() {
             variants={childVariants}
             className="font-serif text-[2.4rem] leading-[1.04] tracking-[-0.02em] text-[#F6F3EA] min-[420px]:text-[2.8rem] sm:text-[3.5rem] lg:text-[3.9rem] xl:text-[4.6rem]"
           >
-            Supplements Shouldn&apos;t
+            Supplements that
             <br />
-            Feel Like a{" "}
-            <em className="italic text-[#8CAB77]">Guessing&nbsp;Game</em>
+            <em className="italic text-[#8CAB77]">actually make sense</em>
             <span className="not-italic text-[#E7A46C]">.</span>
           </motion.h1>
 
@@ -282,9 +281,21 @@ export default function AboutHero() {
         >
           <div className="relative w-full max-w-[440px] sm:max-w-[560px] lg:w-full lg:max-w-none">
             <div
-              className="relative z-20 flex w-full items-end justify-center"
-              style={{ transform: "translateY(calc(13svh - 65px)) translateX(-20px)" }}
+              className="relative z-20 flex w-full items-end justify-center -translate-x-[20px] translate-y-[calc(13svh_-_135px)] md:translate-y-[calc(13svh_-_65px)]"
             >
+              {/* Orange glow behind products */}
+              <div
+                className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0"
+                aria-hidden
+                style={{
+                  width: "83%",
+                  paddingBottom: "83%",
+                  borderRadius: "50%",
+                  background: "radial-gradient(ellipse at center, rgba(231,164,108,0.55) 0%, rgba(216,148,85,0.28) 38%, transparent 72%)",
+                  filter: "blur(32px)",
+                  transform: "translate(-50%, calc(-50% - 70px))",
+                }}
+              />
               <motion.div
                 initial={reduceMotion ? false : { opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -298,9 +309,8 @@ export default function AboutHero() {
                   height={1080}
                   priority
                   sizes="(max-width: 640px) 104vw, (max-width: 1024px) 69vw, 57.5vw"
-                  className="select-none h-auto"
+                  className="select-none h-auto w-[132%] md:w-[161%] lg:w-[115%]"
                   style={{
-                    width: "115%",
                     maxWidth: "none",
                     filter: "drop-shadow(0 40px 70px rgba(0,0,0,0.85))",
                   }}

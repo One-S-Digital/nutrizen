@@ -211,8 +211,7 @@ export default function CategoryShowcase({ categories }: { categories: Category[
             </h2>
           </div>
           <p className="max-w-xs text-sm leading-relaxed text-ink/60 md:pb-2 md:text-right">
-            Start with the change you want to feel — we&rsquo;ll show you exactly
-            what&rsquo;s inside the formulas built for it.
+            Start with the change you want to feel — we got the formulas you need.
           </p>
         </motion.div>
 
@@ -253,14 +252,15 @@ export default function CategoryShowcase({ categories }: { categories: Category[
           })}
         </motion.div>
 
-        {/* Mobile: snap-scroll goal cards */}
-        <div className="-mx-6 flex snap-x snap-mandatory gap-3 overflow-x-auto px-6 pb-3 scrollbar-hide md:hidden">
+        {/* Mobile: vertically stacked accordion — only one card open at a time */}
+        <div className="flex flex-col gap-3 md:hidden">
           {shown.map((category, i) => {
             const meta = getGoalMeta(category.title, i);
+            const isActive = activeIndex === i;
             return (
               <div
                 key={category.id}
-                className="relative h-[430px] min-w-[82%] snap-center overflow-hidden rounded-[1.3rem]"
+                className={`relative overflow-hidden rounded-[1.3rem] ${isActive ? "min-h-[330px]" : ""}`}
                 style={{ backgroundColor: meta.hue }}
               >
                 <div
@@ -268,14 +268,43 @@ export default function CategoryShowcase({ categories }: { categories: Category[
                   aria-hidden
                 />
                 <ContourField className="absolute inset-0 h-full w-full text-white opacity-[0.07]" />
-                <PanelContent category={category} meta={meta} index={i} expanded />
+                {isActive ? (
+                  <PanelContent category={category} meta={meta} index={i} expanded />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setActiveIndex(i)}
+                    aria-expanded={false}
+                    aria-label={`${category.title} — show formulas`}
+                    className="relative z-10 flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+                  >
+                    <span className="flex items-center gap-3.5">
+                      <span className="font-mono text-[10px] tracking-[0.2em] text-paper/55">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="font-serif text-xl text-paper">{category.title}</span>
+                    </span>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="flex-shrink-0 text-paper/60"
+                      aria-hidden
+                    >
+                      <path d="M12 5v14" />
+                      <path d="M5 12h14" />
+                    </svg>
+                  </button>
+                )}
               </div>
             );
           })}
         </div>
-        <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.25em] text-ink/35 md:hidden">
-          Swipe to explore →
-        </p>
 
         <motion.div
           className="mt-12 text-center"
