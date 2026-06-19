@@ -1,74 +1,109 @@
-const sharp = require('sharp');
-const fs = require('fs');
-const path = require('path');
+/**
+ * Pre-generate responsive WebP variants for heavy LOCAL images.
+ *
+ * Why: next.config images.loader is "custom" (shopify-image-loader) so the
+ * built-in /_next/image optimizer never runs. For Shopify URLs that's fine
+ * (Shopify CDN resizes). For local /public images it meant the raw full-size
+ * PNG was shipped to every device. This script bakes resized WebP variants
+ * that the loader maps to via src/lib/optimized-images.ts.
+ *
+ * Run:  npm i -D sharp  (one-time; not a runtime dep)
+ *       node scripts/optimize-images.js
+ * Output: public/optimized/<slug>/<width>.webp  +  src/lib/optimized-images.ts
+ *
+ * Re-run whenever a source image in SOURCES changes, then commit the generated
+ * public/optimized/** and src/lib/optimized-images.ts. Production serves those
+ * committed files directly, so sharp is never needed at build/runtime.
+ */
+const sharp = require("sharp");
+const fs = require("fs");
+const path = require("path");
 
-const publicDir = path.join(__dirname, '../public');
+const PUBLIC_DIR = path.join(__dirname, "../public");
+const OUT_DIR = path.join(PUBLIC_DIR, "optimized");
+const MANIFEST = path.join(__dirname, "../src/lib/optimized-images.ts");
 
-// Images to optimize (critical path first)
-const imagesToOptimize = [
-  'immunity-power-pack-hero.png',
-  'metabol-hero.png',
-  'vitacore.png',
-  'zinc.png',
-  'cellunex.png',
-  'adaptogen.png',
-  'glutathione.png',
-  'magnesium.png',
-  'iron.png',
-  'metabol.png',
-  'para.png',
-  'vitamin.png',
+// Responsive width buckets. Capped per-image to the source's native width
+// (never upscale). Mobile gets 480/768; desktop 1280/1920.
+const WIDTH_BUCKETS = [480, 768, 1280, 1920];
+const QUALITY = 80;
+
+// Heavy local images served through next/image in production.
+// (Mock-only product thumbnails are skipped — live store uses Shopify CDN.)
+const SOURCES = [
+  "hero-bg.png",
+  "metabol hero image.png",
+  "left leaf element.png",
+  "right leaf element.png",
+  "stone base.png",
+  "science heo bg.png",
+  "science hero image.png",
+  "our story hero.png",
+  "immunity-power-pack-hero.png",
+  "nutrizen-logo.png",
 ];
 
-async function optimizeImages() {
-  console.log('🖼️  Starting image optimization...\n');
+const slugify = (name) =>
+  path.parse(name).name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-  for (const filename of imagesToOptimize) {
-    const inputPath = path.join(publicDir, filename);
+async function run() {
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+  const manifest = {};
+  let originalTotal = 0;
+  let optimizedTotal = 0;
+
+  for (const filename of SOURCES) {
+    const inputPath = path.join(PUBLIC_DIR, filename);
     if (!fs.existsSync(inputPath)) {
-      console.log(`⚠️  Skipping ${filename} (not found)`);
+      console.log(`⚠️  skip ${filename} (not found)`);
       continue;
     }
+    const slug = slugify(filename);
+    const destDir = path.join(OUT_DIR, slug);
+    fs.mkdirSync(destDir, { recursive: true });
 
-    const name = path.parse(filename).name;
-    const ext = path.parse(filename).ext;
+    const meta = await sharp(inputPath).metadata();
+    const origW = meta.width || Math.max(...WIDTH_BUCKETS);
+    const origSize = fs.statSync(inputPath).size;
+    originalTotal += origSize;
 
-    try {
-      // Get original size
-      const originalStats = fs.statSync(inputPath);
-      const originalSize = originalStats.size;
+    // widths < native, plus native itself (so full-res is available), deduped.
+    const widths = Array.from(
+      new Set([...WIDTH_BUCKETS.filter((w) => w < origW), Math.min(origW, 1920)])
+    ).sort((a, b) => a - b);
 
-      // Optimize PNG to temp file, then replace
-      const pngTempOutput = path.join(publicDir, `${name}-opt.png`);
+    const sizes = [];
+    for (const w of widths) {
+      const outPath = path.join(destDir, `${w}.webp`);
       await sharp(inputPath)
-        .png({ quality: 80, progressive: true })
-        .toFile(pngTempOutput);
-
-      fs.renameSync(pngTempOutput, inputPath);
-
-      // Convert to WebP
-      const webpOutput = path.join(publicDir, `${name}.webp`);
-      await sharp(inputPath)
-        .webp({ quality: 80 })
-        .toFile(webpOutput);
-
-      const pngStats = fs.statSync(inputPath);
-      const webpStats = fs.statSync(webpOutput);
-
-      const pngReduction = ((1 - pngStats.size / originalSize) * 100).toFixed(1);
-      const webpReduction = ((1 - webpStats.size / originalSize) * 100).toFixed(1);
-
-      console.log(`✅ ${filename}`);
-      console.log(`   Original: ${(originalSize / 1024).toFixed(0)}KB`);
-      console.log(`   PNG: ${(pngStats.size / 1024).toFixed(0)}KB (-${pngReduction}%)`);
-      console.log(`   WebP: ${(webpStats.size / 1024).toFixed(0)}KB (-${webpReduction}%) 🚀`);
-      console.log();
-    } catch (err) {
-      console.error(`❌ Error processing ${filename}:`, err.message);
+        .resize({ width: w, withoutEnlargement: true })
+        .webp({ quality: QUALITY, effort: 5 })
+        .toFile(outPath);
+      const s = fs.statSync(outPath).size;
+      optimizedTotal += s;
+      sizes.push(`${(s / 1024).toFixed(0)}KB@${w}`);
     }
+
+    manifest["/" + filename] = { slug, widths };
+    console.log(`✅ ${filename}  ${(origSize / 1024).toFixed(0)}KB → ${sizes.join(", ")}`);
   }
 
-  console.log('✨ Image optimization complete!');
+  // Emit the manifest the loader reads (keyed by decoded /public path).
+  const header =
+    "// AUTO-GENERATED by scripts/optimize-images.js — do not edit by hand.\n" +
+    "// Maps a decoded /public image path to its pre-generated WebP variants.\n\n" +
+    "export type OptimizedVariant = { slug: string; widths: number[] };\n\n" +
+    "export const OPTIMIZED_IMAGES: Record<string, OptimizedVariant> = ";
+  fs.writeFileSync(MANIFEST, header + JSON.stringify(manifest, null, 2) + ";\n");
+
+  console.log(
+    `\n📦 ${(originalTotal / 1024 / 1024).toFixed(2)}MB originals → ` +
+      `${(optimizedTotal / 1024 / 1024).toFixed(2)}MB across all variants`
+  );
+  console.log(`📝 wrote ${path.relative(process.cwd(), MANIFEST)}`);
 }
 
-optimizeImages().catch(console.error);
+run().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

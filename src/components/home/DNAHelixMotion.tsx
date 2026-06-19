@@ -8,9 +8,14 @@ const C_GOLD: [number, number, number] = [232, 168, 92];
 const C_PALE: [number, number, number] = [248, 222, 176];
 
 const TURNS = 4;
-const BACKBONE_PER_STRAND = 2016;
-const RUNGS = 52;
-const PER_RUNG = 80;
+// Particle density — full on desktop, ~9x lighter on phones/touch (where the
+// cursor-dispersion can't fire anyway) so the per-frame canvas cost stays cheap.
+const BACKBONE_PER_STRAND_FULL = 2016;
+const RUNGS_FULL = 52;
+const PER_RUNG_FULL = 80;
+const BACKBONE_PER_STRAND_LOW = 280;
+const RUNGS_LOW = 26;
+const PER_RUNG_LOW = 14;
 
 // Cursor dispersion — particles spring away from the cursor and snap back.
 const DISPERSE_R = 180;
@@ -69,7 +74,14 @@ export default function DNAHelixMotion({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const lowPower =
+      window.matchMedia("(max-width: 768px)").matches ||
+      window.matchMedia("(pointer: coarse)").matches;
+    const BACKBONE_PER_STRAND = lowPower ? BACKBONE_PER_STRAND_LOW : BACKBONE_PER_STRAND_FULL;
+    const RUNGS = lowPower ? RUNGS_LOW : RUNGS_FULL;
+    const PER_RUNG = lowPower ? PER_RUNG_LOW : PER_RUNG_FULL;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, lowPower ? 1 : 1.5);
     let w = 0;
     let h = 0;
     let raf = 0;

@@ -14,7 +14,13 @@
  *   width   — resize to this pixel width
  *   format  — webp (broad browser support, ~30% smaller than JPEG)
  *   quality — 1–100 (Shopify default: 100; we use 85 for a good size/quality balance)
+ *
+ * Local /public images: the built-in optimizer is disabled (custom loader), so
+ * heavy PNGs would otherwise ship full-size to every device. Instead we map them
+ * to pre-generated responsive WebP variants (scripts/optimize-images.js writes
+ * optimized-images.ts) and pick the smallest variant ≥ the requested width.
  */
+import { OPTIMIZED_IMAGES } from "./optimized-images";
 
 interface ShopifyLoaderProps {
   src: string;
@@ -23,14 +29,22 @@ interface ShopifyLoaderProps {
 }
 
 export default function shopifyLoader({ src, width, quality }: ShopifyLoaderProps): string {
-  // Local or non-Shopify images — return untransformed
-  if (!src.startsWith("https://cdn.shopify.com")) {
-    return src;
+  if (src.startsWith("https://cdn.shopify.com")) {
+    const url = new URL(src);
+    url.searchParams.set("width", String(width));
+    url.searchParams.set("format", "webp");
+    url.searchParams.set("quality", String(quality ?? 85));
+    return url.toString();
   }
 
-  const url = new URL(src);
-  url.searchParams.set("width", String(width));
-  url.searchParams.set("format", "webp");
-  url.searchParams.set("quality", String(quality ?? 85));
-  return url.toString();
+  // Local image with pre-generated WebP variants — serve the right-sized one.
+  const key = src.includes("%") ? decodeURI(src) : src;
+  const variant = OPTIMIZED_IMAGES[key];
+  if (variant) {
+    const w = variant.widths.find((x) => x >= width) ?? variant.widths[variant.widths.length - 1];
+    return `/optimized/${variant.slug}/${w}.webp`;
+  }
+
+  // Other local / non-Shopify images — return untransformed.
+  return src;
 }

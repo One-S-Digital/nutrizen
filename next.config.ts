@@ -39,6 +39,8 @@ const nextConfig: NextConfig = {
     // Shopify CDN transforms to exactly these pixel widths.
     deviceSizes: [480, 640, 750, 828, 1080, 1200, 1920],
     imageSizes: [64, 128, 256, 384],
+    // Allowed quality values (Next 16 requires whitelisting; hero uses 90).
+    qualities: [75, 85, 90],
   },
 };
 

@@ -52,7 +52,10 @@ export default function InfusionField({
 
     let w = 0;
     let h = 0;
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const lowPower =
+      window.matchMedia("(max-width: 768px)").matches ||
+      window.matchMedia("(pointer: coarse)").matches;
+    const dpr = Math.min(window.devicePixelRatio || 1, lowPower ? 1 : 1.5);
     let raf = 0;
     let pageVisible = true;
     let inView = true;
@@ -72,7 +75,9 @@ export default function InfusionField({
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = Math.round(Math.min(Math.max((w * h) / 15000, 60), 130));
+      const count = lowPower
+        ? Math.round(Math.min(Math.max((w * h) / 45000, 18), 40))
+        : Math.round(Math.min(Math.max((w * h) / 15000, 60), 130));
       particles = Array.from({ length: count }, (_, i) => {
         const bvx = (seeded(1, i) - 0.5) * 0.18;
         const bvy = -0.07 - seeded(2, i) * 0.22;

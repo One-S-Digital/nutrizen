@@ -171,6 +171,7 @@ export default function Hero() {
           alt=""
           width={814}
           height={1247}
+          sizes="(max-width: 640px) 220px, (max-width: 1024px) 370px, 460px"
           className="h-auto w-full object-contain object-bottom"
           style={{ filter: "brightness(0.75) saturate(1.1)" }}
         />
@@ -253,6 +254,7 @@ export default function Hero() {
               alt=""
               width={705}
               height={1240}
+              sizes="(max-width: 640px) 200px, (max-width: 1024px) 320px, 400px"
               className="h-auto w-full object-contain object-bottom"
               style={{ filter: "brightness(0.75) saturate(1.1)" }}
             />
@@ -324,6 +326,7 @@ export default function Hero() {
                   alt=""
                   width={1254}
                   height={566}
+                  sizes="(max-width: 640px) 340px, (max-width: 1024px) 420px, 770px"
                   className="h-auto w-full object-contain"
                   style={{
                     filter: "drop-shadow(0 32px 56px rgba(0,0,0,0.9)) brightness(0.92) saturate(1.05)",

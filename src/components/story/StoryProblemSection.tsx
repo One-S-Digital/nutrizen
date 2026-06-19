@@ -1,10 +1,32 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { scrollEase, scrollViewport } from "@/lib/motion";
 
 export default function StoryProblemSection() {
   const reduceMotion = useReducedMotion();
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Defer the 4MB video: only fetch + play once it scrolls into view, and
+  // pause it when it leaves (saves bandwidth on load and CPU when off-screen).
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (video.preload !== "auto") video.preload = "auto";
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.25 }
+    );
+    io.observe(video);
+    return () => io.disconnect();
+  }, []);
 
   return (
     <section className="relative overflow-hidden bg-white py-20 md:py-28">
@@ -27,11 +49,12 @@ export default function StoryProblemSection() {
           />
           <div className="relative overflow-hidden rounded-[2rem] border border-neutral-light/80 bg-background-main shadow-[0_40px_90px_-48px_rgba(47,58,51,0.5)]">
             <video
+              ref={videoRef}
               src="/about%20video.mp4"
-              autoPlay
               muted
               loop
               playsInline
+              preload="none"
               className="aspect-[4/5] w-full object-cover md:aspect-[5/6]"
             />
             <div
