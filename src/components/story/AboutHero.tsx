@@ -179,8 +179,12 @@ export default function AboutHero() {
           variants={containerVariants}
           initial={reduceMotion ? false : "hidden"}
           animate="visible"
-          style={reduceMotion ? {} : { y: textY, opacity: textOpacity }}
-          className="relative z-20 flex flex-col justify-center lg:justify-start" style={{ maxWidth: "calc(42rem + 50px)" }}
+          style={
+            reduceMotion
+              ? { maxWidth: "calc(42rem + 50px)" }
+              : { y: textY, opacity: textOpacity, maxWidth: "calc(42rem + 50px)" }
+          }
+          className="relative z-20 flex flex-col justify-center lg:justify-start"
         >
           <motion.p
             variants={childVariants}
