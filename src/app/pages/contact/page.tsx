@@ -2,6 +2,7 @@ export const revalidate = 86400; // 24 hours — static content
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Phone } from "lucide-react";
 import ContactForm from "@/components/pages/ContactForm";
 
 const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "hello@nutrizen.co.za";
@@ -91,7 +92,7 @@ export default function ContactPage() {
                 href="tel:+27812609790"
                 className="mt-5 inline-flex items-center gap-2 text-base font-medium text-primary hover:text-primary/90"
               >
-                <span>📱</span>
+                <Phone className="h-4 w-4" strokeWidth={1.8} aria-hidden />
                 <span>+27 81 260 9790</span>
               </a>
             </div>

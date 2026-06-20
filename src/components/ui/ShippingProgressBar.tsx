@@ -1,13 +1,14 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import { Truck, PartyPopper, Check } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 
 const THRESHOLD = 690;
 
 function getMessage(remaining: number, progress: number): string {
   if (progress === 0) return `Spend R${THRESHOLD} to unlock free shipping`;
-  if (remaining <= 0) return "You've unlocked free shipping! 🎉";
+  if (remaining <= 0) return "You've unlocked free shipping!";
   if (progress >= 0.85) return `Only R${remaining.toFixed(0)} away — almost there!`;
   if (progress >= 0.5) return `Getting close! R${remaining.toFixed(0)} more for free shipping`;
   return `Add R${remaining.toFixed(0)} more to qualify for free shipping`;
@@ -55,10 +56,10 @@ export function ShippingProgressBanner() {
               animate={{ scale: 1, rotate: 0 }}
               exit={{ scale: 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white text-sm"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-white"
               aria-hidden
             >
-              ✓
+              <Check className="h-4 w-4" strokeWidth={3} aria-hidden />
             </motion.span>
           ) : (
             <motion.span
@@ -66,10 +67,10 @@ export function ShippingProgressBanner() {
               initial={{ x: -4, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 4, opacity: 0 }}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-light/60 text-base"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-light/60 text-neutral-dark"
               aria-hidden
             >
-              🚚
+              <Truck className="h-4 w-4" strokeWidth={1.8} aria-hidden />
             </motion.span>
           )}
         </AnimatePresence>
@@ -157,10 +158,10 @@ export function ShippingProgressCart() {
               initial={{ rotate: -20, scale: 0 }}
               animate={{ rotate: 0, scale: 1 }}
               transition={{ type: "spring", stiffness: 400, damping: 18, delay: 0.1 }}
-              className="text-lg"
+              className="text-primary"
               aria-hidden
             >
-              🎉
+              <PartyPopper className="h-5 w-5" strokeWidth={1.8} aria-hidden />
             </motion.span>
             <div>
               <p className="text-xs font-bold text-primary leading-tight">Free shipping unlocked!</p>
@@ -178,7 +179,7 @@ export function ShippingProgressCart() {
             {/* Header row */}
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5">
-                <span className="text-sm" aria-hidden>🚚</span>
+                <Truck className="h-4 w-4 text-neutral-dark" strokeWidth={1.8} aria-hidden />
                 <p className="text-xs font-semibold text-neutral-darkest leading-tight">{message}</p>
               </div>
               <span className="text-[11px] font-bold tabular-nums text-primary">
@@ -208,10 +209,10 @@ export function ShippingProgressCart() {
                 <motion.div
                   animate={progress >= 0.85 ? { y: [0, -2, 0, -2, 0] } : {}}
                   transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
-                  className="h-5 w-5 rounded-full bg-white border-2 border-primary shadow flex items-center justify-center text-[10px]"
+                  className="h-5 w-5 rounded-full bg-white border-2 border-primary shadow flex items-center justify-center text-primary"
                   aria-hidden
                 >
-                  🚚
+                  <Truck className="h-2.5 w-2.5" strokeWidth={2.2} aria-hidden />
                 </motion.div>
               </motion.div>
             </div>

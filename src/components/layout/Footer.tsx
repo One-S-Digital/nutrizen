@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { Phone, Mail } from "lucide-react";
 import type { FooterNavColumn, FooterNavLink } from "@/lib/shopify";
 
 const COMPANY_LINKS: FooterNavLink[] = [
@@ -59,11 +60,11 @@ export default function Footer({ mainMenuLinks }: FooterProps) {
           </p>
           <div className="mt-4 space-y-1.5 text-sm text-neutral-dark">
             <a href="tel:+27812609790" className="flex items-center gap-2 hover:text-primary transition">
-              <span aria-hidden>📱</span>
+              <Phone className="h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden />
               <span>+27 81 260 9790</span>
             </a>
             <a href="mailto:hello@nutrizen.co.za" className="flex items-center gap-2 hover:text-primary transition">
-              <span aria-hidden>✉️</span>
+              <Mail className="h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden />
               <span>hello@nutrizen.co.za</span>
             </a>
             <p className="text-xs text-neutral">Mon – Fri, 9 AM – 5 PM</p>

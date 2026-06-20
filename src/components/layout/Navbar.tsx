@@ -7,26 +7,27 @@ import { usePathname } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { useUIStore } from "@/store/uiStore";
 import type { NavCollection, FooterNavLink } from "@/lib/shopify";
+import { Zap, Moon, ShieldCheck, Sprout, Activity, Dumbbell, Sparkles, Pill } from "lucide-react";
 
-// ── Category icon map ────────────────────────────────────────────────────────
+// ── Category icon map (premium icons from lucide-react) ──────────────────────
 type IconDef = { bg: string; icon: React.ReactNode };
 function getCategoryIcon(title: string): IconDef {
   const t = title.toLowerCase();
   if (t.includes("energy") || t.includes("vitality"))
-    return { bg: "bg-amber-50", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-amber-500" aria-hidden><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg> };
+    return { bg: "bg-amber-50", icon: <Zap className="h-5 w-5 text-amber-500" aria-hidden /> };
   if (t.includes("stress") || t.includes("sleep") || t.includes("mood"))
-    return { bg: "bg-indigo-50", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-indigo-500" aria-hidden><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg> };
+    return { bg: "bg-indigo-50", icon: <Moon className="h-5 w-5 text-indigo-500" aria-hidden /> };
   if (t.includes("immun") || t.includes("defense") || t.includes("defence"))
-    return { bg: "bg-emerald-50", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-emerald-600" aria-hidden><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> };
+    return { bg: "bg-emerald-50", icon: <ShieldCheck className="h-5 w-5 text-emerald-600" aria-hidden /> };
   if (t.includes("detox") || t.includes("digest"))
-    return { bg: "bg-teal-50", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-teal-500" aria-hidden><path d="M12 2a7 7 0 0 1 7 7c0 4.97-7 13-7 13S5 13.97 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg> };
+    return { bg: "bg-teal-50", icon: <Sprout className="h-5 w-5 text-teal-500" aria-hidden /> };
   if (t.includes("metabol") || t.includes("blood sugar"))
-    return { bg: "bg-rose-50", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-rose-500" aria-hidden><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> };
+    return { bg: "bg-rose-50", icon: <Activity className="h-5 w-5 text-rose-500" aria-hidden /> };
   if (t.includes("bone") || t.includes("muscle") || t.includes("recovery"))
-    return { bg: "bg-orange-50", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-orange-500" aria-hidden><path d="M6.5 6.5a4.5 4.5 0 0 0 0 6.36l4.59 4.59a1 1 0 0 0 1.41 0l4.59-4.59a4.5 4.5 0 0 0-6.36-6.36L9 8.27"/><path d="M9 8.27 6.5 6.5"/><path d="M17.5 17.5a4.5 4.5 0 0 0 0-6.36l-1.09-1.09"/></svg> };
+    return { bg: "bg-orange-50", icon: <Dumbbell className="h-5 w-5 text-orange-500" aria-hidden /> };
   if (t.includes("cellular") || t.includes("longev"))
-    return { bg: "bg-violet-50", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-violet-500" aria-hidden><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3 4 6l-3 1 3 1 1 3 1-3 3-1-3-1-1-3z"/></svg> };
-  return { bg: "bg-primary/10", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-primary" aria-hidden><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg> };
+    return { bg: "bg-violet-50", icon: <Sparkles className="h-5 w-5 text-violet-500" aria-hidden /> };
+  return { bg: "bg-primary/10", icon: <Pill className="h-5 w-5 text-primary" aria-hidden /> };
 }
 
 type NavbarProps = {
@@ -44,9 +45,11 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
   const pathname = usePathname();
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Detect if we're on a page with a dark hero (home + Our Story)
+  // Detect if we're on a page with a dark editorial hero, so the navbar starts
+  // transparent with light text and only goes solid on scroll.
   const isHomePage = pathname === "/";
-  const isDarkHero = isHomePage || pathname === "/pages/about";
+  const DARK_HERO_ROUTES = ["/pages/about", "/pages/our-story", "/pages/science", "/shop"];
+  const isDarkHero = isHomePage || DARK_HERO_ROUTES.includes(pathname);
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 40);
@@ -338,7 +341,7 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
             >
               <div className="flex justify-between items-center mb-6">
                 <Link href="/" onClick={() => setMobileOpen(false)}>
-                  <Image src="/nutrizen-logo.png" alt="NutriZen" width={140} height={36} className="h-8 w-auto brightness-0 invert" />
+                  <Image src="/nutrizen-logo.png" alt="NutriZen" width={140} height={36} className="h-8 w-auto" />
                 </Link>
                 <button
                   type="button"

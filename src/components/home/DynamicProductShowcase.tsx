@@ -10,15 +10,16 @@ import {
   useTransform,
   type Variants,
 } from "framer-motion";
+import { Shield, Zap, Dumbbell, Bone, Star } from "lucide-react";
 import { scrollEase, scrollViewport } from "@/lib/motion";
 
 export const COMBO_PRODUCT_HREF = "/products/nutrizen-daily-immunity-recovery-stack";
 
 const BENEFIT_PILLS = [
-  { label: "Supports immune defense", icon: "🛡️" },
-  { label: "Boosts antioxidant protection", icon: "⚡" },
-  { label: "Promotes energy and resilience", icon: "💪" },
-  { label: "Supports bone, muscle & recovery", icon: "🦴" },
+  { label: "Supports immune defense", Icon: Shield },
+  { label: "Boosts antioxidant protection", Icon: Zap },
+  { label: "Promotes energy and resilience", Icon: Dumbbell },
+  { label: "Supports bone, muscle & recovery", Icon: Bone },
 ] as const;
 
 export default function DynamicProductShowcase() {
@@ -132,7 +133,10 @@ export default function DynamicProductShowcase() {
                 transition={{ duration: 0.5, delay: 0.55, ease: [0.34, 1.56, 0.64, 1] }}
                 className="absolute top-5 right-5 bg-[#DE9E48] text-white rounded-full px-3.5 py-1.5 shadow-lg"
               >
-                <span className="text-xs font-bold tracking-wide">⭐ Best Seller</span>
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold tracking-wide">
+                  <Star className="h-3.5 w-3.5" fill="currentColor" strokeWidth={0} aria-hidden />
+                  Best Seller
+                </span>
               </motion.div>
             </div>
 
@@ -177,14 +181,14 @@ export default function DynamicProductShowcase() {
               variants={itemVariants}
               className="mb-7 flex w-full max-w-xl flex-wrap justify-center gap-2 lg:justify-start"
             >
-              {BENEFIT_PILLS.map(({ label, icon }) => (
+              {BENEFIT_PILLS.map(({ label, Icon }) => (
                 <motion.span
                   key={label}
                   whileHover={reduceMotion ? {} : { y: -2, scale: 1.03 }}
                   transition={{ duration: 0.18 }}
                   className="inline-flex items-center gap-2 rounded-full border border-[#3B4A3F]/12 bg-white/95 px-4 py-2.5 text-[12px] font-medium leading-snug text-[#3B4A3F] shadow-[0_1px_6px_rgba(0,0,0,0.05)] cursor-default"
                 >
-                  <span>{icon}</span>
+                  <Icon className="h-[15px] w-[15px] shrink-0 text-primary" strokeWidth={1.9} aria-hidden />
                   {label}
                 </motion.span>
               ))}
