@@ -126,7 +126,7 @@ export const PRODUCTS: Record<string, Product> = {
     compareAt: 350,
     variantId: "50127821537473",
     image: "/vitacore.png",
-    forms: ["All 8 B Vitamins", "Choline", "Inositol", "Taurine", "NAC"],
+    forms: ["Vitamin B3 (Niacin)", "Vitamin B6", "Vitamin B9 (Folate)", "Choline", "Inositol", "Taurine", "NAC"],
   },
   "glutathione-nac": {
     id: "glutathione-nac",
@@ -420,7 +420,7 @@ export const WHY_COPY: Record<string, string> = {
   ZINC:
     "Zinc is a cofactor in immune defence, wound repair, and the enzymes that maintain taste and smell — which is why a shortfall shows up as colds that linger, cuts that heal slowly, or food that tastes duller than it should. Taking zinc alone, especially at a meaningful dose, depletes copper — so this formula includes copper and selenium alongside it. Same transparency principle as everything else here: show the whole mechanism, not just the headline mineral.",
   B_VITAMINS:
-    "The B vitamins run the reactions that turn food into usable energy and keep the nervous system insulated, which is why a shortfall reads as brain fog, mouth ulcers, or an afternoon crash no amount of coffee fixes. Two things deplete B12 specifically, and almost nobody asks about them: long-term acid blockers (PPIs, antacids) and metformin. Both quietly reduce how much B12 you absorb, over months — worth knowing if either applies to you.",
+    "B3, B6, and B9 each cover a different part of the same energy-and-mood system: B3 (niacin) feeds the enzymes your cells use to turn food into usable energy, B6 supports the neurotransmitters behind mood, motivation, and focus, and B9 (folate) is needed for red blood cell production and the same methylation pathway B12 relies on — which is why a folate shortfall on its own can produce the brain fog, mouth ulcers, and afternoon crash people usually associate with B12. Regular alcohol use is one of the more common, under-discussed ways to run low on all three at once — it interferes with how the body absorbs and uses B vitamins generally.",
   ANTIOXIDANT:
     "Glutathione is your body's own master antioxidant — you don't eat it directly, you manufacture it, from NAC, glycine, and glutamine. Smoking, pollution, heavy alcohol, and even routine paracetamol use all burn through those raw materials faster than an average diet replaces them. This isn't a deficiency in the way a mineral can be low; it's a reserve that's more depleted than replenished. The formula supplies the precursors, not the antioxidant itself — that's the form your body can actually use.",
   STRESS_LOAD:
@@ -471,9 +471,9 @@ export const TIMELINES: Record<string, Timeline> = {
     month1: { heading: "Month 1 and beyond", bullets: ["Nail changes (white spots, ridging) take a full growth cycle to show — longer than a month.", "Ongoing use through cold-and-flu season is where this earns its keep most.", "No change to skin or healing by 8 weeks? Zinc likely wasn't the limiting factor."], tip: "Reassess against the full symptom list, not one signal alone." },
   },
   "vitacore-b-complex": {
-    week1: { heading: "The first week", bullets: ["Energy from B vitamins is often felt fast — sometimes within days — since they're water-soluble.", "Urine may turn brighter yellow; that's riboflavin (B2), harmless.", "Take in the morning — B vitamins are mildly stimulating for some people."], tip: "With food reduces the rare chance of mild stomach upset." },
-    weeks23: { heading: "Weeks 2–3", bullets: ["Afternoon energy crashes typically become less severe.", "Brain fog, if B12-related, is usually one of the slower symptoms to lift.", "Mouth ulcers or cracked corners, if present, usually heal in this window."], tip: "On metformin or long-term antacids? Expect this to take longer — ongoing depletion works against you." },
-    month1: { heading: "Month 1 and beyond", bullets: ["Mood and focus improvements, where B12/folate were the driver, are typically clearest by now.", "A reasonable point to retest B12 if you started from a known low result.", "Long-term use is genuinely low-risk — excess B vitamins are simply excreted, not stored."], tip: "Worth taking indefinitely if you're vegetarian, vegan, or on the medications above." },
+    week1: { heading: "The first week", bullets: ["Energy from B vitamins is often felt fast — sometimes within days — since they're water-soluble.", "Take with food if the niacin (B3) causes any warmth or flushing — harmless, and it settles within days for most people.", "Take in the morning — B vitamins are mildly stimulating for some people."], tip: "With food reduces the rare chance of mild stomach upset." },
+    weeks23: { heading: "Weeks 2–3", bullets: ["Afternoon energy crashes typically become less severe.", "Brain fog, if folate-related, is usually one of the slower symptoms to lift.", "Mouth ulcers or cracked corners, if present, usually heal in this window."], tip: "Regular alcohol use works directly against what this formula is rebuilding — cutting back, even temporarily, speeds this up." },
+    month1: { heading: "Month 1 and beyond", bullets: ["Mood and focus improvements, where folate was the driver, are typically clearest by now.", "A reasonable point to retest folate if you started from a known low result.", "Long-term use is genuinely low-risk — excess B vitamins are simply excreted, not stored."], tip: "Worth taking on an ongoing basis if regular alcohol use is a consistent part of your week — that's the risk factor most likely to keep drawing this down." },
   },
   "glutathione-nac": {
     week1: { heading: "The first week", bullets: ["No dramatic shift expected — this replenishes a reserve, it doesn't create an immediate effect.", "Take consistently, same time each day, away from other supplements that compete for absorption.", "Mild detox-type symptoms (slight headache, fatigue) are possible early on and usually pass."], tip: "Hydration matters more than usual in the first week." },
@@ -504,7 +504,7 @@ export const TIMELINES: Record<string, Timeline> = {
 
 export const GATE_COPY = {
   ironBlocked:
-    "Your answers are consistent with the pattern of low iron — but iron is the one mineral where more isn't automatically better, since it accumulates in the body. Before recommending it outright, confirm with a ferritin and full blood count. In the meantime, B vitamins are a safe adjacent option: B12 and folate deficiency produce a near-identical fatigue-and-pallor picture, with no accumulation risk.",
+    "Your answers are consistent with the pattern of low iron — but iron is the one mineral where more isn't automatically better, since it accumulates in the body. Before recommending it outright, confirm with a ferritin and full blood count. In the meantime, B vitamins are a safe adjacent option: folate deficiency produces a near-identical fatigue-and-pallor picture to low iron, with no accumulation risk.",
   adaptogenBlocked:
     "Adaptogen+ contains licorice root, which can raise blood pressure, and ashwagandha, which needs care alongside thyroid medication. Since that applies to you, we've routed you to Magnesium Complex instead — it addresses the same wired-but-exhausted pattern through a different mechanism.",
   cellunexCaution:
@@ -517,7 +517,7 @@ export const GATE_COPY = {
 export const FOOTER_COPY = [
   "This is a wellness guide, not a medical assessment.",
   "Symptoms overlap across many possible causes — this is a pattern match, not a diagnosis.",
-  "If iron, vitamin D, or B12 came up strongly, confirm with a blood test before treating it as settled.",
+  "If iron, vitamin D, or B vitamins came up strongly, confirm with a blood test before treating it as settled.",
   "Speak to a doctor if symptoms persist.",
 ];
 
