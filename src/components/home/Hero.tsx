@@ -220,8 +220,8 @@ export default function Hero() {
 
           <motion.div variants={childVariants} className="hero-actions">
             <Magnetic>
-              <Link href="/shop" className="group hero-btn hero-btn-primary">
-                Shop bestsellers
+              <Link href="/free-nutrient-test" className="group hero-btn hero-btn-primary">
+                Take the free nutrient test
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
                   <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
                 </svg>

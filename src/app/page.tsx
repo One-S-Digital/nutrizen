@@ -5,6 +5,7 @@ import Hero from "@/components/home/Hero";
 import ProductMarquee from "@/components/home/ProductMarquee";
 import DynamicProductShowcase from "@/components/home/DynamicProductShowcase";
 import CategoryShowcase from "@/components/home/CategoryShowcase";
+import QuizPromo from "@/components/home/QuizPromo";
 import IngredientBreakdown from "@/components/home/IngredientBreakdown";
 import SocialProof from "@/components/home/SocialProof";
 import JsonLd from "@/components/seo/JsonLd";
@@ -103,6 +104,7 @@ export default async function Home() {
           </div>
         </section>
       )}
+      <QuizPromo />
       <IngredientBreakdown />
       <DynamicProductShowcase />
       <SocialProof />

@@ -1,6 +1,11 @@
 import type { Config } from "tailwindcss";
 
 export default {
+  // "class"-based so the quiz page's manual light/dark switch can control it;
+  // nothing else in this codebase uses the `dark:` variant, so this has no
+  // effect anywhere else (previously unset, which defaults to Tailwind's
+  // OS-preference-only "media" strategy — that gave no way to override it).
+  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
