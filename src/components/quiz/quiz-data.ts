@@ -410,7 +410,7 @@ export const TRACK_LINE: Record<Bucket, string> = {
 
 export const WHY_COPY: Record<string, string> = {
   VIT_D:
-    "Vitamin D isn't really a vitamin — it behaves more like a hormone, and your skin only makes it from direct, unfiltered sunlight on bare skin. South Africa gets plenty of sun, but an indoor, sun-avoidant working week doesn't reach it, and higher melanin needs substantially longer exposure to synthesise the same amount. The result is a sunny country with widespread low vitamin D. It's involved in immune signalling, mood regulation, and muscle function — which is why a shortfall shows up as colds, low winter mood, and aches that don't map to any injury.",
+    "Vitamin D isn't really a vitamin — it behaves more like a hormone, and your skin only makes it from direct, unfiltered sunlight on bare skin. South Africa gets plenty of sun, but an indoor, sun-avoidant working week doesn't reach it, and higher melanin can need up to ten times longer exposure to synthesise the same amount. The result is a sunny country with widespread low vitamin D. It's involved in immune signalling, mood regulation, and muscle function — which is why a shortfall shows up as colds, low winter mood, and aches that don't map to any injury.",
   MAGNESIUM_COMPLEX:
     "Magnesium runs over 300 enzyme reactions, including the ones that switch your nervous system from “on” to “off.” It's also the mineral most reliably depleted by stress, caffeine, alcohol, and hard training — all of which increase how much you excrete — and modern soil supplies less of it than it used to. Low magnesium rarely announces itself with one symptom; it shows up as a cluster: tight muscles, a mind that won't switch off, and cramping that seems to come from nowhere.",
   MAGNESIUM_OXIDE:
@@ -611,7 +611,8 @@ export function score(answers: Answers): ScoreResult {
 export function tierLabel(n: number): string {
   if (n >= 0.65) return "strong pattern";
   if (n >= 0.45) return "clear pattern";
-  return "early signs";
+  if (n >= 0.2) return "early signs";
+  return "no clear pattern";
 }
 
 function topContributions(contributions: Record<string, Contribution[]>, bucket: string, count: number): string[] {
@@ -646,6 +647,7 @@ export interface ResultItem {
   why: string;
   timeline: Timeline;
   echo: string[];
+  allEcho: string[];
   gated: keyof typeof GATE_COPY | null;
   addToCartDisabled: boolean;
   redirectTo?: Bucket;
@@ -712,6 +714,7 @@ export function buildResult(answers: Answers, safety: SafetyState): QuizResult {
       why: WHY_COPY[whyKey],
       timeline: TIMELINES[productId],
       echo: topContributions(s.contributions, bucket, 3),
+      allEcho: topContributions(s.contributions, bucket, 8),
       gated: null,
       addToCartDisabled: false,
     };
@@ -755,6 +758,9 @@ export function buildResult(answers: Answers, safety: SafetyState): QuizResult {
       why: WHY_COPY.BUNDLE,
       timeline: TIMELINES.bundle,
       echo: bundleHits.reduce<string[]>((acc, b) => acc.concat(topContributions(s.contributions, b, 2)), []).slice(0, 4),
+      allEcho: Array.from(
+        new Set(bundleHits.reduce<string[]>((acc, b) => acc.concat(topContributions(s.contributions, b, 8)), [])),
+      ).slice(0, 8),
       gated: null,
       addToCartDisabled: false,
       bundleHits: bundleHits.map((b) => BUCKETS[b].label),

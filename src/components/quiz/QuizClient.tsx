@@ -19,6 +19,7 @@ import {
   formatPrice,
   cartPermalink,
   pdpLink,
+  tierLabel,
   DEFAULT_SAFETY,
   type Answers,
   type Question,
@@ -502,6 +503,32 @@ function SupportingItem({ item }: { item: ResultItem }) {
   );
 }
 
+function BreakdownBar({ label, pct, tier, active }: { label: string; pct: number; tier: string; active: boolean }) {
+  return (
+    <div className="py-2.5">
+      <div className="mb-1.5 flex items-baseline justify-between gap-3">
+        <span
+          className={cn(
+            "text-[0.9rem] capitalize",
+            active ? "font-semibold text-[#16281F] dark:text-[#F1EFE8]" : "text-[#4A5B52] dark:text-[#B6C1B9]",
+          )}
+        >
+          {label}
+        </span>
+        <span className="flex-none font-mono text-[0.76rem] text-[#8B948E] dark:text-[#7D8B83]">
+          {tier} · {pct}%
+        </span>
+      </div>
+      <div className="h-[5px] overflow-hidden rounded-full bg-[#16281F]/8 dark:bg-[#F1EFE8]/10">
+        <span
+          className={cn("block h-full rounded-full", active ? "bg-[#2F6B4F] dark:bg-[#5EAB80]" : "bg-[#8B948E]/50 dark:bg-[#7D8B83]/50")}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 function ResultScreen({ result, onRestart }: { result: QuizResult; onRestart: () => void }) {
   const primary = result.items[0];
   const supporting = result.items.slice(1);
@@ -513,6 +540,19 @@ function ResultScreen({ result, onRestart }: { result: QuizResult; onRestart: ()
   const cartLink = cartPermalink(activeItems);
   const singleCtaItem = primary.addToCartDisabled ? activeItems[0] : primary;
   const showSingleCta = activeItems.length > 1 && !!singleCtaItem;
+
+  const highlightedBuckets = new Set(
+    result.items.flatMap((i) => (i.bucket === "BUNDLE" ? ["VIT_D", "ZINC", "ANTIOXIDANT"] : [i.bucket])),
+  );
+  const breakdown = (Object.keys(BUCKETS) as Array<keyof typeof BUCKETS>)
+    .map((b) => ({
+      key: b,
+      label: BUCKETS[b].label,
+      pct: Math.round((result.normalized[b] || 0) * 100),
+      tier: tierLabel(result.normalized[b] || 0),
+      active: highlightedBuckets.has(b),
+    }))
+    .sort((a, b) => b.pct - a.pct);
 
   return (
     <div className="screen">
@@ -534,9 +574,37 @@ function ResultScreen({ result, onRestart }: { result: QuizResult; onRestart: ()
         {primary.echo.length ? `You mentioned ${joinNatural(primary.echo)}. ${primary.trackLine}` : primary.trackLine}
       </p>
 
+      {primary.allEcho.length ? (
+        <div className="my-8">
+          <p className="mb-2.5 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-[#8B948E] dark:text-[#7D8B83]">What you told us</p>
+          <div className="flex flex-wrap gap-2">
+            {primary.allEcho.map((label, i) => (
+              <span
+                key={i}
+                className="rounded-full border border-[#16281F]/12 bg-white px-3 py-1.5 text-[0.82rem] text-[#16281F] dark:border-[#F1EFE8]/13 dark:bg-[#17251D] dark:text-[#F1EFE8]"
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       <div className="my-8">
         <p className="mb-2.5 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-[#8B948E] dark:text-[#7D8B83]">Why, in plain terms</p>
         <p className="max-w-[62ch] text-base leading-[1.68] text-[#16281F] dark:text-[#F1EFE8]">{primary.why}</p>
+      </div>
+
+      <div className="my-8">
+        <p className="mb-1 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-[#8B948E] dark:text-[#7D8B83]">Your full breakdown</p>
+        <p className="mb-1 text-[0.86rem] leading-relaxed text-[#4A5B52] dark:text-[#B6C1B9]">
+          How your answers scored across every area we asked about — not just the one above.
+        </p>
+        <div className="divide-y divide-[#16281F]/8 dark:divide-[#F1EFE8]/10">
+          {breakdown.map((row) => (
+            <BreakdownBar key={row.key} label={row.label} pct={row.pct} tier={row.tier} active={row.active} />
+          ))}
+        </div>
       </div>
 
       <div className="my-8">
