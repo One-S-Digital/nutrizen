@@ -33,7 +33,7 @@ export default function QuizPromo() {
         </motion.h2>
         <motion.p variants={itemVariants} className="mb-9 max-w-md text-paper/65">
           Ten short questions about how you&apos;ve been feeling. We&apos;ll tell you which nutrients your
-          symptoms point to, and why — no guesswork, no pressure.
+          symptoms point to, and why.
         </motion.p>
         <motion.div variants={itemVariants}>
           <Link
