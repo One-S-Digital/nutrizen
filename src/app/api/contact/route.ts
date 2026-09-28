@@ -41,7 +41,9 @@ export async function POST(req: NextRequest) {
 
   // Forward to FormSubmit
   fd.delete("cf-turnstile-response");
-  fd.set("_subject", "New message from NutriZen website");
+  if (!fd.get("_subject")) {
+    fd.set("_subject", "New message from NutriZen website");
+  }
   fd.set("_captcha", "false");
   fd.set("_template", "table");
 
