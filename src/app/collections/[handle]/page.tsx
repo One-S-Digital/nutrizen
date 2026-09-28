@@ -35,6 +35,9 @@ export async function generateMetadata({
       title: `${data.title} | NutriZen`,
       description,
     },
+    // "Home page" is Shopify's auto-generated frontpage collection — it duplicates the
+    // homepage and shouldn't be indexed, but it should still be crawlable/linkable.
+    ...(handle === "frontpage" ? { robots: { index: false, follow: true } } : {}),
   };
 }
 

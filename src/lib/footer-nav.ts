@@ -68,12 +68,15 @@ export function buildFallbackFooterColumns(
       title: "Shop",
       links: [
         { id: "fallback-all", title: "All products", href: "/shop", external: false },
-        ...collections.slice(0, 8).map((c) => ({
-          id: c.id,
-          title: c.title,
-          href: `/shop?collection=${encodeURIComponent(c.handle)}`,
-          external: false,
-        })),
+        ...collections
+          .filter((c) => c.handle !== "frontpage")
+          .slice(0, 8)
+          .map((c) => ({
+            id: c.id,
+            title: c.title,
+            href: `/collections/${encodeURIComponent(c.handle)}`,
+            external: false,
+          })),
       ],
     },
     {

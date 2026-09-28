@@ -8,15 +8,23 @@ import CategoryShowcase from "@/components/home/CategoryShowcase";
 import QuizPromo from "@/components/home/QuizPromo";
 import IngredientBreakdown from "@/components/home/IngredientBreakdown";
 import SocialProof from "@/components/home/SocialProof";
+import HomeAboutSection from "@/components/home/HomeAboutSection";
+import HomeFaqSection from "@/components/home/HomeFaqSection";
 import JsonLd from "@/components/seo/JsonLd";
 import { getCollectionsCached, getMarqueeProductsCached, isShopifyConfigured } from "@/lib/shopify";
+import { HOME_FAQS } from "@/lib/seo-content/homepage";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
 
 export const metadata: Metadata = {
-  title: "Premium Natural Supplements",
+  // Absolute: per Next.js's metadata rules, a layout's title.template does not
+  // apply to a page.tsx at the SAME route segment (root layout + root page here)
+  // — only to nested child segments. That's why the live title tag has always
+  // rendered without the brand suffix (see the spec's audit, item #1); the full
+  // string is spelled out here instead of relying on the template.
+  title: { absolute: "Vitamins & Supplements South Africa | NutriZen" },
   description:
-    "NutriZen delivers premium supplements with transparent ingredients, bioavailable nutrient forms, and targeted formulas for immune support, energy, sleep, and more. Free delivery across South Africa.",
+    "Take the free 2-minute nutrient test and find the right supplement. Magnesium, vitamin D, iron, zinc and more, made in South Africa. Free delivery over R690.",
   keywords: [
     "natural supplements South Africa",
     "premium vitamins",
@@ -32,7 +40,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     url: SITE_URL,
-    title: "NutriZen | Premium Natural Supplements",
+    title: "NutriZen South Africa | Vitamins & Supplements",
     description:
       "Transparent ingredients. High-quality nutrient forms. Targeted support for real health goals. Delivered across South Africa.",
     images: [
@@ -49,12 +57,12 @@ export const metadata: Metadata = {
 const homePageSchema = {
   "@context": "https://schema.org",
   "@type": "Store",
-  name: "NutriZen",
+  name: "NutriZen South Africa",
   url: SITE_URL,
   description:
     "Premium natural supplements with transparent ingredients and high-quality nutrient forms, delivered across South Africa.",
   image: `${SITE_URL}/nutrizen-logo.png`,
-  priceRange: "$$",
+  priceRange: "R199 – R674",
   currenciesAccepted: "ZAR",
   paymentAccepted: "Credit Card, EFT",
   address: {
@@ -68,6 +76,19 @@ const homePageSchema = {
   },
 };
 
+const homeFaqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: HOME_FAQS.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: faq.answer,
+    },
+  })),
+};
+
 export default async function Home() {
   const [collections, marqueeProducts] = await Promise.all([
     getCollectionsCached(),
@@ -79,6 +100,7 @@ export default async function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <JsonLd data={homePageSchema} />
+      <JsonLd data={homeFaqSchema} />
       <Hero />
       <ProductMarquee products={marqueeProducts} />
       {collections.length > 0 ? (
@@ -108,6 +130,8 @@ export default async function Home() {
       <IngredientBreakdown />
       <DynamicProductShowcase />
       <SocialProof />
+      <HomeAboutSection />
+      <HomeFaqSection />
     </div>
   );
 }

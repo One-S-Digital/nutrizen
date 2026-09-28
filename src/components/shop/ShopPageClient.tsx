@@ -465,10 +465,10 @@ function MobileFilterPanel({
 function GuidanceBlock() {
   const reduceMotion = useReducedMotion();
   const goals = [
-    { label: "Immune Support", handle: "immunity", icon: "shield" },
-    { label: "Stress & Sleep", handle: "stress", icon: "leaf" },
-    { label: "Energy & Focus", handle: "energy", icon: "star" },
-    { label: "Gut Health", handle: "gut", icon: "scale" },
+    { label: "Immune Support", handle: "immunity-and-defense", icon: "shield" },
+    { label: "Stress & Sleep", handle: "stress-sleep-and-mood", icon: "leaf" },
+    { label: "Energy & Focus", handle: "energy-and-vitality", icon: "star" },
+    { label: "Gut Health", handle: "detox-and-digestive-health", icon: "scale" },
   ];
   return (
     <motion.div
@@ -491,7 +491,7 @@ function GuidanceBlock() {
           {goals.map((g) => (
             <motion.div key={g.label} whileHover={reduceMotion ? {} : { y: -4 }} whileTap={{ scale: 0.97 }}>
               <Link
-                href={`/shop?collection=${g.handle}`}
+                href={`/collections/${g.handle}`}
                 className="flex h-full flex-col items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.05] p-4 transition-all duration-200 hover:border-[#8CAB77]/40 hover:bg-white/[0.09]"
               >
                 <span className="grid h-9 w-9 place-items-center rounded-full border border-[#8CAB77]/35 text-[#8CAB77]">
@@ -582,7 +582,7 @@ export default function ShopPageClient({
   const handleFilterClick = (handle: string | undefined) => {
     setVisibleCount(PRODUCTS_PER_PAGE);
     startTransition(() => {
-      router.push(handle ? `/shop?collection=${encodeURIComponent(handle)}` : "/shop", { scroll: false });
+      router.push(handle ? `/collections/${encodeURIComponent(handle)}` : "/shop", { scroll: false });
     });
   };
 

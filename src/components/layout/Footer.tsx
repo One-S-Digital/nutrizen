@@ -58,6 +58,9 @@ export default function Footer({ mainMenuLinks }: FooterProps) {
           <p className="text-neutral-dark text-sm leading-relaxed">
             Premium, science-backed natural supplements designed to boost your daily vitality, calm, and focus.
           </p>
+          <p className="mt-3 text-sm font-medium text-neutral-darkest">
+            NutriZen South Africa · Vitamins and supplements made in South Africa, delivered nationwide.
+          </p>
           <div className="mt-4 space-y-1.5 text-sm text-neutral-dark">
             <a href="tel:+27812609790" className="flex items-center gap-2 hover:text-primary transition">
               <Phone className="h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden />

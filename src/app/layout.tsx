@@ -105,24 +105,43 @@ export const metadata: Metadata = {
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: SITE_NAME,
+  "@id": `${SITE_URL}/#organization`,
+  name: "NutriZen South Africa",
+  alternateName: "NutriZen",
   url: SITE_URL,
   logo: `${SITE_URL}/nutrizen-logo.png`,
-  description: SITE_DESCRIPTION,
+  description:
+    "NutriZen South Africa makes targeted vitamins and supplements, manufactured in South Africa, with no proprietary blends. Delivered nationwide, free over R690.",
   email: "hello@nutrizen.co.za",
   address: {
     "@type": "PostalAddress",
     addressCountry: "ZA",
   },
-  sameAs: [],
+  areaServed: {
+    "@type": "Country",
+    name: "South Africa",
+  },
+  sameAs: [
+    "https://www.instagram.com/nutrizen.za",
+    "https://www.tiktok.com/@nutrizen.za",
+    "https://www.facebook.com/people/NutriZen/61580065565562/",
+  ],
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer service",
+    email: "hello@nutrizen.co.za",
+    areaServed: "ZA",
+    availableLanguage: "English",
+  },
 };
 
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: SITE_NAME,
+  name: "NutriZen South Africa",
   url: SITE_URL,
   description: SITE_DESCRIPTION,
+  publisher: { "@id": `${SITE_URL}/#organization` },
   potentialAction: {
     "@type": "SearchAction",
     target: {

@@ -78,10 +78,12 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
     shopLeaveTimer.current = setTimeout(() => setShopOpen(false), 160);
   };
 
+  // Build dropdown items: prefer main-menu links (already /collections/<handle>),
+  // fall back to raw nav collections.
   const dropdownItems: { id: string; title: string; href: string; imageUrl?: string | null }[] =
     mainMenuLinks.length > 0
       ? mainMenuLinks.map((l) => {
-          const handleMatch = l.href.match(/[?&]collection=([^&]+)/);
+          const handleMatch = l.href.match(/^\/collections\/([^/?#]+)/);
           const handle = handleMatch ? decodeURIComponent(handleMatch[1]!) : null;
           const matched = handle ? collections.find((c) => c.handle === handle) : null;
           return { id: l.id, title: l.title, href: l.href, imageUrl: matched?.imageUrl ?? null };
@@ -89,7 +91,7 @@ export default function Navbar({ collections = [], mainMenuLinks = [] }: NavbarP
       : collections.map((c) => ({
           id: c.id,
           title: c.title,
-          href: `/shop?collection=${encodeURIComponent(c.handle)}`,
+          href: `/collections/${encodeURIComponent(c.handle)}`,
           imageUrl: c.imageUrl,
         }));
 

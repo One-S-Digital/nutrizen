@@ -144,7 +144,7 @@ function PanelContent({
               ))}
             </div>
             <Link
-              href={`/shop?collection=${encodeURIComponent(category.handle)}`}
+              href={`/collections/${encodeURIComponent(category.handle)}`}
               className="group mt-5 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-paper/80 transition-colors hover:text-paper"
             >
               Explore
@@ -211,7 +211,7 @@ export default function CategoryShowcase({ categories }: { categories: Category[
             </h2>
           </div>
           <p className="max-w-xs text-sm leading-relaxed text-ink/60 md:pb-2 md:text-right">
-            Start with the change you want to feel — we got the formulas you need.
+            Start with how you want to feel. We&apos;ll show you the formulas built for it.
           </p>
         </motion.div>
 

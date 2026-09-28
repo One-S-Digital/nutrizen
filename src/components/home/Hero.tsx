@@ -202,38 +202,35 @@ export default function Hero() {
           className="hero-copy"
         >
           <motion.p variants={childVariants} className="hero-eyebrow">
-            NutriZen · Precision Wellness
+            NutriZen South Africa · Supplements matched to you
           </motion.p>
 
           <motion.h1 variants={childVariants} className="hero-title">
-            Clean Supplements<span className="text-[#E7A46C] not-italic">.</span>
-            <br />
-            <em className="italic text-[#8CAB77]">Real Results</em>
-            <span className="text-[#E7A46C] not-italic">.</span>
+            Find the <em className="italic text-[#8CAB77]">right</em> supplement in 2 minutes.
           </motion.h1>
 
           <motion.p variants={childVariants} className="hero-lede">
-            No fillers. No proprietary blends. Clinically dosed nutrients in the
-            forms your body actually absorbs — formulated in the open, delivered
-            across South Africa.
+            Answer a few quick questions about your energy, sleep, stress and digestion, and
+            we&apos;ll recommend the NutriZen supplements that suit you, and explain why each one
+            fits.
           </motion.p>
 
           <motion.div variants={childVariants} className="hero-actions">
             <Magnetic>
               <Link href="/free-nutrient-test" className="group hero-btn hero-btn-primary">
-                Take the free nutrient test
+                Start the free quiz
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
                   <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
                 </svg>
               </Link>
             </Magnetic>
             <Magnetic>
-              <a href="#goals" className="group hero-btn hero-btn-ghost">
-                Find your formula
+              <Link href="/shop" className="group hero-btn hero-btn-ghost">
+                Browse all supplements
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
                   <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
                 </svg>
-              </a>
+              </Link>
             </Magnetic>
           </motion.div>
         </motion.div>

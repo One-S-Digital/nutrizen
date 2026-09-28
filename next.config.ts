@@ -29,6 +29,16 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  async redirects() {
+    return [
+      {
+        // Duplicate Journal post — canonicalise to the original.
+        source: "/blogs/news/magnesium-glycinate-vs-citrate-vs-oxide-which-one-should-you-choose-1",
+        destination: "/blogs/news/magnesium-glycinate-vs-citrate-vs-oxide-which-one-should-you-choose",
+        permanent: true,
+      },
+    ];
+  },
   images: {
     // Custom loader: Shopify CDN handles resizing/format via URL params.
     // Images are served directly from cdn.shopify.com (Fastly edge) — Render
