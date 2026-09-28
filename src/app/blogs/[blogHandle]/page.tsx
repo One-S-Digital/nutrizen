@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { getBlogCached } from "@/lib/shopify";
+import { JOURNAL_INDEX_SEO } from "@/lib/seo-content/journal";
 
 export const revalidate = 3600;
 
@@ -14,14 +15,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { blogHandle } = await params;
   const blog = await getBlogCached(blogHandle);
   if (!blog) return {};
+
+  // The Shopify blog is still named "News" — the site displays it as "Journal".
+  const isJournal = blog.handle === "news";
+  const title = isJournal ? JOURNAL_INDEX_SEO.title : blog.title;
+  const description = isJournal
+    ? JOURNAL_INDEX_SEO.metaDescription
+    : `Read the latest articles from NutriZen — ${blog.title}.`;
+
   return {
-    title: blog.title,
-    description: `Read the latest articles from NutriZen — ${blog.title}.`,
+    title: isJournal ? { absolute: title } : title,
+    description,
     alternates: { canonical: `${SITE_URL}/blogs/${blog.handle}` },
     openGraph: {
       type: "website",
       url: `${SITE_URL}/blogs/${blog.handle}`,
-      title: `${blog.title} | NutriZen`,
+      title: isJournal ? title : `${title} | NutriZen`,
+      description,
     },
   };
 }
@@ -39,11 +49,13 @@ export default async function BlogListingPage({ params }: Props) {
   const blog = await getBlogCached(blogHandle);
   if (!blog) notFound();
 
+  const displayTitle = blog.handle === "news" ? JOURNAL_INDEX_SEO.displayTitle : blog.title;
+
   return (
     <main className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
       <header className="mb-12 text-center">
         <h1 className="text-4xl font-bold tracking-tight text-neutral-darkest sm:text-5xl">
-          {blog.title}
+          {displayTitle}
         </h1>
         <p className="mt-3 text-neutral-dark">
           Insights, guides, and research from the NutriZen team.
