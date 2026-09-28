@@ -226,15 +226,13 @@ function ShopHero({
           </motion.p>
 
           <motion.h1 variants={childVariants} className="hero-title sm:text-[3.1rem] lg:text-[3.4rem] xl:text-[3.95rem]">
-            Find what your body{" "}
-            <em className="italic text-[#8CAB77]">actually needs</em>
+            Shop <em className="italic text-[#8CAB77]">vitamins &amp; supplements</em>
             <span className="text-[#E7A46C] not-italic">.</span>
           </motion.h1>
 
           <motion.p variants={childVariants} className="hero-lede">
-            Every formula is transparent, clinically dosed, and built to actually
-            work — not just to sell. Browse by goal, delivered free across South
-            Africa.
+            Find what your body actually needs. Every formula is transparent and
+            built for a specific goal, delivered across South Africa.
           </motion.p>
 
           {/* Shop-by-goal filter pills */}
@@ -540,8 +538,14 @@ function ShopFinalCta() {
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
               <Link
-                href="/pages/science"
+                href="/free-nutrient-test"
                 className="inline-flex min-w-[180px] items-center justify-center rounded-full bg-primary px-8 py-4 text-base font-semibold text-white shadow-[0_16px_40px_-14px_rgba(140,171,119,0.8)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#7a9d65]"
+              >
+                Take the free 2-minute test
+              </Link>
+              <Link
+                href="/pages/science"
+                className="inline-flex min-w-[180px] items-center justify-center rounded-full border border-ink/20 bg-transparent px-8 py-4 text-base font-semibold text-ink transition-all duration-300 hover:-translate-y-0.5 hover:border-ink/40 hover:bg-ink/[0.04]"
               >
                 Read the science
               </Link>

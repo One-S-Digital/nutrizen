@@ -4,13 +4,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import FaqContent from "@/components/pages/FaqContent";
 import JsonLd from "@/components/seo/JsonLd";
+import { HOME_FAQS } from "@/lib/seo-content/homepage";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
 
 export const metadata: Metadata = {
-  title: "FAQ",
+  // Absolute: the spec's target title doesn't end in "| NutriZen" (it already carries
+  // the brand mid-string), so the root layout's title.template would double-brand it.
+  title: { absolute: "NutriZen South Africa FAQ | Delivery, Products & Returns" },
   description:
-    "Frequently asked questions about NutriZen supplements – shipping across South Africa, how to use our formulas, return policy, and account details. Clear and straightforward answers.",
+    "Answers about NutriZen South Africa: where our supplements are made, halal, delivery, returns and choosing the right formula.",
   keywords: [
     "NutriZen FAQ",
     "supplement shipping South Africa",
@@ -22,9 +25,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: `${SITE_URL}/pages/faq`,
-    title: "FAQ | NutriZen",
+    title: "NutriZen South Africa FAQ | Delivery, Products & Returns",
     description:
-      "Quick answers about orders, shipping, product use, returns, and your account. Clear and straightforward.",
+      "Answers about NutriZen South Africa: where our supplements are made, halal, delivery, returns and choosing the right formula.",
   },
 };
 
@@ -32,6 +35,11 @@ const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   mainEntity: [
+    ...HOME_FAQS.slice(0, 6).map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: { "@type": "Answer", text: f.answer },
+    })),
     {
       "@type": "Question",
       name: "Where do you ship?",

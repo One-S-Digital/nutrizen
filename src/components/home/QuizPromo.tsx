@@ -40,7 +40,7 @@ export default function QuizPromo() {
             href="/free-nutrient-test"
             className="group inline-flex items-center gap-2 rounded-full bg-paper px-7 py-3.5 text-sm font-semibold text-ink transition-colors hover:bg-[#D9E8C4]"
           >
-            Take the 90-second test
+            Take the free 2-minute test
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
               <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
             </svg>

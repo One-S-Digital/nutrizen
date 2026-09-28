@@ -7,6 +7,8 @@ import { notFound } from "next/navigation";
 import { getCollectionByHandleCached } from "@/lib/shopify";
 import { formatPrice } from "@/lib/formatPrice";
 import JsonLd from "@/components/seo/JsonLd";
+import CollectionSeoSection from "@/components/collections/CollectionSeoSection";
+import { COLLECTION_SEO_CONTENT, ALL_COLLECTION_OVERRIDE } from "@/lib/seo-content/collections";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
 
@@ -20,19 +22,26 @@ export async function generateMetadata({
   if (!data) return {};
 
   const canonical = `${SITE_URL}/collections/${handle}`;
+  const seoContent = COLLECTION_SEO_CONTENT[handle];
+  const isAllOverride = handle === ALL_COLLECTION_OVERRIDE.handle;
+  const title = seoContent?.title ?? (isAllOverride ? ALL_COLLECTION_OVERRIDE.title : data.title);
   const description =
-    data.description
-      ? `${data.description.slice(0, 140)} – Shop the ${data.title} range at NutriZen.`
-      : `Shop the ${data.title} collection at NutriZen. Premium natural supplements with transparent ingredients, delivered across South Africa.`;
+    seoContent?.metaDescription ??
+    (isAllOverride
+      ? ALL_COLLECTION_OVERRIDE.metaDescription
+      : data.description
+        ? `${data.description.slice(0, 140)} – Shop the ${data.title} range at NutriZen.`
+        : `Shop the ${data.title} collection at NutriZen. Premium natural supplements with transparent ingredients, delivered across South Africa.`);
 
   return {
-    title: data.title,
+    // seoContent/override titles already carry the full brand suffix.
+    title: seoContent || isAllOverride ? { absolute: title } : title,
     description,
     alternates: { canonical },
     openGraph: {
       type: "website",
       url: canonical,
-      title: `${data.title} | NutriZen`,
+      title: seoContent || isAllOverride ? title : `${title} | NutriZen`,
       description,
     },
     // "Home page" is Shopify's auto-generated frontpage collection — it duplicates the
@@ -53,6 +62,8 @@ export default async function CollectionPage({
   }
 
   const canonical = `${SITE_URL}/collections/${handle}`;
+  const seoContent = COLLECTION_SEO_CONTENT[handle];
+  const displayTitle = handle === ALL_COLLECTION_OVERRIDE.handle ? ALL_COLLECTION_OVERRIDE.h1 : data.title;
 
   const collectionSchema = {
     "@context": "https://schema.org",
@@ -70,20 +81,33 @@ export default async function CollectionPage({
     },
   };
 
+  const faqSchema = seoContent
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: seoContent.faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: { "@type": "Answer", text: faq.answer },
+        })),
+      }
+    : null;
+
   return (
     <div className="bg-background-main min-h-screen pb-24 pt-10">
       <JsonLd data={collectionSchema} />
+      {faqSchema ? <JsonLd data={faqSchema} /> : null}
       <div className="max-w-7xl mx-auto px-6">
         <nav className="text-sm text-neutral-dark mb-8" aria-label="Breadcrumb">
           <Link href="/" className="hover:text-primary">
             Home
           </Link>
           <span className="mx-2">/</span>
-          <span className="text-neutral-darkest">{data.title}</span>
+          <span className="text-neutral-darkest">{displayTitle}</span>
         </nav>
 
         <header className="mb-12 max-w-3xl">
-          <h1 className="text-3xl md:text-4xl font-bold text-neutral-darkest mb-3">{data.title}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-neutral-darkest mb-3">{displayTitle}</h1>
           {data.description ? (
             <p className="text-neutral-dark text-lg leading-relaxed">{data.description}</p>
           ) : null}
@@ -125,6 +149,8 @@ export default async function CollectionPage({
             ))}
           </ul>
         )}
+
+        {seoContent ? <CollectionSeoSection content={seoContent} /> : null}
       </div>
     </div>
   );

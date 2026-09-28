@@ -522,7 +522,7 @@ export const FOOTER_COPY = [
 ];
 
 export const INTRO_COPY = {
-  eyebrow: "NutriZen · 90 seconds",
+  eyebrow: "NutriZen · 2 minutes",
   headline: "Find out what your body is *running low* on.",
   body: "Ten short questions about how you've been feeling. At the end we'll tell you which nutrients your symptoms point to, and why.",
   disclaimer: "This is a wellness guide, not a medical assessment.",

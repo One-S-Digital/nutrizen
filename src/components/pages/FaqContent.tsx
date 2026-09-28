@@ -1,4 +1,10 @@
+import { HOME_FAQS } from "@/lib/seo-content/homepage";
+
 const FAQ_SECTIONS: { heading: string; items: { q: string; a: string }[] }[] = [
+  {
+    heading: "About NutriZen",
+    items: HOME_FAQS.slice(0, 6).map((f) => ({ q: f.question, a: f.answer })),
+  },
   {
     heading: "Orders & delivery",
     items: [

@@ -15,9 +15,9 @@ export const revalidate = 300;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutrizen.co.za";
 
 export const metadata: Metadata = {
-  title: "Shop Supplements",
+  title: "Buy Supplements Online South Africa",
   description:
-    "Browse the full NutriZen supplement range. Immune support, magnesium, vitamin D3, iron, glutathione, and more – premium formulas with transparent ingredients, delivered across South Africa.",
+    "Shop all 12 NutriZen supplements: magnesium, vitamin D, iron, zinc, B-vitamins, adaptogens and more. Made in South Africa. Free delivery over R690.",
   keywords: [
     "buy supplements South Africa",
     "online supplement store",
@@ -32,9 +32,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: `${SITE_URL}/shop`,
-    title: "Shop Supplements | NutriZen",
+    title: "Buy Supplements Online South Africa | NutriZen",
     description:
-      "Premium natural supplements with transparent ingredients. Browse immune support, energy, sleep, and mineral formulas – delivered across South Africa.",
+      "Shop all 12 NutriZen supplements: magnesium, vitamin D, iron, zinc, B-vitamins, adaptogens and more. Made in South Africa. Free delivery over R690.",
   },
 };
 
@@ -46,14 +46,16 @@ export default async function ShopPage({
   const { collection: collectionParam } = await searchParams;
   const collectionHandle = collectionParam?.trim();
 
-  const navCollections = await getNavCollectionsCached();
+  // "frontpage" is Shopify's auto-generated Home page collection — never a real
+  // shopping goal, so it's excluded from the Shop page's goal filters.
+  const navCollections = (await getNavCollectionsCached()).filter((c) => c.handle !== "frontpage");
   const menuLinks = await getMainMenuLinksCached(navCollections);
 
   // Build an ordered list of collections matching the Shopify main-menu.
   // Fall back to all nav collections if the menu has no collection links.
   const menuHandles = menuLinks
     .map((l) => {
-      const m = l.href.match(/[?&]collection=([^&]+)/);
+      const m = l.href.match(/^\/collections\/([^/?#]+)/);
       return m ? decodeURIComponent(m[1]!) : null;
     })
     .filter((h): h is string => h !== null);
