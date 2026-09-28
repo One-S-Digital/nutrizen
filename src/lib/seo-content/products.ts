@@ -169,8 +169,12 @@ export const PRODUCT_SEO_CONTENT: Record<string, ProductSeoContent> = {
     relatedReading: {
       collectionHandle: "detox-and-digestive-health",
       collectionLabel: "Detox & Digestive Health",
-      // "Bloating after eating" (spec §6.2) isn't published yet — link only the collection for now.
-      journalLinks: [],
+      journalLinks: [
+        {
+          title: "Bloating After Eating: Causes and Natural Support",
+          href: `${JOURNAL_BASE}/bloating-after-eating`,
+        },
+      ],
     },
   },
 
@@ -372,8 +376,12 @@ export const PRODUCT_SEO_CONTENT: Record<string, ProductSeoContent> = {
     relatedReading: {
       collectionHandle: "detox-and-digestive-health",
       collectionLabel: "Detox & Digestive Health",
-      // "How to do a herbal parasite cleanse" (spec §6.2) isn't published yet — link only the collection for now.
-      journalLinks: [],
+      journalLinks: [
+        {
+          title: "How to Do a Herbal Parasite Cleanse: Timing, Ingredients and Safety",
+          href: `${JOURNAL_BASE}/how-to-do-a-herbal-parasite-cleanse`,
+        },
+      ],
     },
   },
 };

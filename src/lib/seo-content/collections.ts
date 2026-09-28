@@ -134,8 +134,10 @@ export const COLLECTION_SEO_CONTENT: Record<string, CollectionSeoContent> = {
         answer: "Yes, it is designed for daily use before meals, as directed on the label.",
       },
     ],
-    // "Bloating after eating" and "How to do a herbal parasite cleanse" (spec §6.2) aren't published yet.
-    relatedReading: [],
+    relatedReading: [
+      { title: "Bloating After Eating: Causes and Natural Support", href: `${JOURNAL_BASE}/bloating-after-eating` },
+      { title: "How to Do a Herbal Parasite Cleanse: Timing, Ingredients and Safety", href: `${JOURNAL_BASE}/how-to-do-a-herbal-parasite-cleanse` },
+    ],
   },
 
   "metabolism-and-blood-sugar": {
@@ -188,8 +190,10 @@ export const COLLECTION_SEO_CONTENT: Record<string, CollectionSeoContent> = {
         answer: "Vitamin D helps the body absorb calcium, which bones need. Many South Africans are low, especially in winter.",
       },
     ],
-    // "Magnesium for night leg cramps" (spec §6.2) isn't published yet.
-    relatedReading: [{ title: "Magnesium Glycinate vs Citrate vs Oxide: Which One Should You Choose?", href: `${JOURNAL_BASE}/magnesium-glycinate-vs-citrate-vs-oxide-which-one-should-you-choose` }],
+    relatedReading: [
+      { title: "Magnesium Glycinate vs Citrate vs Oxide: Which One Should You Choose?", href: `${JOURNAL_BASE}/magnesium-glycinate-vs-citrate-vs-oxide-which-one-should-you-choose` },
+      { title: "Magnesium for Night Leg Cramps: Does It Help?", href: `${JOURNAL_BASE}/magnesium-for-night-leg-cramps` },
+    ],
   },
 
   "cellular-health-and-longevity": {

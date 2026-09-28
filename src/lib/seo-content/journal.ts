@@ -316,4 +316,215 @@ export const JOURNAL_SEO_CONTENT: Record<string, JournalSeoContent> = {
     },
     lastReviewed: LAST_REVIEWED,
   },
+
+  // --- Step 4 (§6.2) — new posts, created as unpublished drafts pending review ---
+  "ferritin-test-before-iron": {
+    metaDescription:
+      "Why a ferritin test matters before taking iron, what normal levels mean, and who should never take iron without testing first.",
+    inShort:
+      "A ferritin test measures your iron stores, not just the iron in your blood, which is why it's the standard way to confirm low iron rather than guessing from symptoms. Menstruating women, pregnant women, vegetarians and endurance athletes are most likely to benefit from testing first. Iron builds up in the body, so it should only be taken once a test confirms you need it.",
+    faqs: [
+      {
+        question: "Should I take iron without testing first?",
+        answer:
+          "No. Iron builds up in the body over time, so it's best to confirm you're actually low before supplementing, especially if you're male or post-menopausal.",
+      },
+      {
+        question: "What's a normal ferritin level?",
+        answer:
+          "Reference ranges vary by lab and by sex, so ask your doctor to interpret your specific result alongside your symptoms rather than comparing it to a general number.",
+      },
+      {
+        question: "Where can I get a ferritin test in South Africa?",
+        answer:
+          "Through your GP or a pathology lab such as Lancet, Ampath or PathCare, usually alongside a full blood count.",
+      },
+    ],
+    shopThisTopic: {
+      productHandle: "nutrizen-iron-plus-supplement",
+      productLabel: "Iron+ Supplement",
+      collectionHandle: "energy-and-vitality",
+      collectionLabel: "Energy & Vitality",
+    },
+    lastReviewed: LAST_REVIEWED,
+  },
+  "always-tired-after-sleeping": {
+    metaDescription:
+      "Waking up tired every day? Low iron, vitamin D, magnesium and B-vitamins are common factors. What to check and when to see a doctor.",
+    inShort:
+      "Persistent tiredness despite enough sleep can be linked to low iron, vitamin D, magnesium, B-vitamins or unstable blood sugar. Each plays a different role in how the body produces and uses energy, and each is confirmed with a simple blood test rather than guesswork. If tiredness continues for more than a few weeks, see your doctor.",
+    faqs: [
+      {
+        question: "Can low vitamin D cause tiredness?",
+        answer:
+          "Yes, vitamin D contributes to normal muscle function and immune health, and low levels are common in South Africans who spend most of the day indoors.",
+      },
+      {
+        question: "Should I take an iron supplement if I'm always tired?",
+        answer:
+          "Only if a blood test confirms your iron is low. Taking iron without testing isn't recommended, since iron builds up in the body.",
+      },
+      {
+        question: "How do I know which nutrient is behind my tiredness?",
+        answer:
+          "A blood test is the only way to confirm a specific shortfall. Our free nutrient test can help point you toward which areas are worth asking your doctor about.",
+      },
+    ],
+    shopThisTopic: {
+      productHandle: "nutrizen-vitacore-b-complex",
+      productLabel: "Vitacore B-Complex",
+      collectionHandle: "energy-and-vitality",
+      collectionLabel: "Energy & Vitality",
+    },
+    lastReviewed: LAST_REVIEWED,
+  },
+  "bloating-after-eating": {
+    metaDescription:
+      "Why you feel bloated after meals, simple habits that help, and which herbs are traditionally used for digestive comfort.",
+    inShort:
+      "Bloating after meals is usually linked to eating quickly, large or rich meals, and slow digestion rather than one single cause. Simple habits — eating slowly, smaller portions, a short walk after eating — often help alongside herbs like fenugreek, ajwain and fennel, traditionally used for digestive comfort. Persistent or painful bloating should be checked by a doctor.",
+    faqs: [
+      {
+        question: "What foods commonly cause bloating?",
+        answer:
+          "Large or rich meals, carbonated drinks, and eating too quickly are common triggers. Individual sensitivities, such as to dairy or certain carbohydrates, also play a role for some people.",
+      },
+      {
+        question: "Can herbs help with bloating?",
+        answer:
+          "Fenugreek, ajwain and fennel are traditionally used to support digestion after meals. NutriZen Metabol+ combines all three in one formula.",
+      },
+      {
+        question: "When should bloating see a doctor?",
+        answer:
+          "If it's persistent, painful, or comes with weight loss or a change in bowel habits, see a doctor rather than managing it with diet alone.",
+      },
+    ],
+    shopThisTopic: {
+      productHandle: "nutrizen-metabol-plus-improve-metabolism",
+      productLabel: "Metabol+",
+      collectionHandle: "detox-and-digestive-health",
+      collectionLabel: "Detox & Digestive Health",
+    },
+    lastReviewed: LAST_REVIEWED,
+  },
+  "how-to-do-a-herbal-parasite-cleanse": {
+    metaDescription:
+      "How a herbal parasite cleanse works, why many start before the full moon, what black walnut, wormwood and clove do, and who should avoid it.",
+    inShort:
+      "A herbal parasite cleanse is a traditional 2–4 week course built around black walnut hull, wormwood and clove, often started a few days before the full moon per traditional practice. It's a wellness routine rooted in traditional use, not a diagnosed medical treatment. Pregnant or breastfeeding women, and anyone on chronic medication, should avoid it or check with a doctor first.",
+    faqs: [
+      {
+        question: "When should I start a parasite cleanse?",
+        answer:
+          "Traditional protocols recommend starting a few days before the full moon, which is the timing NutriZen's directions follow.",
+      },
+      {
+        question: "How long does a herbal cleanse take?",
+        answer:
+          "A typical course runs two to four weeks, taken twice daily with meals as directed on the label.",
+      },
+      {
+        question: "Can I use a herbal cleanse if I'm pregnant?",
+        answer:
+          "No. Avoid herbal parasite cleanses during pregnancy or breastfeeding, and speak to a doctor first if you take chronic medication.",
+      },
+    ],
+    shopThisTopic: {
+      productHandle: "nutrizen-para-cleanse-complex",
+      productLabel: "Para-Cleanse Complex",
+      collectionHandle: "detox-and-digestive-health",
+      collectionLabel: "Detox & Digestive Health",
+    },
+    lastReviewed: LAST_REVIEWED,
+  },
+  "medications-that-lower-magnesium": {
+    metaDescription:
+      "Long-term reflux tablets, some diuretics and other medicines can lower magnesium. Which ones, the signs, and what to ask your pharmacist.",
+    inShort:
+      "Long-term use of proton-pump inhibitors (reflux medication), certain diuretics, and some antibiotics can lower magnesium levels over time. This doesn't mean everyone on these medications is deficient, but it's worth asking your doctor or pharmacist about, especially alongside symptoms like cramping, fatigue or poor sleep. Never stop a prescribed medication without medical advice.",
+    faqs: [
+      {
+        question: "Does omeprazole lower magnesium?",
+        answer:
+          "Long-term use of proton-pump inhibitors like omeprazole has been linked to lower magnesium levels, particularly after a year or more of use.",
+      },
+      {
+        question: "Do diuretics affect magnesium?",
+        answer: "Yes, loop and thiazide diuretics increase how much magnesium is lost through urine.",
+      },
+      {
+        question: "Should I stop my medication if it affects magnesium?",
+        answer:
+          "No, never stop a prescribed medication on your own. Ask your doctor or pharmacist whether a magnesium check or supplement makes sense alongside your treatment.",
+      },
+    ],
+    shopThisTopic: {
+      productHandle: "nutrizen-magnesium-complex",
+      productLabel: "Magnesium Complex",
+      collectionHandle: "stress-sleep-and-mood",
+      collectionLabel: "Stress, Sleep & Mood",
+    },
+    lastReviewed: LAST_REVIEWED,
+  },
+  "magnesium-for-night-leg-cramps": {
+    metaDescription:
+      "Why leg cramps strike at night, whether magnesium helps, which form to choose, and when cramps need a doctor.",
+    inShort:
+      "Night-time leg cramps are common and usually harmless, often linked to dehydration, prolonged sitting or standing, and low magnesium. Magnesium contributes to normal muscle function, which is why it's commonly used for cramps alongside stretching and hydration. Frequent, severe or unusual cramps should be checked by a doctor.",
+    faqs: [
+      {
+        question: "What causes leg cramps at night?",
+        answer:
+          "Dehydration, long periods of sitting or standing, intense exercise, certain medications, and low magnesium are all common factors.",
+      },
+      {
+        question: "Does magnesium stop leg cramps?",
+        answer:
+          "Magnesium contributes to normal muscle function and may help if low levels are part of the cause, though it isn't a guaranteed fix for every cramp.",
+      },
+      {
+        question: "Which magnesium is best for cramps?",
+        answer:
+          "Magnesium Oxide provides a concentrated dose for cramps and regularity; Magnesium Complex adds gentler forms if sleep is also a concern.",
+      },
+    ],
+    shopThisTopic: {
+      productHandle: "nutrizen-magnesium-oxide",
+      productLabel: "Magnesium Oxide",
+      collectionHandle: "bone-muscle-and-recovery",
+      collectionLabel: "Bone, Muscle & Recovery",
+    },
+    lastReviewed: LAST_REVIEWED,
+  },
+  "supplements-for-stress-and-sleep": {
+    metaDescription:
+      "Magnesium, ashwagandha, rhodiola and more: which supplements support stress and sleep, how to combine them, and who should avoid them.",
+    inShort:
+      "Magnesium is usually the sensible starting point for stress and sleep, supporting muscle relaxation and nervous system function. Adaptogens like ashwagandha and rhodiola are traditionally used for more ongoing stress and are typically taken for several weeks before effects are noticed. Both work best alongside consistent sleep habits, not instead of them.",
+    faqs: [
+      {
+        question: "Can I take magnesium and ashwagandha together?",
+        answer:
+          "Many people do, since they work in different ways. Speak to a professional first if you're pregnant, have a thyroid condition or take medication.",
+      },
+      {
+        question: "How long do adaptogens take to work for stress?",
+        answer:
+          "Most are taken daily for several weeks before people notice a difference, unlike magnesium which can help more quickly with relaxation.",
+      },
+      {
+        question: "What's the best supplement for sleep?",
+        answer:
+          "Magnesium, particularly the glycinate (bisglycinate) form, is usually the first place to start for sleep support.",
+      },
+    ],
+    shopThisTopic: {
+      productHandle: "nutrizen-adaptogen-plus-complex",
+      productLabel: "Adaptogen+ Complex",
+      collectionHandle: "stress-sleep-and-mood",
+      collectionLabel: "Stress, Sleep & Mood",
+    },
+    lastReviewed: LAST_REVIEWED,
+  },
 };
