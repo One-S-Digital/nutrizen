@@ -132,7 +132,7 @@ export default function CategoryShowcase({ categories }: { categories: Category[
             Find Your Perfect Formula
           </h2>
           <p className="text-lg text-neutral-dark leading-relaxed">
-            Every body is different. Start with your goal.
+            Start with how you want to feel. We&apos;ll show you the formulas built for it.
           </p>
         </motion.div>
 
@@ -228,7 +228,7 @@ export default function CategoryShowcase({ categories }: { categories: Category[
           transition={{ duration: 0.6, ease: scrollEase }}
         >
           <Link
-            href={`/shop?collection=${encodeURIComponent(activeCategory.handle)}`}
+            href={`/collections/${encodeURIComponent(activeCategory.handle)}`}
             className="group inline-flex items-center gap-2 rounded-full border-2 border-primary px-8 py-3 text-sm font-semibold text-primary hover:bg-primary hover:text-white transition-all duration-300"
           >
             Explore {activeCategory.title}

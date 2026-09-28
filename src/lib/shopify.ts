@@ -473,7 +473,7 @@ export async function getAllProductsForShop(limit = 250): Promise<ShopProduct[]>
         n.priceRange.minVariantPrice.currencyCode
       ),
       imageUrl: n.featuredImage?.url ?? null,
-      imageAlt: n.featuredImage?.altText ?? n.title,
+      imageAlt: n.featuredImage?.altText ?? `NutriZen ${n.title} supplement bottle`,
     }));
   } catch {
     return [];
@@ -696,14 +696,7 @@ export async function getMainMenuLinks(
     }>({ query, variables: { handle: "main-menu" } });
     const items = response.body?.menu?.items;
     if (items?.length) {
-      return flattenFooterLeafLinks(items).map((link) => {
-        // Convert /collections/<handle> → /shop?collection=<handle>
-        const collectionMatch = link.href.match(/^\/collections\/([^/?#]+)/);
-        if (collectionMatch) {
-          return { ...link, href: `/shop?collection=${encodeURIComponent(collectionMatch[1]!)}`, external: false };
-        }
-        return link;
-      });
+      return flattenFooterLeafLinks(items).filter((link) => !/^\/collections\/frontpage(\/|$|\?|#)/.test(link.href));
     }
   } catch {
     // fall through to fallback
@@ -712,12 +705,15 @@ export async function getMainMenuLinks(
   // Fallback: derive links from nav collections
   return [
     { id: "fb-all", title: "All Products", href: "/shop", external: false },
-    ...fallbackCollections.slice(0, 8).map((c) => ({
-      id: c.id,
-      title: c.title,
-      href: `/shop?collection=${encodeURIComponent(c.handle)}`,
-      external: false,
-    })),
+    ...fallbackCollections
+      .filter((c) => c.handle !== "frontpage")
+      .slice(0, 8)
+      .map((c) => ({
+        id: c.id,
+        title: c.title,
+        href: `/collections/${encodeURIComponent(c.handle)}`,
+        external: false,
+      })),
   ];
 }
 
@@ -903,6 +899,8 @@ export type ProductDetail = {
   seoTitle: string | null;
   /** SEO description from global.description_tag metafield (used in <meta description>). */
   seoDescription: string | null;
+  /** First variant's SKU, for Product schema (falls back to variant id when unset). */
+  sku: string | null;
 };
 
 export type { ProductVariantSummary, ReferencedProductSummary } from "@/lib/shopify-referenced-products";
@@ -961,6 +959,7 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
       productReviews: m.productReviews,
       seoTitle: null,
       seoDescription: null,
+      sku: m.variants[0]?.id ?? null,
     };
   }
 
@@ -995,6 +994,7 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
             node {
               id
               title
+              sku
               availableForSale
               price {
                 amount
@@ -1179,6 +1179,7 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
                 node: {
                   id: string;
                   title: string;
+                  sku: string | null;
                   availableForSale: boolean;
                   price: { amount: string; currencyCode: string };
                   compareAtPrice: { amount: string; currencyCode: string } | null;
@@ -1239,6 +1240,7 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
             node: {
               id: string;
               title: string;
+              sku: string | null;
               availableForSale: boolean;
               price: { amount: string; currencyCode: string };
               compareAtPrice: { amount: string; currencyCode: string } | null;
@@ -1297,13 +1299,14 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
     ? { amount: firstVariant.priceAmount, currencyCode: firstVariant.currencyCode }
     : p.priceRange.minVariantPrice;
 
+  const defaultAlt = `NutriZen ${p.title} supplement bottle`;
   const galleryEdges = p.images?.edges ?? [];
   const gallery = galleryEdges.map((e) => ({
     url: e.node.url,
-    alt: e.node.altText ?? p.title,
+    alt: e.node.altText ?? defaultAlt,
   }));
   const featured = p.featuredImage?.url ?? gallery[0]?.url ?? null;
-  const featuredAlt = p.featuredImage?.altText ?? gallery[0]?.alt ?? p.title;
+  const featuredAlt = p.featuredImage?.altText ?? gallery[0]?.alt ?? defaultAlt;
 
   const bundleProducts = referencedProductsFromMetafield(p.bundle_products ?? null);
   const frequentlyBoughtTogether = referencedProductsFromMetafield(p.frequently_bought_together ?? null);
@@ -1364,6 +1367,7 @@ export async function getProductDetail(handle: string): Promise<ProductDetail | 
     productReviews,
     seoTitle,
     seoDescription,
+    sku: variantEdges[0]?.node.sku ?? null,
   };
 }
 

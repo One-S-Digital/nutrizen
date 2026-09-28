@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { getProductDetailCached as getProductDetailFromCache } from "@/lib/shopify";
 import ProductDetailClient from "./ProductDetailClient";
 import JsonLd from "@/components/seo/JsonLd";
+import { PRODUCT_SEO_CONTENT } from "@/lib/seo-content/products";
 
 // React.cache() deduplicates calls within the same render pass (generateMetadata
 // + page body). unstable_cache (in shopify.ts) persists the result across
@@ -23,14 +24,18 @@ export async function generateMetadata({
   const product = await getProductDetailCached(handle);
   if (!product) return {};
 
-  const title = product.seoTitle ?? product.title;
+  const seoContent = PRODUCT_SEO_CONTENT[handle];
+  const title = seoContent?.title ?? product.seoTitle ?? product.title;
   const description =
-    product.seoDescription ?? product.description?.slice(0, 160) ?? undefined;
+    seoContent?.metaDescription ?? product.seoDescription ?? product.description?.slice(0, 160) ?? undefined;
   const canonical = `${SITE_URL}/products/${handle}`;
   const image = product.featuredImageUrl;
+  // seoContent titles already carry the full "… | NutriZen[ South Africa]" brand
+  // suffix (it varies per product); the legacy fallback path still needs it appended.
+  const brandedTitle = seoContent ? title : `${title} | NutriZen`;
 
   return {
-    title,
+    title: seoContent ? { absolute: title } : title,
     description,
     keywords: [
       product.title,
@@ -45,7 +50,7 @@ export async function generateMetadata({
     openGraph: {
       type: "website",
       url: canonical,
-      title: `${title} | NutriZen`,
+      title: brandedTitle,
       description,
       ...(image
         ? {
@@ -62,7 +67,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${title} | NutriZen`,
+      title: brandedTitle,
       description,
       ...(image ? { images: [image] } : {}),
     },
@@ -77,13 +82,17 @@ export default async function ProductPage({ params }: { params: Promise<{ handle
   }
 
   const canonical = `${SITE_URL}/products/${handle}`;
+  const seoContent = PRODUCT_SEO_CONTENT[handle];
+  const allFaqItems = seoContent ? [...product.faqItems, ...seoContent.newFaqs] : product.faqItems;
 
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.title,
-    description: product.description,
+    description: seoContent?.metaDescription ?? product.description,
     url: canonical,
+    sku: product.sku ?? product.variants[0]?.id ?? product.id,
+    countryOfOrigin: "ZA",
     brand: {
       "@type": "Brand",
       name: "NutriZen",
@@ -105,25 +114,69 @@ export default async function ProductPage({ params }: { params: Promise<{ handle
         "@type": "Organization",
         name: "NutriZen",
       },
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "ZA",
+        },
+        // Flat courier rate for packages under 5kg (policies/shipping-policy); free over R690
+        // is out of scope for this single static Offer entry.
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          currency: "ZAR",
+          value: 130,
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 1, unitCode: "DAY" },
+          transitTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 5, unitCode: "DAY" },
+        },
+      },
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "ZA",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 30,
+      },
     },
-    ...(product.faqItems?.length
-      ? {
-          mainEntity: product.faqItems.map((faq) => ({
-            "@type": "Question",
-            name: faq.question,
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: faq.answer,
-            },
-          })),
-        }
-      : {}),
+  };
+
+  const faqSchema = allFaqItems.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: allFaqItems.map((faq) => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.answer,
+          },
+        })),
+      }
+    : null;
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Shop", item: `${SITE_URL}/shop` },
+      { "@type": "ListItem", position: 3, name: product.title, item: canonical },
+    ],
   };
 
   return (
     <>
       <JsonLd data={productSchema} />
-      <ProductDetailClient product={product} />
+      {faqSchema ? <JsonLd data={faqSchema} /> : null}
+      <JsonLd data={breadcrumbSchema} />
+      <ProductDetailClient
+        product={{ ...product, faqItems: allFaqItems }}
+        descriptorLine={seoContent?.descriptorLine}
+        relatedReading={seoContent?.relatedReading}
+      />
     </>
   );
 }

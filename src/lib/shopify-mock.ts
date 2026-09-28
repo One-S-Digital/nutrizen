@@ -417,7 +417,7 @@ export function getMockMainMenuLinks() {
   return getMockNavCollections().map((c) => ({
     id: c.id,
     title: c.title,
-    href: `/shop?collection=${encodeURIComponent(c.handle)}`,
+    href: `/collections/${encodeURIComponent(c.handle)}`,
     external: false,
   }));
 }

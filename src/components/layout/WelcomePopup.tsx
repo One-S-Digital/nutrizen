@@ -114,9 +114,11 @@ export default function WelcomePopup() {
                   />
                 </div>
 
-                <h2 className="text-2xl font-bold text-neutral-darkest text-center mb-1">
+                {/* Promotional modal copy — not real page content, so it's a <p>, not a
+                    heading, to avoid competing with each page's own heading outline. */}
+                <p className="text-2xl font-bold text-neutral-darkest text-center mb-1">
                   Welcome to NutriZen
-                </h2>
+                </p>
                 <p className="text-neutral-dark text-center text-sm mb-6">
                   Premium supplements, transparent ingredients, delivered to your door.
                 </p>

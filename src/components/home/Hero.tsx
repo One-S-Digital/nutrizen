@@ -251,16 +251,16 @@ export default function Hero() {
               variants={textChildVariants}
               className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-4"
             >
-              Precision Wellness
+              NutriZen South Africa · Supplements matched to you
             </motion.span>
 
             <motion.h1
               variants={textChildVariants}
               className="text-5xl md:text-7xl font-bold tracking-tight text-neutral-darkest mb-6 leading-[1.1]"
             >
-              Clean Supplements. <br />
-              <span className="text-primary relative inline-block mt-2">
-                Real Results.
+              Find the{" "}
+              <span className="text-primary relative inline-block italic">
+                right
                 <motion.span
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
@@ -268,21 +268,23 @@ export default function Hero() {
                   style={{ originX: 0 }}
                   className="absolute -bottom-2 left-0 w-full h-[3px] bg-secondary/40 rounded-full"
                 />
-              </span>
+              </span>{" "}
+              supplement in 2 minutes.
             </motion.h1>
 
             <motion.p
               variants={textChildVariants}
               className="text-lg md:text-xl text-neutral-dark mb-10 max-w-2xl mx-auto leading-relaxed"
             >
-              No fillers. No hidden blends. Just scientifically formulated nutrients your body actually uses.
+              Answer a few quick questions about your energy, sleep, stress and digestion, and we&apos;ll
+              recommend the NutriZen supplements that suit you, and explain why each one fits.
             </motion.p>
 
             <motion.div variants={textChildVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                <Link href="/shop">
+                <Link href="/free-nutrient-test">
                   <Button size="lg" variant="primary" className="px-10 text-lg group shadow-[0_8px_24px_-6px_rgba(140,171,119,0.5)]">
-                    Shop Now
+                    Start the free quiz
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2 group-hover:translate-x-1 transition-transform">
                       <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
                     </svg>
@@ -290,9 +292,9 @@ export default function Hero() {
                 </Link>
               </motion.div>
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                <Link href="/pages/science">
+                <Link href="/shop">
                   <Button size="lg" variant="outline" className="px-8 text-lg">
-                    The Science
+                    Browse all supplements
                   </Button>
                 </Link>
               </motion.div>

@@ -15,13 +15,17 @@ import { ProductInfoStrip } from "@/components/product/ProductInfoStrip";
 import { WellnessTimelineSection } from "@/components/product/WellnessTimelineSection";
 import { ProductFaqSection } from "@/components/product/ProductFaqSection";
 import { ProductReviewsSection } from "@/components/product/ProductReviewsSection";
+import { RelatedReading } from "@/components/product/RelatedReading";
+import type { ProductRelatedReading } from "@/lib/seo-content/products";
 import { cn } from "@/lib/utils";
 
 type Props = {
   product: ProductDetail;
+  descriptorLine?: string;
+  relatedReading?: ProductRelatedReading;
 };
 
-export default function ProductDetailClient({ product }: Props) {
+export default function ProductDetailClient({ product, descriptorLine, relatedReading }: Props) {
   const variants = useMemo(
     () =>
       product.variants.length > 0
@@ -162,6 +166,9 @@ export default function ProductDetailClient({ product }: Props) {
                 <span className="text-neutral-darkest">{product.title}</span>
               </nav>
               <h1 className="mb-4 text-4xl font-bold tracking-tight text-neutral-darkest md:text-5xl">{product.title}</h1>
+              {descriptorLine ? (
+                <p className="mb-4 -mt-2 text-lg font-medium text-primary">{descriptorLine}</p>
+              ) : null}
               <div className="mb-2 flex flex-wrap items-baseline gap-3">
                 <p className="text-2xl font-semibold text-neutral-dark">{selectedVariant.priceDisplay}</p>
                 {selectedVariant.compareAtAmount ? (
@@ -347,6 +354,12 @@ export default function ProductDetailClient({ product }: Props) {
             {showReviews ? <ProductReviewsSection reviews={product.productReviews} /> : null}
           </div>
         )}
+
+        {relatedReading ? (
+          <div className="mt-16 max-w-2xl">
+            <RelatedReading relatedReading={relatedReading} />
+          </div>
+        ) : null}
 
         {(showBundle || showFbt) && (
           <div className="mt-16 space-y-12 pb-8">

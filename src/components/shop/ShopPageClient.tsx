@@ -390,10 +390,10 @@ function MobileFilterPanel({
 function GuidanceBlock() {
   const reduceMotion = useReducedMotion();
   const goals = [
-    { icon: "🛡️", label: "Immune Support", handle: "immunity" },
-    { icon: "🧘", label: "Stress & Sleep", handle: "stress" },
-    { icon: "⚡", label: "Energy & Focus", handle: "energy" },
-    { icon: "🌱", label: "Gut Health", handle: "gut" },
+    { icon: "🛡️", label: "Immune Support", handle: "immunity-and-defense" },
+    { icon: "🧘", label: "Stress & Sleep", handle: "stress-sleep-and-mood" },
+    { icon: "⚡", label: "Energy & Focus", handle: "energy-and-vitality" },
+    { icon: "🌱", label: "Gut Health", handle: "detox-and-digestive-health" },
   ];
 
   return (
@@ -419,7 +419,7 @@ function GuidanceBlock() {
               whileTap={{ scale: 0.97 }}
             >
               <Link
-                href={`/shop?collection=${g.handle}`}
+                href={`/collections/${g.handle}`}
                 className="flex flex-col items-center gap-2 rounded-2xl bg-white/10 hover:bg-white/18 border border-white/10 p-4 text-center transition-all duration-200"
               >
                 <span className="text-2xl">{g.icon}</span>
@@ -456,7 +456,7 @@ export default function ShopPageClient({
     setVisibleCount(PRODUCTS_PER_PAGE);
     startTransition(() => {
       if (handle) {
-        router.push(`/shop?collection=${encodeURIComponent(handle)}`, { scroll: false });
+        router.push(`/collections/${encodeURIComponent(handle)}`, { scroll: false });
       } else {
         router.push("/shop", { scroll: false });
       }
