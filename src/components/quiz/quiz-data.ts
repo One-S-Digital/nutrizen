@@ -41,10 +41,6 @@ export interface Question {
 export interface SafetyState {
   ageBracket: string | null;
   pregnant: boolean;
-  menstruating: boolean;
-  vegetarian: boolean;
-  lowIron: boolean;
-  diabetesMed: boolean;
   thyroidMed: boolean;
   bpMed: boolean;
   bloodThinners: boolean;
@@ -53,10 +49,6 @@ export interface SafetyState {
 export const DEFAULT_SAFETY: SafetyState = {
   ageBracket: null,
   pregnant: false,
-  menstruating: false,
-  vegetarian: false,
-  lowIron: false,
-  diabetesMed: false,
   thyroidMed: false,
   bpMed: false,
   bloodThinners: false,
@@ -383,10 +375,6 @@ export const SAFETY_QUESTION = {
   },
   flags: [
     { key: "pregnant", label: "Pregnant, or breastfeeding" },
-    { key: "menstruating", label: "Currently menstruating, with regular or heavy periods" },
-    { key: "vegetarian", label: "Vegetarian or vegan" },
-    { key: "lowIron", label: "Previously told by a doctor you're low in iron" },
-    { key: "diabetesMed", label: "On medication for diabetes" },
     { key: "thyroidMed", label: "On medication for a thyroid condition" },
     { key: "bpMed", label: "On medication for blood pressure" },
     { key: "bloodThinners", label: "On blood thinners" },
@@ -448,12 +436,12 @@ export const TIMELINES: Record<string, Timeline> = {
   "vitamin-d3": {
     week1: { heading: "The first week", bullets: ["No dramatic shift yet — vitamin D builds up in fat stores gradually.", "Some people notice slightly better mood within the first few days.", "Take it with a meal that has some fat in it — it's fat-soluble and absorbs poorly on an empty stomach."], tip: "Morning, with breakfast, is easier to remember than “with a meal” left open-ended." },
     weeks23: { heading: "Weeks 2–3", bullets: ["Levels are climbing but not yet at a steady state.", "Aches from low vitamin D are often the first thing to ease.", "Immune resilience typically improves before mood does."], tip: "Pair with the magnesium already in this formula — it's required to activate vitamin D in the body." },
-    month1: { heading: "Month 1 and beyond", bullets: ["Blood levels typically plateau by 8–12 weeks of consistent daily use.", "A good point to re-test if you started from a confirmed low result.", "Ongoing use matters more in low-sun months than high-sun ones."], tip: "A repeat blood test is the only way to know your actual level — not the quiz." },
+    month1: { heading: "Month 1 and beyond", bullets: ["Levels typically build up and plateau over 8–12 weeks of consistent daily use.", "Ongoing use matters more in low-sun months than high-sun ones."], tip: "Consistency matters more than timing — a daily habit is what builds levels up." },
   },
   "magnesium-complex": {
     week1: { heading: "The first week", bullets: ["Muscle relaxation is usually the fastest effect — cramps and twitching often ease within days.", "Sleep may feel deeper before it feels longer.", "Some people get mild loosening of stool as the gut adjusts; that settles."], tip: "Take it 30–60 minutes before bed if sleep is the main goal." },
     weeks23: { heading: "Weeks 2–3", bullets: ["Tension headaches, if magnesium-related, typically reduce in this window.", "A wound-down nervous system starts to feel less reactive to stress.", "PMS cramping, if applicable, is usually noticeably softer by the next cycle."], tip: "Reduce caffeine after 2pm — it actively depletes magnesium." },
-    month1: { heading: "Month 1 and beyond", bullets: ["Muscle recovery after training improves as tissue magnesium stores refill.", "Most people find their effective dose and don't need to increase it further.", "If cramping was severe and doesn't improve, it's worth a blood test."], tip: "No need to cycle — this is a maintenance mineral, not a stimulant." },
+    month1: { heading: "Month 1 and beyond", bullets: ["Muscle recovery after training improves as tissue magnesium stores refill.", "Most people find their effective dose and don't need to increase it further.", "If cramping was severe and doesn't improve, it's worth speaking to a doctor."], tip: "No need to cycle — this is a maintenance mineral, not a stimulant." },
   },
   "magnesium-oxide": {
     week1: { heading: "The first week", bullets: ["Effects on regularity are usually the fastest in this range — often within 24–48 hours.", "Start at the labelled dose; more can overshoot into looseness.", "Take with water, at the same time each day."], tip: "Mornings tend to work with the body's natural digestive rhythm." },
@@ -473,7 +461,7 @@ export const TIMELINES: Record<string, Timeline> = {
   "vitacore-b-complex": {
     week1: { heading: "The first week", bullets: ["Energy from B vitamins is often felt fast — sometimes within days — since they're water-soluble.", "Take with food if the niacin (B3) causes any warmth or flushing — harmless, and it settles within days for most people.", "Take in the morning — B vitamins are mildly stimulating for some people."], tip: "With food reduces the rare chance of mild stomach upset." },
     weeks23: { heading: "Weeks 2–3", bullets: ["Afternoon energy crashes typically become less severe.", "Brain fog, if folate-related, is usually one of the slower symptoms to lift.", "Mouth ulcers or cracked corners, if present, usually heal in this window."], tip: "Regular alcohol use works directly against what this formula is rebuilding — cutting back, even temporarily, speeds this up." },
-    month1: { heading: "Month 1 and beyond", bullets: ["Mood and focus improvements, where folate was the driver, are typically clearest by now.", "A reasonable point to retest folate if you started from a known low result.", "Long-term use is genuinely low-risk — excess B vitamins are simply excreted, not stored."], tip: "Worth taking on an ongoing basis if regular alcohol use is a consistent part of your week — that's the risk factor most likely to keep drawing this down." },
+    month1: { heading: "Month 1 and beyond", bullets: ["Mood and focus improvements, where folate was the driver, are typically clearest by now.", "Energy and mood changes build gradually, so judge it across a few weeks rather than days.", "Long-term use is genuinely low-risk — excess B vitamins are simply excreted, not stored."], tip: "Worth taking on an ongoing basis if regular alcohol use is a consistent part of your week — that's the risk factor most likely to keep drawing this down." },
   },
   "glutathione-nac": {
     week1: { heading: "The first week", bullets: ["No dramatic shift expected — this replenishes a reserve, it doesn't create an immediate effect.", "Take consistently, same time each day, away from other supplements that compete for absorption.", "Mild detox-type symptoms (slight headache, fatigue) are possible early on and usually pass."], tip: "Hydration matters more than usual in the first week." },
@@ -491,7 +479,7 @@ export const TIMELINES: Record<string, Timeline> = {
     month1: { heading: "Month 1 and beyond", bullets: ["Most people have a good sense by now of whether this is solving the problem or just easing it.", "Digestion that's “slow” rather than acutely uncomfortable often needs more than a month.", "Reassess against fibre, water, and meal timing — the formula works with these, not instead of them."], tip: "Keep a rough note of which meals trigger symptoms — the fastest way to find the real cause." },
   },
   cellunex: {
-    week1: { heading: "The first week", bullets: ["Some people notice fewer sharp cravings within the first week.", "Take before your largest or most carb-heavy meal, per label guidance.", "On diabetes medication? Have that conversation with your doctor this week, before continuing."], tip: "Pair with protein at the start of a meal — it blunts the same spike this formula targets." },
+    week1: { heading: "The first week", bullets: ["Some people notice fewer sharp cravings within the first week.", "Take before your largest or most carb-heavy meal, per label guidance."], tip: "Pair with protein at the start of a meal — it blunts the same spike this formula targets." },
     weeks23: { heading: "Weeks 2–3", bullets: ["The 2–3 hour post-meal crash, if present, often becomes less severe.", "Energy swings through the day typically start to flatten out.", "Cravings for sugar specifically tend to ease before general appetite does."], tip: "Consistency matters more than dose here — skipping days blunts the effect." },
     month1: { heading: "Month 1 and beyond", bullets: ["A reasonable point to reassess energy stability across a full week.", "Weight changes, if any, are usually secondary to the energy and craving effects.", "Nothing shifted? Worth investigating with a doctor rather than increasing the dose."], tip: "A supporting formula, not a substitute for medical management of diagnosed blood sugar conditions." },
   },
@@ -503,21 +491,23 @@ export const TIMELINES: Record<string, Timeline> = {
 };
 
 export const GATE_COPY = {
-  ironBlocked:
-    "Your answers are consistent with the pattern of low iron — but iron is the one mineral where more isn't automatically better, since it accumulates in the body. Before recommending it outright, confirm with a ferritin and full blood count. In the meantime, B vitamins are a safe adjacent option: folate deficiency produces a near-identical fatigue-and-pallor picture to low iron, with no accumulation risk.",
   adaptogenBlocked:
     "Adaptogen+ contains licorice root, which can raise blood pressure, and ashwagandha, which needs care alongside thyroid medication. Since that applies to you, we've routed you to Magnesium Complex instead — it addresses the same wired-but-exhausted pattern through a different mechanism.",
-  cellunexCaution:
-    "You mentioned you're on medication for blood sugar. Cellunex may improve insulin sensitivity, which means it can plausibly stack with that medication — please discuss it with your doctor before starting, rather than adding it to your cart today.",
   pregnancyBanner:
     "Because you're pregnant, breastfeeding, or under 18, we're not going to recommend adding anything to your cart here. The pattern below is still worth knowing — but the right next step is a conversation with your doctor or midwife, not a supplement order.",
   fallback: "Nothing stood out strongly, so we've gone with what you told us at the start you want to change.",
 };
 
+// The only two products that carry a "get a blood test" note. It's advice shown beside the
+// product, not a gate — both are recommended and added to the cart like any other.
+export const BLOOD_TEST_NOTE: Partial<Record<Bucket, string>> = {
+  IRON: "Iron is stored in the body rather than flushed out, so we'd recommend getting a blood test (ferritin) to check your levels.",
+  BLOOD_SUGAR: "We'd recommend getting a blood test (fasting glucose or HbA1c) to see where your blood sugar sits.",
+};
+
 export const FOOTER_COPY = [
   "This is a wellness guide, not a medical assessment.",
   "Symptoms overlap across many possible causes — this is a pattern match, not a diagnosis.",
-  "If iron, vitamin D, or B vitamins came up strongly, confirm with a blood test before treating it as settled.",
   "Speak to a doctor if symptoms persist.",
 ];
 
@@ -540,8 +530,17 @@ export const EMAIL_GATE_COPY = {
 // ---------------------------------------------------------------------
 // Scoring
 // ---------------------------------------------------------------------
-function computeMaxPossible(): Record<string, number> {
-  const max: Record<string, number> = {};
+// Every nutrient is scored against the same yardstick: how close are you to showing its
+// strongest symptoms? 1.0 = its FULL_SIGNAL_SYMPTOMS strongest symptoms (the Q1 goal counts 1.5x).
+// Dividing by the sum of *all* possible symptoms instead would penalise nutrients that simply
+// have more symptoms listed (magnesium, B vitamins) and favour those with fewer (stress, digestion).
+const FULL_SIGNAL_SYMPTOMS = 5;
+
+function computeCeilings(): Record<string, number> {
+  const weights: Record<string, number[]> = {};
+  const add = (bucket: string, w: number) => {
+    (weights[bucket] = weights[bucket] || []).push(w);
+  };
   QUESTIONS.forEach((q) => {
     if (q.type === "single") {
       const bestPerBucket: Record<string, number> = {};
@@ -550,22 +549,25 @@ function computeMaxPossible(): Record<string, number> {
           bestPerBucket[b] = Math.max(bestPerBucket[b] || 0, opt.weights[b as Bucket] || 0);
         });
       });
-      Object.keys(bestPerBucket).forEach((b) => {
-        max[b] = (max[b] || 0) + bestPerBucket[b] * 1.5;
-      });
+      Object.keys(bestPerBucket).forEach((b) => add(b, bestPerBucket[b] * 1.5));
     } else {
       q.options.forEach((opt) => {
         if (opt.exclusive) return;
-        Object.keys(opt.weights).forEach((b) => {
-          max[b] = (max[b] || 0) + (opt.weights[b as Bucket] || 0);
-        });
+        Object.keys(opt.weights).forEach((b) => add(b, opt.weights[b as Bucket] || 0));
       });
     }
   });
-  return max;
+  const ceilings: Record<string, number> = {};
+  Object.keys(weights).forEach((b) => {
+    ceilings[b] = weights[b]
+      .sort((a, c) => c - a)
+      .slice(0, FULL_SIGNAL_SYMPTOMS)
+      .reduce((sum, w) => sum + w, 0);
+  });
+  return ceilings;
 }
 
-const MAX_POSSIBLE = computeMaxPossible();
+const CEILINGS = computeCeilings();
 
 interface Contribution {
   label: string;
@@ -602,7 +604,8 @@ export function score(answers: Answers): ScoreResult {
 
   const normalized: Record<string, number> = {};
   (Object.keys(BUCKETS) as Bucket[]).forEach((b) => {
-    normalized[b] = MAX_POSSIBLE[b] ? (raw[b] || 0) / MAX_POSSIBLE[b] : 0;
+    // Left uncapped (can pass 1.0) so heavy responders still rank cleanly; clamp when displaying.
+    normalized[b] = CEILINGS[b] ? (raw[b] || 0) / CEILINGS[b] : 0;
   });
 
   return { raw, normalized, magSub, contributions };
@@ -637,7 +640,8 @@ export function joinNatural(list: string[]): string {
 
 export interface ResultItem {
   bucket: string;
-  role: "primary" | "supporting" | "addon";
+  // primary = top score; main = also a clear pattern; recommended = lighter signal worth adding
+  role: "primary" | "main" | "recommended";
   productId: string;
   product: Product;
   tier: string;
@@ -649,12 +653,11 @@ export interface ResultItem {
   echo: string[];
   allEcho: string[];
   gated: keyof typeof GATE_COPY | null;
-  addToCartDisabled: boolean;
+  bloodTestNote: string | null;
   redirectTo?: Bucket;
   redirectedFrom?: Bucket;
   bundleHits?: string[];
   freeDeliveryAddon?: boolean;
-  isIronSafeAlternative?: boolean;
 }
 
 export interface QuizResult {
@@ -664,30 +667,47 @@ export interface QuizResult {
   normalized: Record<string, number>;
 }
 
+// Bars on the 0–1 scale from score(). They line up with tierLabel(): MAIN_MIN is "clear pattern",
+// RECOMMEND_MIN sits inside "early signs" (a couple of matching symptoms). Tuned by simulating
+// respondents: ~1 in 5 single-theme profiles still get one product, most get two or three, and
+// four stays rare.
+const MAIN_MIN = 0.45; // scoring this high = a main product: something you're likely low in
+const RECOMMEND_MIN = 0.25; // a lighter signal — recommended alongside the main product(s)
+const FOURTH_MIN = 0.6; // a 4th product needs a near-strong pattern, so it stays uncommon
+const BUNDLE_MIN = 0.45; // two of vitamin D / zinc / antioxidant at "clear pattern" -> the stack
+const MAX_ITEMS = 4;
+
 export function buildResult(answers: Answers, safety: SafetyState): QuizResult {
   const s = score(answers);
-  const ELIGIBLE = 0.35;
-  const PRIMARY_MIN = 0.45;
 
   const order = (Object.keys(BUCKETS) as Bucket[]).sort((a, b) => s.normalized[b] - s.normalized[a]);
-  const eligible = order.filter((b) => s.normalized[b] >= ELIGIBLE);
 
+  // No bucket reached "clear pattern": fall back to what the person said they most want to change.
   let isFallback = false;
-  let primaryBucket: Bucket | null = eligible.length && s.normalized[eligible[0]] >= PRIMARY_MIN ? eligible[0] : null;
-  let supportingBuckets: Bucket[] = [];
-
-  if (!primaryBucket) {
+  let primaryBucket: Bucket = order[0];
+  if (s.normalized[primaryBucket] < MAIN_MIN) {
     isFallback = true;
     const q1picks = (answers.q1 || [])[0];
     const q1Bucket = q1picks ? (Object.keys(q1picks.weights)[0] as Bucket | undefined) : undefined;
-    primaryBucket = q1Bucket || eligible[0] || "MAGNESIUM";
-    supportingBuckets = eligible.filter((b) => b !== primaryBucket).slice(0, 2);
-  } else {
-    supportingBuckets = eligible.filter((b) => b !== primaryBucket).slice(0, 2);
+    primaryBucket = q1Bucket || (s.normalized[order[0]] >= RECOMMEND_MIN ? order[0] : "MAGNESIUM");
   }
 
+  // Fill the remaining slots from `candidates` (already sorted high -> low): each needs
+  // RECOMMEND_MIN, and the last slot needs the higher FOURTH_MIN.
+  function pickMore(candidates: Bucket[], alreadyPicked: number): Bucket[] {
+    const picked: Bucket[] = [];
+    for (const b of candidates) {
+      const slot = alreadyPicked + picked.length + 1;
+      if (slot > MAX_ITEMS) break;
+      if (s.normalized[b] < (slot === MAX_ITEMS ? FOURTH_MIN : RECOMMEND_MIN)) break;
+      picked.push(b);
+    }
+    return picked;
+  }
+  const roleFor = (b: Bucket): ResultItem["role"] => (s.normalized[b] >= MAIN_MIN ? "main" : "recommended");
+
   const bundleTrio: Bucket[] = ["VIT_D", "ZINC", "ANTIOXIDANT"];
-  const bundleHits = bundleTrio.filter((b) => s.normalized[b] >= ELIGIBLE);
+  const bundleHits = bundleTrio.filter((b) => s.normalized[b] >= BUNDLE_MIN);
   const bundleTriggered = bundleHits.length >= 2;
 
   function resolveProduct(bucket: Bucket): string {
@@ -716,33 +736,19 @@ export function buildResult(answers: Answers, safety: SafetyState): QuizResult {
       echo: topContributions(s.contributions, bucket, 3),
       allEcho: topContributions(s.contributions, bucket, 8),
       gated: null,
-      addToCartDisabled: false,
+      bloodTestNote: BLOOD_TEST_NOTE[bucket] ?? null,
     };
 
-    if (bucket === "IRON") {
-      const qualifies = !!safety.menstruating || !!safety.pregnant || !!safety.vegetarian || !!safety.lowIron;
-      if (!qualifies) {
-        item.gated = "ironBlocked";
-        item.addToCartDisabled = true;
-      }
-    }
     if (bucket === "STRESS_LOAD") {
       if (safety.bpMed || safety.thyroidMed) {
         item.gated = "adaptogenBlocked";
         item.redirectTo = "MAGNESIUM";
       }
     }
-    if (bucket === "BLOOD_SUGAR") {
-      if (safety.diabetesMed) {
-        item.gated = "cellunexCaution";
-        item.addToCartDisabled = true;
-      }
-    }
     return item;
   }
 
-  let items: ResultItem[] = [];
-  const usedBuckets: Record<string, boolean> = {};
+  const items: ResultItem[] = [];
 
   if (bundleTriggered) {
     const bundleNormalized = Math.max(...bundleHits.map((b) => s.normalized[b]));
@@ -762,28 +768,20 @@ export function buildResult(answers: Answers, safety: SafetyState): QuizResult {
         new Set(bundleHits.reduce<string[]>((acc, b) => acc.concat(topContributions(s.contributions, b, 8)), [])),
       ).slice(0, 8),
       gated: null,
-      addToCartDisabled: false,
+      bloodTestNote: null,
       bundleHits: bundleHits.map((b) => BUCKETS[b].label),
     };
     items.push(bundleItem);
-    bundleTrio.forEach((b) => { usedBuckets[b] = true; });
 
-    const remaining = order.filter((b) => !usedBuckets[b] && s.normalized[b] >= ELIGIBLE);
-    remaining.slice(0, 2).forEach((b, idx) => {
-      const it = buildItem(b, idx === 0 ? "addon" : "supporting");
+    pickMore(order.filter((b) => !bundleTrio.includes(b)), 1).forEach((b, idx) => {
+      const it = buildItem(b, roleFor(b));
       it.freeDeliveryAddon = idx === 0;
       items.push(it);
-      usedBuckets[b] = true;
     });
   } else {
-    const primaryItem = buildItem(primaryBucket, "primary");
-    items.push(primaryItem);
-    usedBuckets[primaryBucket] = true;
-
-    supportingBuckets.forEach((b) => {
-      if (usedBuckets[b]) return;
-      items.push(buildItem(b, "supporting"));
-      usedBuckets[b] = true;
+    items.push(buildItem(primaryBucket, "primary"));
+    pickMore(order.filter((b) => b !== primaryBucket), 1).forEach((b) => {
+      items.push(buildItem(b, roleFor(b)));
     });
   }
 
@@ -800,31 +798,16 @@ export function buildResult(answers: Answers, safety: SafetyState): QuizResult {
       }
       return;
     }
-    if (item.gated === "ironBlocked") {
-      item.addToCartDisabled = true;
-      if (!finalProductIds[item.productId]) {
-        finalItems.push(item);
-        finalProductIds[item.productId] = true;
-      }
-      if (!finalProductIds["vitacore-b-complex"] && finalItems.length < 3) {
-        const bItem = buildItem("B_VITAMINS", "supporting");
-        bItem.isIronSafeAlternative = true;
-        finalItems.push(bItem);
-        finalProductIds["vitacore-b-complex"] = true;
-      }
-      return;
-    }
     if (!finalProductIds[item.productId]) {
       finalItems.push(item);
       finalProductIds[item.productId] = true;
     }
   });
 
-  const trimmedItems = finalItems.slice(0, 3);
   const globalCartBlocked = !!safety.pregnant || safety.ageBracket === "Under 18";
 
   return {
-    items: trimmedItems,
+    items: finalItems,
     isFallback,
     globalCartBlocked,
     normalized: s.normalized,
@@ -837,7 +820,7 @@ export function formatPrice(n: number): string {
 
 export function cartPermalink(items: ResultItem[]): string | null {
   const parts = items
-    .filter((i) => !i.addToCartDisabled && i.product?.variantId)
+    .filter((i) => i.product?.variantId)
     .map((i) => i.product.variantId + ":1");
   if (!parts.length) return null;
   return "https://checkout.nutrizen.co.za/cart/" + parts.join(",") + "?discount=QUIZ10";

@@ -444,7 +444,6 @@ function ProductCard({ item }: { item: ResultItem }) {
       <div>
         <div className="mb-1 flex items-center gap-2">
           <h3 className="text-[1.15rem] font-semibold text-[#16281F] dark:text-[#F1EFE8]">{p.name}</h3>
-          {item.addToCartDisabled ? <span className="font-mono text-[0.72rem] text-[#A4442B] dark:text-[#D98868]">not added to cart</span> : null}
         </div>
         <div className="mb-2.5 flex items-baseline gap-2">
           <span className="font-mono text-[1.05rem] font-medium text-[#16281F] dark:text-[#F1EFE8]">{formatPrice(p.price)}</span>
@@ -462,9 +461,9 @@ function ProductCard({ item }: { item: ResultItem }) {
             </span>
           ))}
         </div>
-        {item.gated ? (
+        {item.bloodTestNote ? (
           <div className="mt-3.5 rounded-[9px] border border-[#16281F]/12 bg-[#B9762F]/12 px-3.5 py-3 text-[0.86rem] leading-relaxed text-[#16281F] dark:border-[#F1EFE8]/13 dark:bg-[#DBA46A]/14 dark:text-[#F1EFE8]">
-            {GATE_COPY[item.gated]}
+            {item.bloodTestNote}
           </div>
         ) : null}
         <div className="mt-3.5">
@@ -474,7 +473,7 @@ function ProductCard({ item }: { item: ResultItem }) {
             rel="noopener"
             className="text-[0.85rem] font-semibold text-[#4A5B52] hover:text-[#16281F] dark:text-[#B6C1B9] dark:hover:text-[#F1EFE8]"
           >
-            {item.addToCartDisabled ? "View product page →" : "View full formula →"}
+            View full formula →
           </a>
         </div>
       </div>
@@ -482,13 +481,11 @@ function ProductCard({ item }: { item: ResultItem }) {
   );
 }
 
-function SupportingItem({ item }: { item: ResultItem }) {
+function RecommendedItem({ item }: { item: ResultItem }) {
   const p = item.product;
-  let note = item.trackLine;
-  if (item.isIronSafeAlternative) note = "Suggested in place of Iron+, until a ferritin test confirms low iron.";
-  else if (item.redirectedFrom) note = "Recommended instead of Adaptogen+, given what you told us on the safety screen.";
+  let note = item.echo.length ? `You mentioned ${joinNatural(item.echo)}. ${item.trackLine}` : item.trackLine;
+  if (item.redirectedFrom) note = "Recommended instead of Adaptogen+, given what you told us on the safety screen.";
   else if (item.freeDeliveryAddon) note = `Adds ${formatPrice(p.price)} — takes the order over the free-delivery threshold, saving R130 in shipping.`;
-  else if (item.gated === "cellunexCaution") note = GATE_COPY.cellunexCaution;
 
   return (
     <div className="flex items-start gap-3.5 border-t border-[#16281F]/10 py-4 first:border-t-0 dark:border-[#F1EFE8]/13">
@@ -498,6 +495,11 @@ function SupportingItem({ item }: { item: ResultItem }) {
           {p.name} · <span className="font-mono">{formatPrice(p.price)}</span>
         </h4>
         <p className="text-[0.88rem] leading-relaxed text-[#4A5B52] dark:text-[#B6C1B9]">{note}</p>
+        {item.bloodTestNote ? (
+          <div className="mt-2.5 rounded-[9px] border border-[#16281F]/12 bg-[#B9762F]/12 px-3 py-2.5 text-[0.82rem] leading-relaxed text-[#16281F] dark:border-[#F1EFE8]/13 dark:bg-[#DBA46A]/14 dark:text-[#F1EFE8]">
+            {item.bloodTestNote}
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -531,15 +533,15 @@ function BreakdownBar({ label, pct, tier, active }: { label: string; pct: number
 
 function ResultScreen({ result, onRestart }: { result: QuizResult; onRestart: () => void }) {
   const primary = result.items[0];
-  const supporting = result.items.slice(1);
+  const others = result.items.slice(1);
+  const alsoMain = others.filter((i) => i.role === "main");
+  const recommended = others.filter((i) => i.role === "recommended");
   const bucketMeta = BUCKETS[primary.bucket as keyof typeof BUCKETS];
   const nutrientLabel = primary.bucket === "BUNDLE" ? "immunity & recovery" : bucketMeta.label;
 
-  const activeItems = result.items.filter((i) => !i.addToCartDisabled);
-  const total = activeItems.reduce((sum, i) => sum + i.product.price, 0);
-  const cartLink = cartPermalink(activeItems);
-  const singleCtaItem = primary.addToCartDisabled ? activeItems[0] : primary;
-  const showSingleCta = activeItems.length > 1 && !!singleCtaItem;
+  const total = result.items.reduce((sum, i) => sum + i.product.price, 0);
+  const cartLink = cartPermalink(result.items);
+  const showSingleCta = result.items.length > 1;
 
   const highlightedBuckets = new Set(
     result.items.flatMap((i) => (i.bucket === "BUNDLE" ? ["VIT_D", "ZINC", "ANTIOXIDANT"] : [i.bucket])),
@@ -548,7 +550,7 @@ function ResultScreen({ result, onRestart }: { result: QuizResult; onRestart: ()
     .map((b) => ({
       key: b,
       label: BUCKETS[b].label,
-      pct: Math.round((result.normalized[b] || 0) * 100),
+      pct: Math.min(100, Math.round((result.normalized[b] || 0) * 100)),
       tier: tierLabel(result.normalized[b] || 0),
       active: highlightedBuckets.has(b),
     }))
@@ -616,11 +618,27 @@ function ResultScreen({ result, onRestart }: { result: QuizResult; onRestart: ()
         <FeelTimeline timeline={primary.timeline} />
       </div>
 
-      {supporting.length ? (
+      {alsoMain.map((item) => (
+        <div key={item.productId} className="my-8">
+          <p className="mb-2.5 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-[#8B948E] dark:text-[#7D8B83]">
+            Also a clear pattern · {BUCKETS[item.bucket as keyof typeof BUCKETS].label}
+          </p>
+          <p className="mb-2 text-[0.98rem] leading-relaxed text-[#4A5B52] dark:text-[#B6C1B9]">
+            {item.echo.length ? `You mentioned ${joinNatural(item.echo)}. ${item.trackLine}` : item.trackLine}
+          </p>
+          <p className="mb-4 max-w-[62ch] text-base leading-[1.68] text-[#16281F] dark:text-[#F1EFE8]">{item.why}</p>
+          <ProductCard item={item} />
+        </div>
+      ))}
+
+      {recommended.length ? (
         <div className="my-8">
-          <p className="mb-2.5 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-[#8B948E] dark:text-[#7D8B83]">Also worth knowing</p>
-          {supporting.map((item, i) => (
-            <SupportingItem key={i} item={item} />
+          <p className="mb-1 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-[#8B948E] dark:text-[#7D8B83]">Also recommended</p>
+          <p className="mb-1 text-[0.86rem] leading-relaxed text-[#4A5B52] dark:text-[#B6C1B9]">
+            Lighter signals in your answers — not as strong as the above, but worth adding alongside.
+          </p>
+          {recommended.map((item) => (
+            <RecommendedItem key={item.productId} item={item} />
           ))}
         </div>
       ) : null}
@@ -629,21 +647,14 @@ function ResultScreen({ result, onRestart }: { result: QuizResult; onRestart: ()
         <div className={cn("mt-8 rounded-2xl border border-[#16281F]/10 bg-white p-5 dark:border-[#F1EFE8]/13 dark:bg-[#17251D]", CARD_SHADOW)}>
           <p className="text-[0.98rem] text-[#4A5B52] dark:text-[#B6C1B9]">Speak to your doctor or midwife before starting anything new — we&apos;ve held back the cart options here.</p>
         </div>
-      ) : activeItems.length === 0 ? (
-        <div className={cn("mt-8 rounded-2xl border border-[#16281F]/10 bg-white p-5 dark:border-[#F1EFE8]/13 dark:bg-[#17251D]", CARD_SHADOW)}>
-          <p className="text-[0.98rem] text-[#4A5B52] dark:text-[#B6C1B9]">Nothing here is added to cart automatically — see the note above for why, and what to check first.</p>
-        </div>
       ) : (
         <div className={cn("sticky bottom-4 mt-8 rounded-2xl border border-[#16281F]/10 bg-white p-5 dark:border-[#F1EFE8]/13 dark:bg-[#17251D]", CARD_SHADOW)}>
           <div className="mb-1.5 flex items-baseline justify-between">
-            <span className="text-[0.85rem] text-[#4A5B52] dark:text-[#B6C1B9]">{activeItems.length > 1 ? `Add all ${activeItems.length} to cart` : "Add to cart"}</span>
+            <span className="text-[0.85rem] text-[#4A5B52] dark:text-[#B6C1B9]">{result.items.length > 1 ? `Add all ${result.items.length} to cart` : "Add to cart"}</span>
             <span className="font-mono text-xl font-semibold text-[#16281F] dark:text-[#F1EFE8]">{formatPrice(total)}</span>
           </div>
-          {primary.bucket === "BUNDLE" && supporting.some((s) => s.freeDeliveryAddon) ? (
+          {primary.bucket === "BUNDLE" && others.some((s) => s.freeDeliveryAddon) ? (
             <p className="mb-3.5 text-[0.85rem] text-[#2F6B4F] dark:text-[#5EAB80]">The stack alone is R16 under free delivery — the add-on above clears it and saves R130 in shipping.</p>
-          ) : null}
-          {primary.addToCartDisabled ? (
-            <p className="mb-3.5 text-[0.85rem] text-[#A4442B] dark:text-[#D98868]">{primary.product.name} isn&apos;t included above — see the note on it for why.</p>
           ) : null}
           <div className="flex flex-wrap gap-2.5">
             {cartLink ? (
@@ -658,12 +669,12 @@ function ResultScreen({ result, onRestart }: { result: QuizResult; onRestart: ()
             ) : null}
             {showSingleCta ? (
               <a
-                href={pdpLink(singleCtaItem.product)}
+                href={pdpLink(primary.product)}
                 target="_blank"
                 rel="noopener"
                 className="rounded-lg px-5 py-[13px] text-center text-[0.95rem] font-semibold text-[#4A5B52] hover:text-[#16281F] dark:text-[#B6C1B9] dark:hover:text-[#F1EFE8]"
               >
-                Just the {singleCtaItem.product.name}
+                Just the {primary.product.name}
               </a>
             ) : null}
           </div>

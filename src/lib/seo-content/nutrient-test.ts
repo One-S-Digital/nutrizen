@@ -7,11 +7,11 @@
 export const HOW_IT_WORKS_STEPS = [
   "Answer 10 short questions about your energy, sleep, stress, digestion and lifestyle.",
   "See which nutrient areas your answers point to, with an explanation for each.",
-  "Get a recommendation of up to three NutriZen formulas, and a note on when to ask your doctor for a blood test.",
+  "Get a recommendation of up to four NutriZen formulas, with the reasoning behind each one.",
 ] as const;
 
 export const WHAT_IT_CANT_TELL_YOU =
-  "The test looks for patterns in common symptoms, such as tiredness, poor sleep, muscle cramps and frequent colds, that are often linked to low magnesium, vitamin D, iron, zinc or B-vitamins. It is a wellness guide, not a medical assessment. Only a blood test can confirm a deficiency.";
+  "The test looks for patterns in common symptoms, such as tiredness, poor sleep, muscle cramps and frequent colds, that are often linked to low magnesium, vitamin D, iron, zinc or B-vitamins. It is a wellness guide, not a medical assessment or a diagnosis.";
 
 export type NutrientTestFaq = { question: string; answer: string };
 
@@ -23,7 +23,7 @@ export const NUTRIENT_TEST_FAQS: NutrientTestFaq[] = [
   {
     question: "Can the test diagnose a deficiency?",
     answer:
-      "No. It points to nutrient areas worth exploring. A blood test from your doctor or a pathology lab is the only way to confirm a deficiency.",
+      "No. It points to nutrient areas worth exploring, based on the symptoms you describe. It is a wellness guide, not a medical assessment.",
   },
   {
     question: "Which supplement do I need?",
