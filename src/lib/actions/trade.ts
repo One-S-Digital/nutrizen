@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { isValidEmail, normalizeEmail } from "@/lib/trade/accounts";
-import { findTradeAccount } from "@/lib/trade/accounts-source";
+import { findTradeAccount, getTradeAccounts } from "@/lib/trade/accounts-source";
 import { MAGIC_LINK_TTL, MAGIC_LINK_TTL_MS, TRADE_LOGIN_PATH, TRADE_VERIFY_PATH } from "@/lib/trade/constants";
 import { allow, consumeOnce } from "@/lib/trade/guards";
 import { sendTradeMail } from "@/lib/trade/mailer";
@@ -62,6 +62,11 @@ export async function requestTradeLinkAction(
   }
 
   const account = await findTradeAccount(email);
+  if (!account) {
+    // Server log only: the response below stays identical, so the form reveals nothing.
+    const loaded = (await getTradeAccounts()).length;
+    console.log(`[trade] Sign-in link requested for an address that is not approved (${loaded} approved accounts loaded).`);
+  }
   const secret = getTradeSecret();
   if (account && secret) {
     const origin = siteOrigin(h);

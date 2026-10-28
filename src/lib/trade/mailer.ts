@@ -45,7 +45,8 @@ export async function sendTradeMail(mail: Mail): Promise<boolean> {
     return false;
   }
   try {
-    await mailer.send.sendMail({ from: mailer.from, ...mail });
+    const info = await mailer.send.sendMail({ from: mailer.from, ...mail });
+    console.log(`[trade] SMTP server accepted "${mail.subject}": ${info.response}`);
     return true;
   } catch (err) {
     console.error("[trade] Email failed:", err instanceof Error ? err.message : err);
