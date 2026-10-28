@@ -29,19 +29,50 @@ function getMailer() {
   return cached;
 }
 
+// Some hosts (Render among them) block outbound SMTP, so Resend's HTTPS API is preferred.
+async function sendWithResend(apiKey: string, mail: Mail): Promise<boolean> {
+  const from = process.env.RESEND_FROM?.trim() || "NutriZen Trade <hello@nutrizen.co.za>";
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from,
+        to: [mail.to],
+        subject: mail.subject,
+        text: mail.text,
+        ...(mail.replyTo ? { reply_to: mail.replyTo } : {}),
+      }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!res.ok) {
+      console.error(`[trade] Email failed: Resend answered HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
+      return false;
+    }
+    console.log(`[trade] Resend accepted "${mail.subject}"`);
+    return true;
+  } catch (err) {
+    console.error("[trade] Email failed:", err instanceof Error ? err.message : err);
+    return false;
+  }
+}
+
 /**
- * Sends through any SMTP mailbox (SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASSWORD).
- * Returns false on failure. With no SMTP configured, outside production the email is
- * printed to the server console instead, so sign-in links can be followed in local development.
+ * Sends through Resend when RESEND_API_KEY is set (sender: RESEND_FROM), otherwise through
+ * any SMTP mailbox (SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASSWORD). Returns false on
+ * failure. With neither configured, outside production the email is printed to the server
+ * console instead, so sign-in links can be followed in local development.
  */
 export async function sendTradeMail(mail: Mail): Promise<boolean> {
+  const resendKey = process.env.RESEND_API_KEY?.trim();
+  if (resendKey) return sendWithResend(resendKey, mail);
   const mailer = getMailer();
   if (!mailer) {
     if (process.env.NODE_ENV !== "production") {
       console.log(`\n[trade] No SMTP configured. Email that would be sent:\nTo: ${mail.to}\nSubject: ${mail.subject}\n\n${mail.text}\n`);
       return true;
     }
-    console.error("[trade] SMTP_HOST / SMTP_USER / SMTP_PASSWORD are not set. Email not sent.");
+    console.error("[trade] Neither RESEND_API_KEY nor SMTP_HOST / SMTP_USER / SMTP_PASSWORD is set. Email not sent.");
     return false;
   }
   try {

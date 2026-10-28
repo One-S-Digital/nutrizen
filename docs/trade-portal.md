@@ -53,7 +53,9 @@ The site reads the list with the same Storefront token it already uses for FAQ a
 | Variable | What to put |
 |---|---|
 | `TRADE_SESSION_SECRET` | A random string of 32+ characters, e.g. from `openssl rand -base64 32`. Changing it signs everyone out. |
-| `SMTP_HOST` | `mail.spacemail.com` (your `nutrizen.co.za` email is hosted on Spacemail). |
+| `RESEND_API_KEY` | **Recommended.** API key from resend.com, with `nutrizen.co.za` verified there. Sends over HTTPS, which works on Render even though it blocks outbound SMTP (an SMTP attempt there ends in `Email failed: Connection timeout`). When this is set, the `SMTP_*` settings are ignored. |
+| `RESEND_FROM` | The sender, on the verified domain, e.g. `NutriZen Trade <hello@nutrizen.co.za>` (this is also the default). |
+| `SMTP_HOST` | Fallback only, used when `RESEND_API_KEY` is not set: `mail.spacemail.com` (your `nutrizen.co.za` email is hosted on Spacemail). |
 | `SMTP_PORT` | `465` (the default, so you can leave it out). |
 | `SMTP_USER` | The full address of the mailbox that sends the sign-in links and order emails, e.g. `hello@nutrizen.co.za`. |
 | `SMTP_PASSWORD` | That mailbox's own password, as set in Spacemail. It is not stored anywhere in the code. |
