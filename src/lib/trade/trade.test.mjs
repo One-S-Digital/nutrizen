@@ -11,10 +11,12 @@ import {
 } from "./accounts.ts";
 import { signToken, verifyToken } from "./tokens.ts";
 import { allow, consumeOnce } from "./guards.ts";
+import { signInEmail } from "./signin-email.ts";
 import { productsForTier } from "./products.ts";
 import {
   MAX_QTY,
   SHIPPING,
+  formatOrderHtml,
   formatOrderText,
   makeReference,
   money,
@@ -381,4 +383,33 @@ test("formatOrderText names the signed-in account and cannot be spoofed via note
   assert.match(text, /Signed-in account: jane@shop\.co\.za \(Reseller \+\)/);
   assert.equal(text.split("\n").filter((l) => l.startsWith("TOTAL:")).length, 1);
   assert.equal(text.split("\n").filter((l) => l.startsWith("Payment method:")).length, 1);
+});
+
+// ------------------------------------------------------------ sign-in email
+test("signInEmail puts the link in a button, keeps a plain-text copy and escapes the business name", () => {
+  const link = "https://nutrizen.co.za/trade/verify?token=a.b-c&x=1";
+  const mail = signInEmail(link, `<b>Jane's</b> & Co`);
+  assert.match(mail.html, /<a href="https:\/\/nutrizen\.co\.za\/trade\/verify\?token=a\.b-c&amp;x=1"[^>]*>Sign in to NutriZen Trade<\/a>/);
+  assert.ok(mail.text.includes(link));
+  assert.ok(!mail.html.includes("<b>Jane"));
+  assert.ok(mail.html.includes("&lt;b&gt;Jane&#39;s") || mail.html.includes("&lt;b&gt;Jane's"));
+  assert.match(signInEmail(link, "").text, /^Hi,\n/);
+});
+
+test("formatOrderHtml shows the order in a styled table and escapes what buyers typed", () => {
+  const products = productsForTier("reseller");
+  const priced = priceOrder(products, { adaptogen: 2 });
+  const html = formatOrderHtml({
+    reference: "NZ-261027-ABCD",
+    account: { email: "jane@shop.co.za", business: "Jane's Health", tier: "reseller" },
+    details: details({ business: "<script>x</script> & Co", notes: "line one\nline two" }),
+    ...priced,
+  });
+  assert.match(html, /NZ-261027-ABCD/);
+  assert.match(html, /2 &times;/);
+  assert.ok(html.includes(money(priced.total)));
+  assert.ok(!html.includes("<script>"));
+  assert.ok(html.includes("&lt;script&gt;x&lt;/script&gt; &amp; Co"));
+  assert.ok(html.includes("line one<br>line two"));
+  assert.ok(html.includes("Deliver to customer"));
 });

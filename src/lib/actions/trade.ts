@@ -8,7 +8,9 @@ import { findTradeAccount, getTradeAccounts } from "@/lib/trade/accounts-source"
 import { MAGIC_LINK_TTL, MAGIC_LINK_TTL_MS, TRADE_LOGIN_PATH, TRADE_VERIFY_PATH } from "@/lib/trade/constants";
 import { allow, consumeOnce } from "@/lib/trade/guards";
 import { sendTradeMail } from "@/lib/trade/mailer";
+import { signInEmail } from "@/lib/trade/signin-email";
 import {
+  formatOrderHtml,
   formatOrderText,
   makeReference,
   orderSubject,
@@ -81,21 +83,7 @@ export async function requestTradeLinkAction(
         jti: crypto.randomUUID(),
       });
       const link = `${origin}${TRADE_VERIFY_PATH}?token=${encodeURIComponent(token)}`;
-      await sendTradeMail({
-        to: account.email,
-        subject: "Your NutriZen trade sign-in link",
-        text: [
-          account.business ? `Hi ${account.business},` : "Hi,",
-          "",
-          "Use this link to sign in to the NutriZen trade order portal:",
-          "",
-          link,
-          "",
-          "The link works once and expires in 15 minutes. If you did not ask for it, ignore this email: nobody can sign in without it.",
-          "",
-          "NutriZen",
-        ].join("\n"),
-      });
+      await sendTradeMail({ to: account.email, ...signInEmail(link, account.business) });
     });
   }
 
@@ -168,10 +156,12 @@ export async function submitTradeOrderAction(
 
   const reference = makeReference();
   const subject = orderSubject(account.tier, reference, details.business);
-  const text = formatOrderText({ reference, account, details, ...priced });
+  const orderData = { reference, account, details, ...priced };
+  const text = formatOrderText(orderData);
+  const html = formatOrderHtml(orderData);
 
   const to = process.env.TRADE_ORDER_EMAIL?.trim() || "hello@nutrizen.co.za";
-  const sent = await sendTradeMail({ to, subject, text, replyTo: details.email });
+  const sent = await sendTradeMail({ to, subject, text, html, replyTo: details.email });
 
   return sent ? { status: "sent", reference } : { status: "manual", reference, to, subject, text };
 }

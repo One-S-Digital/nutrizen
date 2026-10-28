@@ -1,6 +1,6 @@
 import nodemailer, { type Transporter } from "nodemailer";
 
-type Mail = { to: string; subject: string; text: string; replyTo?: string };
+type Mail = { to: string; subject: string; text: string; html?: string; replyTo?: string };
 
 let cached: { send: Transporter; from: string } | null | undefined;
 
@@ -41,6 +41,7 @@ async function sendWithResend(apiKey: string, mail: Mail): Promise<boolean> {
         to: [mail.to],
         subject: mail.subject,
         text: mail.text,
+        ...(mail.html ? { html: mail.html } : {}),
         ...(mail.replyTo ? { reply_to: mail.replyTo } : {}),
       }),
       signal: AbortSignal.timeout(15_000),

@@ -164,3 +164,68 @@ export function formatOrderText(o: {
   L.push(`Signed-in account: ${account.email} (${tierLabel(account.tier)})`);
   return L.join("\n");
 }
+
+const esc = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+const escBr = (s: string) =>
+  s.split(/\r?\n+/).map((x) => esc(x.trim())).filter(Boolean).join("<br>");
+
+/** Styled HTML version of the order email (the plain-text one stays as the fallback). */
+export function formatOrderHtml(o: Parameters<typeof formatOrderText>[0]): string {
+  const { account, details: d } = o;
+  const reseller = isResellerTier(account.tier);
+  const FONT = "font-family:Helvetica,Arial,sans-serif;";
+  const row = (label: string, value: string) =>
+    `<tr><td style="${FONT}font-size:13px;color:#6b756f;padding:4px 12px 4px 0;vertical-align:top;white-space:nowrap;">${label}</td>` +
+    `<td style="${FONT}font-size:14px;color:#1f2a24;padding:4px 0;vertical-align:top;">${value}</td></tr>`;
+  const heading = (t: string) =>
+    `<tr><td style="${FONT}font-size:12px;font-weight:bold;letter-spacing:1px;color:#4f6f3f;text-transform:uppercase;padding:24px 0 8px;border-bottom:1px solid #e4e0d6;">${t}</td></tr>`;
+  const block = (rows: string) =>
+    `<tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}</table></td></tr>`;
+
+  const cell = (v: string, align = "left", bold = false) =>
+    `<td align="${align}" style="${FONT}font-size:14px;color:#1f2a24;padding:8px 0;border-bottom:1px solid #eeeae0;${bold ? "font-weight:bold;" : ""}">${v}</td>`;
+  const items = o.lines
+    .map((l) => `<tr>${cell(`${l.qty} &times;`)}${cell(esc(l.name))}${cell(money(l.unit), "right")}${cell(money(l.line), "right", true)}</tr>`)
+    .join("");
+  const total = (label: string, value: string, strong = false) =>
+    `<tr><td colspan="3" align="right" style="${FONT}font-size:${strong ? 16 : 14}px;${strong ? "font-weight:bold;" : ""}padding:6px 12px 0 0;color:#1f2a24;">${label}</td>` +
+    `<td align="right" style="${FONT}font-size:${strong ? 16 : 14}px;${strong ? "font-weight:bold;" : ""}padding:6px 0 0;color:#1f2a24;">${value}</td></tr>`;
+
+  return `<!doctype html>
+<html>
+<body style="margin:0;padding:0;background:#f4f1ea;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f1ea;padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:16px;padding:32px;">
+        <tr><td style="${FONT}font-size:12px;font-weight:bold;letter-spacing:1px;color:#4f6f3f;text-transform:uppercase;">NutriZen ${esc(tierLabel(account.tier))} order</td></tr>
+        <tr><td style="${FONT}font-size:24px;font-weight:bold;color:#1f2a24;padding:4px 0 4px;">${esc(o.reference)}</td></tr>
+        <tr><td style="${FONT}font-size:14px;color:#6b756f;padding-bottom:8px;">${esc(oneLine(d.business))}</td></tr>
+        ${heading("Customer")}
+        ${block(
+          row("Business", esc(oneLine(d.business))) +
+            row("Contact", esc(oneLine(d.contact))) +
+            row("Email", `${esc(oneLine(d.email))} <span style="color:#6b756f;">(use for tracking)</span>`) +
+            row("Phone", esc(oneLine(d.phone)))
+        )}
+        ${heading(reseller ? "Deliver to customer" : "Deliver to")}
+        ${block(
+          (reseller ? row("Name", esc(oneLine(d.recipient))) : "") +
+            (reseller && d.recipientPhone ? row("Phone", esc(oneLine(d.recipientPhone))) : "") +
+            row("Address", escBr(d.address))
+        )}
+        ${heading(`Items (${esc(tierLabel(account.tier))} prices)`)}
+        ${block(items + total("Products", money(o.subtotal)) + total("Shipping (under 5kg)", money(o.shipping)) + total("Total", money(o.total), true))}
+        ${heading("Payment")}
+        ${block(
+          row("Method", esc(oneLine(d.payment))) +
+            (d.notes ? row("Notes", escBr(d.notes)) : "") +
+            row("Agreement", "Reseller agreement confirmed")
+        )}
+        <tr><td style="${FONT}font-size:12px;color:#8a938d;padding-top:24px;">Signed-in account: ${esc(account.email)} (${esc(tierLabel(account.tier))})</td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
