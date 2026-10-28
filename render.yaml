@@ -16,4 +16,19 @@ services:
         sync: false
       - key: SHOPIFY_USE_MOCK
         value: false
+      # Trade order portal (/trade). See docs/trade-portal.md
+      - key: TRADE_SESSION_SECRET
+        sync: false
+      - key: TRADE_PRICES
+        sync: false
+      - key: TRADE_ORDER_EMAIL
+        sync: false
+      - key: SMTP_HOST
+        value: mail.spacemail.com
+      - key: SMTP_PORT
+        value: 465
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
     healthCheckPath: /

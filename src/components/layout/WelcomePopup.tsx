@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 export default function WelcomePopup() {
   const [visible, setVisible] = useState(false);
   const [copied, setCopied] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     // Only show on a genuine fresh page load — not on browser back/forward
@@ -64,6 +66,9 @@ export default function WelcomePopup() {
       document.body.removeChild(el);
     }
   }
+
+  // The private trade portal is not a retail page: no discount popup there.
+  if (pathname.startsWith("/trade")) return null;
 
   return (
     <AnimatePresence>

@@ -27,7 +27,17 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   serverExternalPackages: ["sanitize-html"],
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      {
+        // Private trade portal: never cached, never indexed.
+        source: "/trade/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
+      },
+    ];
   },
   async redirects() {
     return [

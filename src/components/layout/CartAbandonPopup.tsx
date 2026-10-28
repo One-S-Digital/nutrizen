@@ -4,12 +4,14 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/formatPrice";
+import { usePathname } from "next/navigation";
 
 const STORAGE_KEY = "nutrizen-cart-abandon-shown";
 
 export default function CartAbandonPopup() {
   const [visible, setVisible] = useState(false);
   const shownRef = useRef(false);
+  const pathname = usePathname();
   const { items, openCart, closeCart } = useCartStore();
 
   const hasItems = items.length > 0;
@@ -47,6 +49,9 @@ export default function CartAbandonPopup() {
     // Small delay so the popup closes before the cart drawer opens
     setTimeout(() => openCart(), 150);
   }
+
+  // The private trade portal is not a retail page: no cart popup there.
+  if (pathname.startsWith("/trade")) return null;
 
   return (
     <AnimatePresence>
