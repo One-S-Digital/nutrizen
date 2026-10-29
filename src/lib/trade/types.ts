@@ -23,6 +23,8 @@ export type OrderDetails = {
   phone: string;
   recipient: string;
   recipientPhone: string;
+  /** Resellers only: ship to their customer (default) or to the reseller. */
+  deliverTo: "customer" | "self";
   address: string;
   payment: string;
   notes: string;

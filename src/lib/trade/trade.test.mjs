@@ -413,3 +413,22 @@ test("formatOrderHtml shows the order in a styled table and escapes what buyers 
   assert.ok(html.includes("line one<br>line two"));
   assert.ok(html.includes("Deliver to customer"));
 });
+
+test("resellers can ship to themselves: no customer name needed, and the emails say so", () => {
+  const toSelf = readDetails((k) => ({ ...goodForm, recipient: "", deliverTo: "self" })[k] ?? null);
+  assert.equal(toSelf.deliverTo, "self");
+  assert.deepEqual(validateOrder("reseller", toSelf, 1), []);
+  assert.deepEqual(validateOrder("resellerplus", toSelf, 1), []);
+  // default stays "customer", which still needs a name
+  assert.equal(details().deliverTo, "customer");
+  assert.ok(validateOrder("reseller", details({ recipient: "" }), 1).includes("Enter your customer's name."));
+
+  const priced = priceOrder(productsForTier("reseller"), { adaptogen: 1 });
+  const order = { reference: "NZ-261027-ABCD", account: { email: "jane@shop.co.za", business: "J", tier: "reseller" }, ...priced };
+  const selfText = formatOrderText({ ...order, details: toSelf });
+  assert.match(selfText, /DELIVER TO RESELLER \(own address\)/);
+  assert.ok(!selfText.includes("DELIVER TO CUSTOMER"));
+  assert.ok(formatOrderHtml({ ...order, details: toSelf }).includes("Deliver to reseller (own address)"));
+  // wholesalers are unchanged
+  assert.match(formatOrderText({ ...order, account: { ...order.account, tier: "wholesaler" }, details: toSelf }), /\nDELIVER TO\n/);
+});

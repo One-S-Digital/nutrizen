@@ -20,6 +20,9 @@ const TIER_LABEL: Record<TradeTier, string> = {
 
 export const tierLabel = (tier: TradeTier) => TIER_LABEL[tier];
 export const isResellerTier = (tier: TradeTier) => tier !== "wholesaler";
+/** True when the order ships to the reseller's customer rather than to the buyer. */
+export const shipsToCustomer = (tier: TradeTier, d: Pick<OrderDetails, "deliverTo">) =>
+  isResellerTier(tier) && d.deliverTo === "customer";
 
 /** 1234.5 -> "R1 234,50" (South African format, no reliance on ICU). */
 export function money(n: number): string {
@@ -77,6 +80,7 @@ export function readDetails(get: (key: string) => string | null): OrderDetails {
     phone: v("phone"),
     recipient: v("recipient"),
     recipientPhone: v("recipientPhone"),
+    deliverTo: get("deliverTo") === "self" ? "self" : "customer",
     address: v("address"),
     payment: v("payment"),
     notes: v("notes"),
@@ -91,7 +95,7 @@ export function validateOrder(tier: TradeTier, d: OrderDetails, lineCount: numbe
   if (!d.contact) e.push("Enter a contact person.");
   if (!EMAIL_RE.test(d.email)) e.push("Enter a valid email address.");
   if (!d.phone) e.push("Enter a phone number.");
-  if (isResellerTier(tier) && !d.recipient) e.push("Enter your customer's name.");
+  if (shipsToCustomer(tier, d) && !d.recipient) e.push("Enter your customer's name.");
   if (!d.address) e.push("Enter the delivery address.");
   if (!(PAYMENT_METHODS as readonly string[]).includes(d.payment)) e.push("Select a payment method.");
   if (!d.agreed) e.push("Confirm the reseller agreement.");
@@ -132,7 +136,7 @@ export function formatOrderText(o: {
   total: number;
 }): string {
   const { account, details: d } = o;
-  const reseller = isResellerTier(account.tier);
+  const toCustomer = shipsToCustomer(account.tier, d);
   const L: string[] = [];
   L.push(`NUTRIZEN ${tierLabel(account.tier).toUpperCase()} ORDER ${o.reference}`);
   L.push("");
@@ -141,12 +145,12 @@ export function formatOrderText(o: {
   L.push(`Email (use for tracking): ${oneLine(d.email)}`);
   L.push(`Phone: ${oneLine(d.phone)}`);
   L.push("");
-  if (reseller) {
+  if (toCustomer) {
     L.push("DELIVER TO CUSTOMER");
     L.push(`Name: ${oneLine(d.recipient)}`);
     if (d.recipientPhone) L.push(`Phone: ${oneLine(d.recipientPhone)}`);
   } else {
-    L.push("DELIVER TO");
+    L.push(isResellerTier(account.tier) ? "DELIVER TO RESELLER (own address)" : "DELIVER TO");
   }
   L.push(`Address: ${d.address.split(/\r?\n+/).map((s) => s.trim()).filter(Boolean).join(", ")}`);
   L.push("");
@@ -173,7 +177,7 @@ const escBr = (s: string) =>
 /** Styled HTML version of the order email (the plain-text one stays as the fallback). */
 export function formatOrderHtml(o: Parameters<typeof formatOrderText>[0]): string {
   const { account, details: d } = o;
-  const reseller = isResellerTier(account.tier);
+  const toCustomer = shipsToCustomer(account.tier, d);
   const FONT = "font-family:Helvetica,Arial,sans-serif;";
   const row = (label: string, value: string) =>
     `<tr><td style="${FONT}font-size:13px;color:#6b756f;padding:4px 12px 4px 0;vertical-align:top;white-space:nowrap;">${label}</td>` +
@@ -208,10 +212,10 @@ export function formatOrderHtml(o: Parameters<typeof formatOrderText>[0]): strin
             row("Email", `${esc(oneLine(d.email))} <span style="color:#6b756f;">(use for tracking)</span>`) +
             row("Phone", esc(oneLine(d.phone)))
         )}
-        ${heading(reseller ? "Deliver to customer" : "Deliver to")}
+        ${heading(toCustomer ? "Deliver to customer" : isResellerTier(account.tier) ? "Deliver to reseller (own address)" : "Deliver to")}
         ${block(
-          (reseller ? row("Name", esc(oneLine(d.recipient))) : "") +
-            (reseller && d.recipientPhone ? row("Phone", esc(oneLine(d.recipientPhone))) : "") +
+          (toCustomer ? row("Name", esc(oneLine(d.recipient))) : "") +
+            (toCustomer && d.recipientPhone ? row("Phone", esc(oneLine(d.recipientPhone))) : "") +
             row("Address", escBr(d.address))
         )}
         ${heading(`Items (${esc(tierLabel(account.tier))} prices)`)}

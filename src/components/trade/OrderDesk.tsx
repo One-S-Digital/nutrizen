@@ -15,8 +15,8 @@ import type { OrderState, TradeAccount, TradeProduct, TradeTier } from "@/lib/tr
 
 const TIER_BLURB: Record<TradeTier, string> = {
   wholesaler: "Bulk stock for your own business. Delivered to you.",
-  reseller: "You order for your customer and we ship straight to them.",
-  resellerplus: "Our lowest reseller price. You order for your customer and we ship straight to them.",
+  reseller: "You order for your customer and we ship to them, or to you.",
+  resellerplus: "Our lowest reseller price. You order for your customer and we ship to them, or to you.",
 };
 
 const inputCls =
@@ -84,6 +84,8 @@ function OrderForm({
   onNewOrder: () => void;
 }) {
   const reseller = isResellerTier(account.tier);
+  const [toSelf, setToSelf] = useState(false);
+  const toCustomer = reseller && !toSelf;
   const [qty, setQty] = useState<Record<string, number>>({});
   const [state, dispatch, pending] = useActionState<OrderState, FormData>(submitTradeOrderAction, {
     status: "idle",
@@ -211,13 +213,30 @@ function OrderForm({
               step="Step 4"
               title="Delivery"
               hint={
-                reseller
-                  ? "Collect payment from your customer first, then enter their delivery details. Tracking goes to your own email above."
-                  : "Where we should deliver your stock."
+                !reseller
+                  ? "Where we should deliver your stock."
+                  : toCustomer
+                    ? "Collect payment from your customer first, then enter their delivery details. Tracking goes to your own email above."
+                    : "We deliver this order to you. Tracking goes to your email above."
               }
             >
+              {reseller && (
+                <fieldset className="mb-4">
+                  <legend className="mb-2 text-sm font-medium text-neutral-700">Deliver to</legend>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:gap-6">
+                    <label className="flex items-center gap-2 text-sm text-neutral-800">
+                      <input type="radio" name="deliverTo" value="customer" checked={!toSelf} onChange={() => setToSelf(false)} />
+                      My customer
+                    </label>
+                    <label className="flex items-center gap-2 text-sm text-neutral-800">
+                      <input type="radio" name="deliverTo" value="self" checked={toSelf} onChange={() => setToSelf(true)} />
+                      Me (my own address)
+                    </label>
+                  </div>
+                </fieldset>
+              )}
               <div className="grid gap-4 sm:grid-cols-2">
-                {reseller && (
+                {toCustomer && (
                   <>
                     <Field id="recipient" label="Customer name">
                       <input id="recipient" name="recipient" type="text" autoComplete="off" className={inputCls} />
@@ -227,7 +246,7 @@ function OrderForm({
                     </Field>
                   </>
                 )}
-                <Field id="address" label={reseller ? "Customer delivery address" : "Delivery address"} full>
+                <Field id="address" label={toCustomer ? "Customer delivery address" : "Delivery address"} full>
                   <textarea
                     id="address"
                     name="address"
